@@ -9,6 +9,9 @@ const Index = () => {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
+  // SPEED HACK: Only show 12 tools at first on mobile
+  const [displayLimit, setDisplayLimit] = useState(12);
+
   const categories = useMemo(() => {
     if (!tools) return [];
     return [...new Set(tools.map((t) => t.category))].sort();
@@ -29,8 +32,10 @@ const Index = () => {
     if (activeCategory) {
       result = result.filter((t) => t.category === activeCategory);
     }
-    return result;
-  }, [tools, search, activeCategory]);
+
+    // SPEED HACK: Slice the result so the phone doesn't render 100 cards at once
+    return result.slice(0, displayLimit); 
+  }, [tools, search, activeCategory, displayLimit]);
 
   const featured = filtered.filter((t) => t.featured);
   const suggested = filtered.filter((t) => t.suggested);
@@ -115,6 +120,19 @@ const Index = () => {
                 <div className="h-4 bg-secondary rounded w-2/3" />
               </div>
             ))}
+          </div>
+        )}
+        {/* --- ADD THIS BUTTON FOR MOBILE USERS --- */}
+        {tools && tools.length > displayLimit && (
+          <div className="flex justify-center pb-12">
+            <Button 
+              onClick={() => setDisplayLimit(prev => prev + 12)}
+              variant="outline"
+              className="glass-strong px-8 h-12 rounded-xl hover:scale-105 transition-all font-semibold"
+            >
+              Show More AI Tools
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
           </div>
         )}
         {error && <p className="text-destructive text-center">Error: {error.message}</p>}

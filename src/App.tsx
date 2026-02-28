@@ -7,7 +7,16 @@ import Index from "./pages/Index";
 import ControlPanel from "./pages/ControlPanel";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // Keep data "fresh" for 5 mins (No re-loading!)
+      gcTime: 1000 * 60 * 10,    // Keep data in cache for 10 mins
+      retry: 1,                 // Don't spam retries if mobile net is weak
+      refetchOnWindowFocus: false, // Don't reload every time you switch apps
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
