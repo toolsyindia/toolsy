@@ -1,14 +1,5 @@
-User-agent: Googlebot
+user-agent: *
 Allow: /
 
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
-User-agent: *
-Allow: /
+# This is the line Google is looking for!
+Sitemap: https://toolsyindia.netlify.app/sitemap.xml
