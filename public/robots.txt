@@ -1,5 +1,5 @@
-user-agent: *
+User-agent: *
 Allow: /
 
-# This is the line Google is looking for!
-Sitemap: https://toolsyindia.netlify.app/sitemap.xml
+# Updated for the new pro domain!
+Sitemap: https://toolsyai.xyz/sitemap.xml

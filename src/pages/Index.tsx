@@ -42,7 +42,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background bg-mesh">
-      {/* Hero Section - Optimized for Google Search */}
+      {/* Hero Section */}
       <section className="relative pt-20 pb-12 px-6 text-center overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full bg-primary/5 blur-[60px] md:blur-[120px] opacity-50" />
@@ -52,7 +52,8 @@ const Index = () => {
             <Sparkles className="h-3.5 w-3.5 text-primary" />
             <span>Premium AI Tools Directory</span>
           </div>
-          {/* SEO FIX: Added descriptive text to the H1 */}
+
+          
           <h1 className="text-5xl md:text-6xl font-bold font-display tracking-tight mb-4">
             <span className="gradient-text">Toolsy: India's Largest AI Tools Hub</span>
           </h1>
@@ -78,13 +79,13 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Categories */}
+      {/* Categories (WITH YOUTUBE SWIPE FIX FOR MOBILE) */}
       {categories.length > 0 && (
-        <section className="px-6 pb-10 max-w-6xl mx-auto relative z-10">
-          <div className="flex flex-wrap justify-center gap-2">
+        <section className="px-6 pb-10 max-w-6xl mx-auto relative z-10 overflow-hidden">
+          <div className="flex md:flex-wrap md:justify-center overflow-x-auto whitespace-nowrap pb-4 gap-2 scrollbar-hide">
             <button
               onClick={() => setActiveCategory(null)}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex-shrink-0 ${
                 activeCategory === null
                   ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
                   : "glass text-muted-foreground hover:text-foreground hover:bg-secondary"
@@ -96,7 +97,7 @@ const Index = () => {
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat === activeCategory ? null : cat)}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex-shrink-0 ${
                   activeCategory === cat
                     ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
                     : "glass text-muted-foreground hover:text-foreground hover:bg-secondary"
@@ -110,14 +111,23 @@ const Index = () => {
       )}
 
       <div className="max-w-6xl mx-auto px-6 pb-20 relative z-10">
+        
+        {/* THE PREMIUM SKELETON LOADER */}
         {isLoading && (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="glass rounded-2xl p-6 animate-pulse h-[280px]">
-                <div className="w-14 h-14 bg-secondary rounded-xl mb-4" />
-                <div className="h-5 bg-secondary rounded w-1/2 mb-3" />
-                <div className="h-4 bg-secondary rounded w-full mb-2" />
-                <div className="h-4 bg-secondary rounded w-2/3" />
+              <div key={i} className="glass rounded-2xl p-6 flex flex-col h-[320px] relative overflow-hidden">
+                <div className="w-14 h-14 bg-secondary/80 rounded-xl mb-4 animate-pulse" />
+                <div className="h-6 bg-secondary/80 rounded-md w-2/3 mb-4 animate-pulse" />
+                <div className="space-y-2 mb-6 flex-1">
+                  <div className="h-4 bg-secondary/60 rounded-md w-full animate-pulse" />
+                  <div className="h-4 bg-secondary/60 rounded-md w-5/6 animate-pulse" />
+                </div>
+                <div className="flex gap-2 mb-5">
+                  <div className="h-6 w-20 bg-secondary/80 rounded-lg animate-pulse" />
+                  <div className="h-6 w-16 bg-secondary/80 rounded-lg animate-pulse" />
+                </div>
+                <div className="h-11 w-full bg-secondary/80 rounded-xl animate-pulse mt-auto" />
               </div>
             ))}
           </div>
@@ -175,8 +185,6 @@ const Index = () => {
 
 
 
-    
-
       <footer className="border-t border-border/50 py-8 px-6 text-center">
         <p className="text-sm text-muted-foreground/60">© 2026 Toolsy India AI Hub. All rights reserved.</p>
       </footer>
@@ -184,6 +192,7 @@ const Index = () => {
   );
 };
 
+// ... (KEEP YOUR SectionTitle, PricingBadge, and ToolGrid functions at the bottom exactly as they were!)
 function SectionTitle({ icon, title, id }: { icon: React.ReactNode; title: string; id?: string }) {
   return (
     <div className="flex items-center gap-2.5 mb-6">
@@ -249,14 +258,16 @@ function ToolGrid({ tools }: { tools: any[] }) {
               </div>
             )}
 
-            {/* SEO FIX: Emoji Accessibility wrapping */}
+
+
             <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-secondary/80 border border-border/50 text-3xl mb-4 group-hover:scale-105 transition-transform duration-300">
               <span role="img" aria-label={`${tool.name} AI tool icon`}>
                 {tool.icon || "🔧"}
               </span>
             </div>
 
-            {/* SEO FIX: Tool name wrapped in H3 for proper hierarchy */}
+
+
             <h3 className="text-lg font-bold font-display mb-1.5 group-hover:text-primary transition-colors duration-300 pr-20">
               {tool.name}
             </h3>

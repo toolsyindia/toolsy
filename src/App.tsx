@@ -3,9 +3,17 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+// 1. IMPORT YOUR EXISTING PAGES
 import Index from "./pages/Index";
 import ControlPanel from "./pages/ControlPanel";
 import NotFound from "./pages/NotFound";
+
+// 2. IMPORT YOUR NEW NAVBAR AND LEGAL PAGES
+import Navbar from "./components/Navbar";
+import Contact from "./pages/Contact";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,9 +32,18 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        {/* 3. ADD THE NAVBAR HERE: It sits outside <Routes> so it stays on top of every page! */}
+        <Navbar />
+        
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/controlpanel" element={<ControlPanel />} />
+          
+          {/* 4. ADD THE NEW ROUTES HERE */}
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
@@ -35,3 +52,4 @@ const App = () => (
 );
 
 export default App;
+
