@@ -242,7 +242,15 @@ export default function ControlPanel() {
                   <TableRow key={tool.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        {tool.icon && <span>{tool.icon}</span>}
+                        {/* SEO FIX: Added role and aria-label to the emoji icon */}
+                        {tool.icon && (
+                          <span 
+                            role="img" 
+                            aria-label={`${tool.name} AI tool icon`}
+                          >
+                            {tool.icon}
+                          </span>
+                        )}
                         <span className="font-medium">{tool.name}</span>
                       </div>
                     </TableCell>
@@ -304,3 +312,4 @@ export default function ControlPanel() {
     </div>
   );
 }
+

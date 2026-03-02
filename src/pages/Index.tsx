@@ -33,7 +33,6 @@ const Index = () => {
       result = result.filter((t) => t.category === activeCategory);
     }
 
-    // SPEED HACK: Slice the result so the phone doesn't render 100 cards at once
     return result.slice(0, displayLimit); 
   }, [tools, search, activeCategory, displayLimit]);
 
@@ -43,7 +42,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background bg-mesh">
-      {/* Hero */}
+      {/* Hero Section - Optimized for Google Search */}
       <section className="relative pt-20 pb-12 px-6 text-center overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full bg-primary/5 blur-[60px] md:blur-[120px] opacity-50" />
@@ -53,23 +52,24 @@ const Index = () => {
             <Sparkles className="h-3.5 w-3.5 text-primary" />
             <span>Premium AI Tools Directory</span>
           </div>
+          {/* SEO FIX: Added descriptive text to the H1 */}
           <h1 className="text-5xl md:text-6xl font-bold font-display tracking-tight mb-4">
-            <span className="gradient-text">Toolsy</span>
+            <span className="gradient-text">Toolsy: India's Largest AI Tools Hub</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto">
-            Discover the best AI tools in one place
+            Discover 500+ best AI tools for writing, coding, and design in one place.
           </p>
         </div>
       </section>
 
-      {/* Search */}
+      {/* Search Section */}
       <section className="px-6 pb-8 max-w-2xl mx-auto relative z-10">
         <div className="relative group">
           <div className="absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-primary/30 via-accent/20 to-primary/30 opacity-0 group-focus-within:opacity-100 blur-sm transition-opacity duration-500" />
           <div className="relative glass-strong rounded-2xl overflow-hidden">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
             <Input
-              placeholder="Search AI tools..."
+              placeholder="Search AI tools by name, category, or feature..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-12 h-14 bg-transparent border-0 text-base focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60"
@@ -90,7 +90,7 @@ const Index = () => {
                   : "glass text-muted-foreground hover:text-foreground hover:bg-secondary"
               }`}
             >
-              All
+              All Categories
             </button>
             {categories.map((cat) => (
               <button
@@ -122,9 +122,36 @@ const Index = () => {
             ))}
           </div>
         )}
-        {/* --- ADD THIS BUTTON FOR MOBILE USERS --- */}
+
+        {error && <p className="text-destructive text-center">Error: {error.message}</p>}
+
+        {/* Featured Section */}
+        {featured.length > 0 && (
+          <section className="mb-14 animate-fade-in" aria-labelledby="featured-title">
+            <SectionTitle id="featured-title" icon={<Star className="h-5 w-5 text-yellow-400" />} title="Featured AI Tools" />
+            <ToolGrid tools={featured} />
+          </section>
+        )}
+
+        {/* Suggested Section */}
+        {suggested.length > 0 && (
+          <section className="mb-14 animate-fade-in" style={{ animationDelay: "0.1s" }} aria-labelledby="suggested-title">
+            <SectionTitle id="suggested-title" icon={<Lightbulb className="h-5 w-5 text-primary" />} title="Suggested AI Resources" />
+            <ToolGrid tools={suggested} />
+          </section>
+        )}
+
+        {/* All Tools Section */}
+        {rest.length > 0 && (
+          <section className="mb-14 animate-fade-in" style={{ animationDelay: "0.2s" }} aria-labelledby="all-tools-title">
+            <SectionTitle id="all-tools-title" icon={<Zap className="h-5 w-5 text-muted-foreground" />} title="Explore All Tools" />
+            <ToolGrid tools={rest} />
+          </section>
+        )}
+
+        {/* Pagination Button */}
         {tools && tools.length > displayLimit && (
-          <div className="flex justify-center pb-12">
+          <div className="flex justify-center pt-8 pb-12">
             <Button 
               onClick={() => setDisplayLimit(prev => prev + 12)}
               variant="outline"
@@ -135,53 +162,33 @@ const Index = () => {
             </Button>
           </div>
         )}
-        {error && <p className="text-destructive text-center">Error: {error.message}</p>}
 
-        {/* Featured */}
-        {featured.length > 0 && (
-          <section className="mb-14 animate-fade-in">
-            <SectionTitle icon={<Star className="h-5 w-5 text-yellow-400" />} title="Featured Tools" />
-            <ToolGrid tools={featured} />
-          </section>
-        )}
 
-        {/* Suggested */}
-        {suggested.length > 0 && (
-          <section className="mb-14 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            <SectionTitle icon={<Lightbulb className="h-5 w-5 text-primary" />} title="Suggested Tools" />
-            <ToolGrid tools={suggested} />
-          </section>
-        )}
-
-        {/* All Tools */}
-        {rest.length > 0 && (
-          <section className="mb-14 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-            <SectionTitle icon={<Zap className="h-5 w-5 text-muted-foreground" />} title="All Tools" />
-            <ToolGrid tools={rest} />
-          </section>
-        )}
 
         {tools && filtered.length === 0 && (
           <div className="text-center py-16">
-            <p className="text-muted-foreground text-lg">No tools found.</p>
-            <p className="text-muted-foreground/60 text-sm mt-1">Try adjusting your search or filters</p>
+            <p className="text-muted-foreground text-lg">No tools found matching your search.</p>
+            <p className="text-muted-foreground/60 text-sm mt-1">Try using broader keywords or a different category.</p>
           </div>
         )}
       </div>
 
 
+
+    
+
       <footer className="border-t border-border/50 py-8 px-6 text-center">
-        <p className="text-sm text-muted-foreground/60">© 2026 Toolsy. All rights reserved.</p>
+        <p className="text-sm text-muted-foreground/60">© 2026 Toolsy India AI Hub. All rights reserved.</p>
       </footer>
     </div>
   );
 };
 
-function SectionTitle({ icon, title }: { icon: React.ReactNode; title: string }) {
+function SectionTitle({ icon, title, id }: { icon: React.ReactNode; title: string; id?: string }) {
   return (
     <div className="flex items-center gap-2.5 mb-6">
       {icon}
-      <h2 className="text-xl font-semibold font-display">{title}</h2>
+      <h2 id={id} className="text-xl font-semibold font-display tracking-tight">{title}</h2>
     </div>
   );
 }
@@ -201,7 +208,9 @@ function PricingBadge({ pricing }: { pricing: string }) {
       </span>
     );
   }
-  // Freemium
+
+
+
   return (
     <span className="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-lg bg-gradient-to-r from-purple-500/15 to-fuchsia-500/15 text-purple-400 border border-purple-500/25">
       {pricing}
@@ -213,18 +222,18 @@ function ToolGrid({ tools }: { tools: any[] }) {
   return (
     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {tools.map((tool: any, i: number) => (
-        <div
+        <article
           key={tool.id}
           className="group relative flex flex-col rounded-2xl opacity-0 animate-fade-in"
           style={{ animationDelay: `${i * 0.05}s` }}
         >
-          {/* Glow border */}
+          {/* Background Glows */}
           <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-br from-primary/20 via-border/40 to-accent/20 opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 blur-md transition-opacity duration-500" />
 
           {/* Card body */}
           <div className="relative flex flex-col flex-1 rounded-2xl bg-card/70 backdrop-blur-xl p-6 group-hover:-translate-y-1 transition-transform duration-400 ease-out">
-            {/* Tags */}
+            {/* Featured/Suggested Tags */}
             {(tool.featured || tool.suggested) && (
               <div className="absolute top-4 right-4 flex gap-1.5">
                 {tool.featured && (
@@ -240,22 +249,26 @@ function ToolGrid({ tools }: { tools: any[] }) {
               </div>
             )}
 
-            {/* Icon */}
+            {/* SEO FIX: Emoji Accessibility wrapping */}
             <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-secondary/80 border border-border/50 text-3xl mb-4 group-hover:scale-105 transition-transform duration-300">
-              {tool.icon || "🔧"}
+              <span role="img" aria-label={`${tool.name} AI tool icon`}>
+                {tool.icon || "🔧"}
+              </span>
             </div>
 
-            {/* Name */}
+            {/* SEO FIX: Tool name wrapped in H3 for proper hierarchy */}
             <h3 className="text-lg font-bold font-display mb-1.5 group-hover:text-primary transition-colors duration-300 pr-20">
               {tool.name}
             </h3>
 
-            {/* Description */}
+
+
             <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-1">
               {tool.description}
             </p>
 
-            {/* Badges */}
+
+
             <div className="flex flex-wrap gap-2 mb-5">
               <span className="text-xs font-medium px-2.5 py-1 rounded-lg bg-secondary text-secondary-foreground">
                 {tool.category}
@@ -263,21 +276,24 @@ function ToolGrid({ tools }: { tools: any[] }) {
               <PricingBadge pricing={tool.pricing} />
             </div>
 
-            {/* Visit Button */}
+
+
             <a
               href={tool.link}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 w-full h-11 rounded-xl text-sm font-semibold bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-md shadow-primary/15 group-hover:shadow-lg group-hover:shadow-primary/30 transition-all duration-300"
             >
-              Visit Tool
+              Visit {tool.name}
               <ExternalLink className="h-3.5 w-3.5" />
             </a>
           </div>
-        </div>
+        </article>
       ))}
     </div>
   );
 }
 
 export default Index;
+
+
