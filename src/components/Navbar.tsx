@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sparkles, Mail, Menu, X, Shield, FileText } from "lucide-react";
+import { Sparkles, Mail, Menu, X, Shield, FileText, PlusCircle } from "lucide-react"; // Added PlusCircle here!
 import { Button } from "@/components/ui/button";
 
 export default function Navbar() {
@@ -24,8 +24,15 @@ export default function Navbar() {
           <a href="/contact" className="hover:text-primary transition-colors flex items-center gap-1.5">
             <Mail className="w-4 h-4" /> Contact
           </a>
+          
+          {/* Changed "Submit a Tool" to "Tool?" */}
           <Button variant="default" className="h-9 rounded-full px-4 shadow-md shadow-primary/20" asChild>
-            <a href="/contact">Submit a Tool</a>
+            <a href="/contact">Tool?</a>
+          </Button>
+          
+          {/* Brand New "Add Tool" Button */}
+          <Button variant="secondary" className="h-9 rounded-full px-4 shadow-md" asChild>
+            <a href="/admin">Add Tool</a>
           </Button>
         </div>
 
@@ -44,10 +51,19 @@ export default function Navbar() {
           <a href="/" className="text-base font-semibold hover:text-primary flex items-center gap-3">
             <Sparkles className="w-5 h-5" /> Explore Tools
           </a>
+          
+          {/* Updated text to "Tool?" here too */}
           <a href="/contact" className="text-base font-semibold hover:text-primary flex items-center gap-3">
-            <Mail className="w-5 h-5" /> Contact / Submit Tool
+            <Mail className="w-5 h-5" /> Contact / Tool?
           </a>
+
+          {/* Added the new Add Tool link for mobile */}
+          <a href="/admin" className="text-base font-semibold text-primary hover:text-primary/80 flex items-center gap-3">
+            <PlusCircle className="w-5 h-5" /> Add Tool
+          </a>
+          
           <hr className="border-border/50" />
+          
           {/* Legal Pages in the mobile menu */}
           <a href="/privacy" className="text-sm font-medium text-muted-foreground hover:text-primary flex items-center gap-3">
             <Shield className="w-4 h-4" /> Privacy Policy
