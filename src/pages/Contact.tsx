@@ -16,29 +16,38 @@ export default function Contact() {
           <p className="text-muted-foreground">Want to feature your AI tool or report a bug? Reach out to us below.</p>
         </div>
 
-        <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+        {/* WEB3FORMS MAGIC HAPPENS HERE */}
+        <form action="https://api.web3forms.com/submit" method="POST" className="space-y-6">
+          
+          {/* YOUR LIVE ACCESS KEY */}
+          <input type="hidden" name="access_key" value="4f5dbcb8-62c1-4393-8d55-1904ead87017" />
+          
+          {/* This bounces them back to your homepage after sending */}
+          <input type="hidden" name="redirect" value="https://toolsyai.xyz" />
+
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="name">Your Name</Label>
-              <Input id="name" placeholder="John Doe" className="bg-background/50" />
+              <Input id="name" name="name" placeholder="John Doe" className="bg-background/50" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
-              <Input id="email" type="email" placeholder="hello@toolsyai.xyz" className="bg-background/50" />
+              <Input id="email" name="email" type="email" placeholder="hello@startup.com" className="bg-background/50" required />
             </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="subject">Subject</Label>
-            <Input id="subject" placeholder="e.g., Featured Listing Inquiry" className="bg-background/50" />
+            <Input id="subject" name="subject" placeholder="e.g., Featured Listing Inquiry" className="bg-background/50" required />
           </div>
           <div className="space-y-2">
             <Label htmlFor="message">Message</Label>
-            <Textarea id="message" placeholder="Tell us about your tool..." className="min-h-[150px] bg-background/50" />
+            <Textarea id="message" name="message" placeholder="Tell us about your tool..." className="min-h-[150px] bg-background/50" required />
           </div>
-          <Button className="w-full h-12 text-lg font-semibold">
+          <Button type="submit" className="w-full h-12 text-lg font-semibold">
             <MessageSquare className="w-4 h-4 mr-2" /> Send Message
           </Button>
         </form>
+
       </div>
     </div>
   );
