@@ -173,8 +173,6 @@ const Index = () => {
           </div>
         )}
 
-
-
         {tools && filtered.length === 0 && (
           <div className="text-center py-16">
             <p className="text-muted-foreground text-lg">No tools found matching your search.</p>
@@ -182,8 +180,6 @@ const Index = () => {
           </div>
         )}
       </div>
-
-
 
       <footer className="border-t border-border/50 py-8 px-6 text-center">
         <p className="text-sm text-muted-foreground/60">© 2026 Toolsy India AI Hub. All rights reserved.</p>
@@ -218,8 +214,6 @@ function PricingBadge({ pricing }: { pricing: string }) {
     );
   }
 
-
-
   return (
     <span className="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-lg bg-gradient-to-r from-purple-500/15 to-fuchsia-500/15 text-purple-400 border border-purple-500/25">
       {pricing}
@@ -230,77 +224,73 @@ function PricingBadge({ pricing }: { pricing: string }) {
 function ToolGrid({ tools }: { tools: any[] }) {
   return (
     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      {tools.map((tool: any, i: number) => (
-        <article
-          key={tool.id}
-          className="group relative flex flex-col rounded-2xl opacity-0 animate-fade-in"
-          style={{ animationDelay: `${i * 0.05}s` }}
-        >
-          {/* Background Glows */}
-          <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-br from-primary/20 via-border/40 to-accent/20 opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 blur-md transition-opacity duration-500" />
+      {tools.map((tool: any, i: number) => {
+        // 🚀 THE MAGIC FIX: If the link doesn't have http/https, we add it automatically!
+        const safeLink = tool.link.startsWith("http") ? tool.link : `https://${tool.link}`;
 
-          {/* Card body */}
-          <div className="relative flex flex-col flex-1 rounded-2xl bg-card/70 backdrop-blur-xl p-6 group-hover:-translate-y-1 transition-transform duration-400 ease-out">
-            {/* Featured/Suggested Tags */}
-            {(tool.featured || tool.suggested) && (
-              <div className="absolute top-4 right-4 flex gap-1.5">
-                {tool.featured && (
-                  <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-yellow-400/10 text-yellow-400 border border-yellow-400/20">
-                    <Star className="h-2.5 w-2.5 fill-yellow-400" /> Featured
-                  </span>
-                )}
-                {tool.suggested && (
-                  <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
-                    <Lightbulb className="h-2.5 w-2.5" /> Suggested
-                  </span>
-                )}
+        return (
+          <article
+            key={tool.id}
+            className="group relative flex flex-col rounded-2xl opacity-0 animate-fade-in"
+            style={{ animationDelay: `${i * 0.05}s` }}
+          >
+            {/* Background Glows */}
+            <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-br from-primary/20 via-border/40 to-accent/20 opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 blur-md transition-opacity duration-500" />
+
+            {/* Card body */}
+            <div className="relative flex flex-col flex-1 rounded-2xl bg-card/70 backdrop-blur-xl p-6 group-hover:-translate-y-1 transition-transform duration-400 ease-out">
+              {/* Featured/Suggested Tags */}
+              {(tool.featured || tool.suggested) && (
+                <div className="absolute top-4 right-4 flex gap-1.5">
+                  {tool.featured && (
+                    <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-yellow-400/10 text-yellow-400 border border-yellow-400/20">
+                      <Star className="h-2.5 w-2.5 fill-yellow-400" /> Featured
+                    </span>
+                  )}
+                  {tool.suggested && (
+                    <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
+                      <Lightbulb className="h-2.5 w-2.5" /> Suggested
+                    </span>
+                  )}
+                </div>
+              )}
+
+              <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-secondary/80 border border-border/50 text-3xl mb-4 group-hover:scale-105 transition-transform duration-300">
+                <span role="img" aria-label={`${tool.name} AI tool icon`}>
+                  {tool.icon || "🔧"}
+                </span>
               </div>
-            )}
 
+              <h3 className="text-lg font-bold font-display mb-1.5 group-hover:text-primary transition-colors duration-300 pr-20">
+                {tool.name}
+              </h3>
 
+              <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-1">
+                {tool.description}
+              </p>
 
-            <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-secondary/80 border border-border/50 text-3xl mb-4 group-hover:scale-105 transition-transform duration-300">
-              <span role="img" aria-label={`${tool.name} AI tool icon`}>
-                {tool.icon || "🔧"}
-              </span>
+              <div className="flex flex-wrap gap-2 mb-5">
+                <span className="text-xs font-medium px-2.5 py-1 rounded-lg bg-secondary text-secondary-foreground">
+                  {tool.category}
+                </span>
+                <PricingBadge pricing={tool.pricing} />
+              </div>
+
+              {/* WE USE THE safeLink HERE INSTEAD OF tool.link */}
+              <a
+                href={safeLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full h-11 rounded-xl text-sm font-semibold bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-md shadow-primary/15 group-hover:shadow-lg group-hover:shadow-primary/30 transition-all duration-300"
+              >
+                Visit {tool.name}
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
             </div>
-
-
-
-            <h3 className="text-lg font-bold font-display mb-1.5 group-hover:text-primary transition-colors duration-300 pr-20">
-              {tool.name}
-            </h3>
-
-
-
-            <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-1">
-              {tool.description}
-            </p>
-
-
-
-            <div className="flex flex-wrap gap-2 mb-5">
-              <span className="text-xs font-medium px-2.5 py-1 rounded-lg bg-secondary text-secondary-foreground">
-                {tool.category}
-              </span>
-              <PricingBadge pricing={tool.pricing} />
-            </div>
-
-
-
-            <a
-              href={tool.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full h-11 rounded-xl text-sm font-semibold bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-md shadow-primary/15 group-hover:shadow-lg group-hover:shadow-primary/30 transition-all duration-300"
-            >
-              Visit {tool.name}
-              <ExternalLink className="h-3.5 w-3.5" />
-            </a>
-          </div>
-        </article>
-      ))}
+          </article>
+        );
+      })}
     </div>
   );
 }

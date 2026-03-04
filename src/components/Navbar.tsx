@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sparkles, Mail, Menu, X, Shield, FileText, PlusCircle } from "lucide-react"; // Added PlusCircle here!
+import { Sparkles, Mail, Menu, X, Shield, FileText } from "lucide-react"; 
 import { Button } from "@/components/ui/button";
 
 export default function Navbar() {
@@ -25,14 +25,9 @@ export default function Navbar() {
             <Mail className="w-4 h-4" /> Contact
           </a>
           
-          {/* Changed "Submit a Tool" to "Tool?" */}
+          {/* Changed to "Tool?" button as requested */}
           <Button variant="default" className="h-9 rounded-full px-4 shadow-md shadow-primary/20" asChild>
             <a href="/contact">Tool?</a>
-          </Button>
-          
-          {/* Brand New "Add Tool" Button */}
-          <Button variant="secondary" className="h-9 rounded-full px-4 shadow-md" asChild>
-            <a href="/admin">Add Tool</a>
           </Button>
         </div>
 
@@ -52,14 +47,8 @@ export default function Navbar() {
             <Sparkles className="w-5 h-5" /> Explore Tools
           </a>
           
-          {/* Updated text to "Tool?" here too */}
           <a href="/contact" className="text-base font-semibold hover:text-primary flex items-center gap-3">
             <Mail className="w-5 h-5" /> Contact / Tool?
-          </a>
-
-          {/* Added the new Add Tool link for mobile */}
-          <a href="/admin" className="text-base font-semibold text-primary hover:text-primary/80 flex items-center gap-3">
-            <PlusCircle className="w-5 h-5" /> Add Tool
           </a>
           
           <hr className="border-border/50" />
