@@ -9,7 +9,7 @@ const Index = () => {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  // SPEED HACK: Only show 12 tools at first on mobile
+  // SPEED HACK: Only show 12 regular tools at first on mobile
   const [displayLimit, setDisplayLimit] = useState(12);
 
   const categories = useMemo(() => {
@@ -17,6 +17,7 @@ const Index = () => {
     return [...new Set(tools.map((t) => t.category))].sort();
   }, [tools]);
 
+  // 🚀 UPGRADE 1: Filter the search, but DO NOT slice the limit yet!
   const filtered = useMemo(() => {
     if (!tools) return [];
     let result = tools;
@@ -33,12 +34,20 @@ const Index = () => {
       result = result.filter((t) => t.category === activeCategory);
     }
 
-    return result.slice(0, displayLimit); 
-  }, [tools, search, activeCategory, displayLimit]);
+    return result; 
+  }, [tools, search, activeCategory]);
 
-  const featured = filtered.filter((t) => t.featured);
-  const suggested = filtered.filter((t) => t.suggested);
-  const rest = filtered.filter((t) => !t.featured && !t.suggested);
+  // 🚀 UPGRADE 2: Strict Boolean Checks to guarantee they show up
+  const isFeatured = (t: any) => t.featured === true || String(t.featured) === "true";
+  const isSuggested = (t: any) => t.suggested === true || String(t.suggested) === "true";
+
+  // 🚀 UPGRADE 3: Separate them out safely
+  const featured = filtered.filter((t) => isFeatured(t));
+  const suggested = filtered.filter((t) => isSuggested(t) && !isFeatured(t)); // Prevents a tool from showing in both
+  const rest = filtered.filter((t) => !isFeatured(t) && !isSuggested(t));
+
+  // 🚀 UPGRADE 4: Apply the 12-tool limit ONLY to the regular tools!
+  const visibleRest = rest.slice(0, displayLimit);
 
   return (
     <div className="min-h-screen bg-background bg-mesh">
@@ -53,7 +62,6 @@ const Index = () => {
             <span>Premium AI Tools Directory</span>
           </div>
 
-          
           <h1 className="text-5xl md:text-6xl font-bold font-display tracking-tight mb-4">
             <span className="gradient-text">Toolsy: India's Largest AI Tools Hub</span>
           </h1>
@@ -79,7 +87,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Categories (WITH YOUTUBE SWIPE FIX FOR MOBILE) */}
+      {/* Categories */}
       {categories.length > 0 && (
         <section className="px-6 pb-10 max-w-6xl mx-auto relative z-10 overflow-hidden">
           <div className="flex md:flex-wrap md:justify-center overflow-x-auto whitespace-nowrap pb-4 gap-2 scrollbar-hide">
@@ -152,15 +160,15 @@ const Index = () => {
         )}
 
         {/* All Tools Section */}
-        {rest.length > 0 && (
+        {visibleRest.length > 0 && (
           <section className="mb-14 animate-fade-in" style={{ animationDelay: "0.2s" }} aria-labelledby="all-tools-title">
             <SectionTitle id="all-tools-title" icon={<Zap className="h-5 w-5 text-muted-foreground" />} title="Explore All Tools" />
-            <ToolGrid tools={rest} />
+            <ToolGrid tools={visibleRest} />
           </section>
         )}
 
-        {/* Pagination Button */}
-        {tools && tools.length > displayLimit && (
+        {/* Pagination Button - Fixed logic to only look at 'rest' */}
+        {rest && rest.length > displayLimit && (
           <div className="flex justify-center pt-8 pb-12">
             <Button 
               onClick={() => setDisplayLimit(prev => prev + 12)}
@@ -188,7 +196,8 @@ const Index = () => {
   );
 };
 
-// ... (KEEP YOUR SectionTitle, PricingBadge, and ToolGrid functions at the bottom exactly as they were!)
+
+
 function SectionTitle({ icon, title, id }: { icon: React.ReactNode; title: string; id?: string }) {
   return (
     <div className="flex items-center gap-2.5 mb-6">
@@ -225,7 +234,9 @@ function ToolGrid({ tools }: { tools: any[] }) {
   return (
     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {tools.map((tool: any, i: number) => {
-        // 🚀 THE MAGIC FIX: If the link doesn't have http/https, we add it automatically!
+
+
+
         const safeLink = tool.link.startsWith("http") ? tool.link : `https://${tool.link}`;
 
         return (
@@ -241,14 +252,14 @@ function ToolGrid({ tools }: { tools: any[] }) {
             {/* Card body */}
             <div className="relative flex flex-col flex-1 rounded-2xl bg-card/70 backdrop-blur-xl p-6 group-hover:-translate-y-1 transition-transform duration-400 ease-out">
               {/* Featured/Suggested Tags */}
-              {(tool.featured || tool.suggested) && (
+              {(tool.featured === true || String(tool.featured) === "true" || tool.suggested === true || String(tool.suggested) === "true") && (
                 <div className="absolute top-4 right-4 flex gap-1.5">
-                  {tool.featured && (
+                  {(tool.featured === true || String(tool.featured) === "true") && (
                     <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-yellow-400/10 text-yellow-400 border border-yellow-400/20">
                       <Star className="h-2.5 w-2.5 fill-yellow-400" /> Featured
                     </span>
                   )}
-                  {tool.suggested && (
+                  {(tool.suggested === true || String(tool.suggested) === "true") && !(tool.featured === true || String(tool.featured) === "true") && (
                     <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
                       <Lightbulb className="h-2.5 w-2.5" /> Suggested
                     </span>
@@ -277,7 +288,8 @@ function ToolGrid({ tools }: { tools: any[] }) {
                 <PricingBadge pricing={tool.pricing} />
               </div>
 
-              {/* WE USE THE safeLink HERE INSTEAD OF tool.link */}
+
+
               <a
                 href={safeLink}
                 target="_blank"

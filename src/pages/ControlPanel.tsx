@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, LogOut, LayoutDashboard, Star, TrendingUp } from "lucide-react"; // Added new icons for the Pro Dashboard!
+import { Pencil, Trash2, Plus, LogOut, LayoutDashboard, Star, TrendingUp, Search } from "lucide-react"; 
 import type { Tool } from "@/types/tool";
 
 const emptyTool = {
@@ -43,7 +43,7 @@ function LoginForm({ onLogin }: { onLogin: (email: string, password: string) => 
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen bg-background p-4 pt-28 max-w-7xl mx-auto">
       <Card className="w-full max-w-sm shadow-xl">
         <CardHeader>
           <CardTitle className="text-center text-2xl font-bold">Admin Login</CardTitle>
@@ -105,11 +105,11 @@ function ToolForm({ initial, onSubmit, onCancel, submitLabel }: { initial: typeo
       </div>
       <div className="flex gap-8 p-4 bg-muted/50 rounded-lg border">
         <div className="flex items-center gap-3">
-          <Switch checked={form.featured} onCheckedChange={(v) => set("featured", v)} />
+          <Switch checked={form.featured === true || String(form.featured) === "true"} onCheckedChange={(v) => set("featured", v)} />
           <Label className="font-semibold cursor-pointer">⭐ Featured</Label>
         </div>
         <div className="flex items-center gap-3">
-          <Switch checked={form.suggested} onCheckedChange={(v) => set("suggested", v)} />
+          <Switch checked={form.suggested === true || String(form.suggested) === "true"} onCheckedChange={(v) => set("suggested", v)} />
           <Label className="font-semibold cursor-pointer">📈 Suggested</Label>
         </div>
       </div>
@@ -131,8 +131,11 @@ export default function ControlPanel() {
   const [editingTool, setEditingTool] = useState<Tool | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  
+  // 🔍 STATE FOR SEARCH BAR
+  const [searchQuery, setSearchQuery] = useState("");
 
-  if (authLoading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading Admin Engine...</div>;
+  if (authLoading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground pt-28">Loading Admin Engine...</div>;
   if (!user) return <LoginForm onLogin={signIn} />;
 
   const handleAdd = async (data: typeof emptyTool) => {
@@ -167,22 +170,33 @@ export default function ControlPanel() {
     }
   };
 
-  const toggleField = async (tool: Tool, field: "featured" | "suggested") => {
+  // 🚀 THE ULTIMATE FIX: Sends the ENTIRE tool object to the database so it doesn't get rejected!
+  const toggleField = async (tool: Tool, field: "featured" | "suggested", newValue: boolean) => {
     try {
-      await updateTool.mutateAsync({ id: tool.id, [field]: !tool[field] });
+      // We take the existing tool, and overwrite JUST the field we clicked
+      const updatedTool = { ...tool, [field]: newValue };
+      
+      await updateTool.mutateAsync(updatedTool);
       toast.success(`${field} status updated!`);
     } catch (err: any) {
       toast.error(err.message);
     }
   };
 
-  // --- PRO DASHBOARD STATS LOGIC ---
+  // 🚀 FIXED: Stats cards strictly count booleans and string-booleans
   const totalTools = tools?.length || 0;
-  const featuredTools = tools?.filter(t => t.featured).length || 0;
-  const suggestedTools = tools?.filter(t => t.suggested).length || 0;
+  const featuredTools = tools?.filter(t => t.featured === true || String(t.featured) === "true").length || 0;
+  const suggestedTools = tools?.filter(t => t.suggested === true || String(t.suggested) === "true").length || 0;
+
+  // 🔍 SEARCH FILTER LOGIC
+  const filteredTools = tools?.filter((tool) => 
+    tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    tool.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    // 🛠️ FIXED: Added pt-28 so the navbar doesn't hide the top of your admin panel
+    <div className="min-h-screen bg-background p-6 pt-28">
       <div className="max-w-6xl mx-auto space-y-8">
         
         {/* HEADER */}
@@ -194,7 +208,6 @@ export default function ControlPanel() {
           <div className="flex gap-3">
             <Dialog open={addOpen} onOpenChange={setAddOpen}>
               <DialogTrigger asChild>
-                {/* UPGRADED ADD TOOL BUTTON */}
                 <Button size="lg" className="shadow-lg shadow-primary/20 font-bold">
                   <Plus className="mr-2 h-5 w-5" /> Add New Tool
                 </Button>
@@ -235,10 +248,24 @@ export default function ControlPanel() {
           </Card>
         </div>
 
+        {/* 🔍 LIVE SEARCH BAR UI */}
+        <div className="relative max-w-md w-full">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <Input 
+            type="text" 
+            placeholder="Search tools by name or category..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 shadow-sm border-border/50 bg-background"
+          />
+        </div>
+
         {/* TOOL DATABASE TABLE */}
         {isLoading ? (
           <div className="text-center py-10 text-muted-foreground animate-pulse">Loading database...</div>
-        ) : tools && tools.length > 0 ? (
+        ) : filteredTools && filteredTools.length > 0 ? (
           <Card className="shadow-md overflow-hidden">
             <div className="overflow-x-auto">
               <Table>
@@ -253,7 +280,7 @@ export default function ControlPanel() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {tools.map((tool) => (
+                  {filteredTools.map((tool) => (
                     <TableRow key={tool.id} className="hover:bg-muted/30">
                       <TableCell>
                         <div className="flex items-center gap-3">
@@ -270,12 +297,21 @@ export default function ControlPanel() {
                       </TableCell>
                       <TableCell><span className="bg-secondary px-2 py-1 rounded-md text-xs font-medium">{tool.category}</span></TableCell>
                       <TableCell><span className="text-sm font-medium">{tool.pricing}</span></TableCell>
+                      
+                      {/* 🚀 UPGRADED SWITCHES: We pass `checked`, the EXACT boolean state, to toggleField */}
                       <TableCell>
-                        <Switch checked={tool.featured} onCheckedChange={() => toggleField(tool, "featured")} />
+                        <Switch 
+                          checked={tool.featured === true || String(tool.featured) === "true"} 
+                          onCheckedChange={(checked) => toggleField(tool, "featured", checked)} 
+                        />
                       </TableCell>
                       <TableCell>
-                        <Switch checked={tool.suggested} onCheckedChange={() => toggleField(tool, "suggested")} />
+                        <Switch 
+                          checked={tool.suggested === true || String(tool.suggested) === "true"} 
+                          onCheckedChange={(checked) => toggleField(tool, "suggested", checked)} 
+                        />
                       </TableCell>
+                      
                       <TableCell className="text-right">
                         <div className="flex gap-2 justify-end">
                           <Button size="icon" variant="outline" className="h-8 w-8 text-blue-500 hover:text-blue-600" onClick={() => { setEditingTool(tool); setEditOpen(true); }}>
@@ -294,8 +330,17 @@ export default function ControlPanel() {
           </Card>
         ) : (
           <div className="text-center py-20 border-2 border-dashed rounded-xl border-muted-foreground/20">
-            <h3 className="text-xl font-bold mb-2">Your database is empty!</h3>
-            <p className="text-muted-foreground mb-6">Click the button above to add your first AI tool.</p>
+            {searchQuery ? (
+              <>
+                <h3 className="text-xl font-bold mb-2">No tools found!</h3>
+                <p className="text-muted-foreground">We couldn't find any tool matching "{searchQuery}".</p>
+              </>
+            ) : (
+              <>
+                <h3 className="text-xl font-bold mb-2">Your database is empty!</h3>
+                <p className="text-muted-foreground mb-6">Click the button above to add your first AI tool.</p>
+              </>
+            )}
           </div>
         )}
 
