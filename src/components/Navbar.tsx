@@ -24,12 +24,16 @@ export default function Navbar() {
       <nav className="fixed top-0 left-0 right-0 z-40 glass border-b border-border/50 backdrop-blur-xl bg-background/60">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           
-          {/* Left Side: Logo (Your original code) */}
-          <a href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-              <Sparkles className="w-4 h-4 text-primary" />
+          {/* Left Side: Logo (MASSIVE SIZE UPDATE 🚀) */}
+          <a href="/" className="flex items-center gap-3 group">
+            <div className="w-14 h-14 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <img 
+                src="/logo.png" 
+                alt="Toolsy Logo" 
+                className="w-full h-full object-contain drop-shadow-2xl" 
+              />
             </div>
-            <span className="text-xl font-bold font-display tracking-tight">Toolsy</span>
+            <span className="text-3xl font-bold font-display tracking-tighter">Toolsy</span>
           </a>
 
           {/* Desktop Links (Your original code + Support Button) */}
@@ -69,8 +73,10 @@ export default function Navbar() {
         {/* Your original mobile dropdown menu logic */}
         {isOpen && (
           <div className="md:hidden glass border-b border-border/50 bg-background/95 px-6 py-6 flex flex-col gap-5 shadow-2xl animate-fade-in">
-            <a href="/" className="text-base font-semibold hover:text-primary flex items-center gap-3">
-              <Sparkles className="w-5 h-5" /> Explore Tools
+            {/* Big logo version for the mobile menu search area */}
+            <a href="/" className="text-xl font-bold hover:text-primary flex items-center gap-4">
+              <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain" />
+              Explore Tools
             </a>
             
             <a href="/contact" className="text-base font-semibold hover:text-primary flex items-center gap-3">
@@ -109,13 +115,13 @@ export default function Navbar() {
                 <Heart className="w-8 h-8 text-primary fill-primary animate-pulse" />
               </div>
               <h2 className="text-2xl font-bold font-display mb-2">Support the Developer</h2>
-             <p className="text-muted-foreground text-sm leading-relaxed">
-  I'm a 17-year-old developer and a 2nd-year student 
-  coding late into the night to build Toolsy. 
-  I'm doing this to support my family and build a future I can be proud of. 
-  Your support isn't just a tip; it's a vote of confidence in my journey 
-  and my hard work. Thank you for being part of my story! ❤️
-</p>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                I'm a 17-year-old developer and a 2nd-year student 
+                coding late into the night to build Toolsy. 
+                I'm doing this to support my family and build a future I can be proud of. 
+                Your support isn't just a tip; it's a vote of confidence in my journey 
+                and my hard work. Thank you for being part of my story! ❤️
+              </p>
             </div>
 
             {/* 📸 YOUR REAL PHONEPE QR CODE (qr.png) */}
@@ -146,3 +152,4 @@ export default function Navbar() {
     </>
   );
 }
+
