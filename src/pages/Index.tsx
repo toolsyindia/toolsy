@@ -265,7 +265,8 @@ function ToolGrid({ tools }: { tools: any[] }) {
         return (
           <article
             key={tool.id}
-            className="group relative flex flex-col rounded-2xl opacity-0 animate-fade-in"
+            // 🚀 THE FIX: Added transform-gpu right here so the phone handles it perfectly!
+            className="group relative flex flex-col rounded-2xl opacity-0 animate-fade-in transform-gpu"
             style={{ animationDelay: `${i * 0.05}s` }}
           >
             {/* Background Glows */}
@@ -273,7 +274,8 @@ function ToolGrid({ tools }: { tools: any[] }) {
             <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 blur-md transition-opacity duration-500" />
 
             {/* Card body */}
-            <div className="relative flex flex-col flex-1 rounded-2xl bg-card/70 backdrop-blur-xl p-6 group-hover:-translate-y-1 transition-transform duration-400 ease-out">
+            {/* 🚀 THE FIX: Changed bg-card/70 to bg-card/95, backdrop-blur-xl to sm, and added transform-gpu */}
+            <div className="relative flex flex-col flex-1 rounded-2xl bg-card/95 backdrop-blur-sm p-6 group-hover:-translate-y-1 transition-transform duration-300 ease-out transform-gpu">
               {/* Featured/Suggested Tags */}
               {(tool.featured === true || String(tool.featured) === "true" || tool.suggested === true || String(tool.suggested) === "true") && (
                 <div className="absolute top-4 right-4 flex gap-1.5">
@@ -331,5 +333,7 @@ function ToolGrid({ tools }: { tools: any[] }) {
 }
 
 export default Index;
+
+
 
 
