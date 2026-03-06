@@ -9,6 +9,9 @@ const Index = () => {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
+  // 🚀 NEW: State for the pricing filter
+  const [priceFilter, setPriceFilter] = useState("All");
+
   // SPEED HACK: Only show 12 regular tools at first on mobile
   const [displayLimit, setDisplayLimit] = useState(12);
 
@@ -34,8 +37,13 @@ const Index = () => {
       result = result.filter((t) => t.category === activeCategory);
     }
 
+    // 🚀 NEW: Pricing Filter Logic
+    if (priceFilter !== "All") {
+      result = result.filter((t) => t.pricing && t.pricing.toLowerCase() === priceFilter.toLowerCase());
+    }
+
     return result; 
-  }, [tools, search, activeCategory]);
+  }, [tools, search, activeCategory, priceFilter]); // <-- Added priceFilter to dependencies
 
   // 🚀 UPGRADE 2: Strict Boolean Checks to guarantee they show up
   const isFeatured = (t: any) => t.featured === true || String(t.featured) === "true";
@@ -72,17 +80,32 @@ const Index = () => {
       </section>
 
       {/* Search Section */}
-      <section className="px-6 pb-8 max-w-2xl mx-auto relative z-10">
+      <section className="px-6 pb-8 max-w-3xl mx-auto relative z-10"> {/* widened to 3xl to fit the dropdown comfortably */}
         <div className="relative group">
           <div className="absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-primary/30 via-accent/20 to-primary/30 opacity-0 group-focus-within:opacity-100 blur-sm transition-opacity duration-500" />
-          <div className="relative glass-strong rounded-2xl overflow-hidden">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+          <div className="relative glass-strong rounded-2xl overflow-hidden flex items-center pr-3">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary pointer-events-none" />
             <Input
               placeholder="Search AI tools by name, category, or feature..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-12 h-14 bg-transparent border-0 text-base focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60"
+              className="pl-12 h-14 bg-transparent border-0 text-base focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60 flex-1"
             />
+            
+            {/* 🚀 NEW: The Dropdown UI */}
+            <div className="border-l border-border/50 pl-3">
+              <select 
+                value={priceFilter}
+                onChange={(e) => setPriceFilter(e.target.value)}
+                className="bg-secondary text-sm font-bold px-3 py-2 rounded-lg outline-none cursor-pointer text-foreground border border-border/50 hover:border-primary/50 transition-colors appearance-none"
+              >
+                <option value="All">All Prices</option>
+                <option value="Free">Free</option>
+                <option value="Freemium">Freemium</option>
+                <option value="Premium">Premium</option>
+              </select>
+            </div>
+
           </div>
         </div>
       </section>
