@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Environment variables from Vercel
-const supabaseUrl = process.env.VITE_SUPABASE_URL; 
+// 1. Bulletproof Key Loading
+const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL; 
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const geminiKey = process.env.GEMINI_API_KEY;
 
@@ -16,49 +16,28 @@ export default async function handler(req, res) {
 
   const { question } = req.body;
 
-  if (!question) {
-    return res.status(400).json({ error: 'Please ask a question!' });
-  }
-
   try {
-    // 🔍 FAST SEARCH: Look for the question keywords in Name or Description
-    const { data: tools, error } = await supabase
+    // 2. Ultra-Fast Search
+    const { data: tools } = await supabase
       .from('tools')
       .select('name, description, link, pricing_type')
       .or(`name.ilike.%${question}%,description.ilike.%${question}%`)
-      .limit(8);
+      .limit(5);
 
-    if (error) {
-      console.error("Supabase Search Error:", error);
-    }
-
-    // 🧠 THINK: Initialize Gemini 1.5 Flash
+    // 3. High-Speed AI Response
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    const prompt = `
-      You are an expert AI consultant for Toolsy, India's largest AI tools hub.
-      User Question: "${question}"
-      
-      Tools currently in our database:
-      ${JSON.stringify(tools || [])}
-      
-      Instructions:
-      1. If the database has matching tools, recommend them clearly.
-      2. If the user mentions "free", prioritize "Free" or "Freemium" tools.
-      3. If no tools match, suggest one from your own knowledge but say "It's not on Toolsy yet".
-      4. Keep it very concise (max 2-3 sentences).
-    `;
+    
+    const prompt = `User asked: ${question}. Recommend from these tools: ${JSON.stringify(tools || [])}. Keep it under 2 sentences.`;
 
     const result = await model.generateContent(prompt);
     const aiAnswer = result.response.text();
 
-    return res.status(200).json({ 
-      answer: aiAnswer, 
-      tools: tools || [] 
-    });
+    // 4. Send it back immediately
+    return res.status(200).json({ answer: aiAnswer });
 
   } catch (err) {
-    console.error("AI Error:", err);
-    return res.status(500).json({ error: 'Something went wrong with the AI' });
+    // This will show up in your Vercel Dashboard Logs
+    console.error("CRITICAL AI ERROR:", err);
+    return res.status(500).json({ error: "AI logic failed. Check Vercel Logs." });
   }
 }
