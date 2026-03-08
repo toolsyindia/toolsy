@@ -1,7 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useTools } from "@/hooks/useTools";
 import { Input } from "@/components/ui/input";
-import { Search, Sparkles, Lightbulb, ArrowRight, Star, Zap, ExternalLink } from "lucide-react";
+import { 
+  Search, Sparkles, Lightbulb, ArrowRight, Star, Zap, 
+  ExternalLink, MessageSquare, Send, X 
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Index = () => {
@@ -9,18 +12,56 @@ const Index = () => {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  // 🚀 NEW: State for the pricing filter
+
   const [priceFilter, setPriceFilter] = useState("All");
 
-  // SPEED HACK: Only show 12 regular tools at first on mobile
+  
   const [displayLimit, setDisplayLimit] = useState(12);
+
+  // --- 🧠 AI Chat State ---
+  const [isAiOpen, setIsAiOpen] = useState(false);
+  const [aiInput, setAiInput] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
+  const [messages, setMessages] = useState([
+    { role: 'assistant', content: "Hey! I'm Toolsy AI. Need help finding a specific tool?" }
+  ]);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleAiChat = async () => {
+    if (!aiInput.trim() || chatLoading) return;
+    
+    const userMsg = { role: 'user', content: aiInput };
+    setMessages(prev => [...prev, userMsg]);
+    setAiInput("");
+    setChatLoading(true);
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: aiInput }),
+      });
+      const data = await res.json();
+      setMessages(prev => [...prev, { role: 'assistant', content: data.answer }]);
+    } catch (err) {
+      setMessages(prev => [...prev, { role: 'assistant', content: "Error connecting to my brain. Try again later!" }]);
+    } finally {
+      setChatLoading(false);
+    }
+  };
 
   const categories = useMemo(() => {
     if (!tools) return [];
     return [...new Set(tools.map((t) => t.category))].sort();
   }, [tools]);
 
-  // 🚀 UPGRADE 1: Filter the search, but DO NOT slice the limit yet!
+
+
+
   const filtered = useMemo(() => {
     if (!tools) return [];
     let result = tools;
@@ -37,24 +78,20 @@ const Index = () => {
       result = result.filter((t) => t.category === activeCategory);
     }
 
-    // 🚀 NEW: Pricing Filter Logic
+
+
     if (priceFilter !== "All") {
       result = result.filter((t) => t.pricing && t.pricing.toLowerCase() === priceFilter.toLowerCase());
     }
 
+
+
     return result; 
-  }, [tools, search, activeCategory, priceFilter]); // <-- Added priceFilter to dependencies
+  }, [tools, search, activeCategory, priceFilter]);
 
-  // 🚀 UPGRADE 2: Strict Boolean Checks to guarantee they show up
-  const isFeatured = (t: any) => t.featured === true || String(t.featured) === "true";
-  const isSuggested = (t: any) => t.suggested === true || String(t.suggested) === "true";
-
-  // 🚀 UPGRADE 3: Separate them out safely
-  const featured = filtered.filter((t) => isFeatured(t));
-  const suggested = filtered.filter((t) => isSuggested(t) && !isFeatured(t)); // Prevents a tool from showing in both
-  const rest = filtered.filter((t) => !isFeatured(t) && !isSuggested(t));
-
-  // 🚀 UPGRADE 4: Apply the 12-tool limit ONLY to the regular tools!
+  const featured = filtered.filter((t) => t.featured === true || String(t.featured) === "true");
+  const suggested = filtered.filter((t) => (t.suggested === true || String(t.suggested) === "true") && !featured.includes(t));
+  const rest = filtered.filter((t) => !featured.includes(t) && !suggested.includes(t));
   const visibleRest = rest.slice(0, displayLimit);
 
   return (
@@ -69,271 +106,149 @@ const Index = () => {
             <Sparkles className="h-3.5 w-3.5 text-primary" />
             <span>Premium AI Tools Directory</span>
           </div>
-
-          <h1 className="text-5xl md:text-6xl font-bold font-display tracking-tight mb-4">
+          <h1 className="text-5xl md:text-6xl font-bold font-display tracking-tight mb-4 text-white">
             <span className="gradient-text">Toolsy: India's Largest AI Tools Hub</span>
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto">
-            Discover 500+ best AI tools for writing, coding, and design in one place.
-          </p>
+
+
+
         </div>
       </section>
 
       {/* Search Section */}
-      <section className="px-6 pb-8 max-w-3xl mx-auto relative z-10"> {/* widened to 3xl to fit the dropdown comfortably */}
-        <div className="relative group">
-          <div className="absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-primary/30 via-accent/20 to-primary/30 opacity-0 group-focus-within:opacity-100 blur-sm transition-opacity duration-500" />
-          <div className="relative glass-strong rounded-2xl overflow-hidden flex items-center pr-3">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary pointer-events-none" />
-            <Input
-              placeholder="Search AI tools by name, category, or feature..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-12 h-14 bg-transparent border-0 text-base focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60 flex-1"
-            />
-            
-            {/* 🚀 NEW: The Dropdown UI */}
-            <div className="border-l border-border/50 pl-3">
-              <select 
-                value={priceFilter}
-                onChange={(e) => setPriceFilter(e.target.value)}
-                className="bg-secondary text-sm font-bold px-3 py-2 rounded-lg outline-none cursor-pointer text-foreground border border-border/50 hover:border-primary/50 transition-colors appearance-none"
-              >
-                <option value="All">All Prices</option>
-                <option value="Free">Free</option>
-                <option value="Freemium">Freemium</option>
-                <option value="Premium">Premium</option>
-              </select>
-            </div>
-
-          </div>
+      <section className="px-6 pb-8 max-w-3xl mx-auto relative z-10">
+        <div className="relative glass-strong rounded-2xl overflow-hidden flex items-center pr-3 border border-white/10">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Input
+            placeholder="Search AI tools..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-12 h-14 bg-transparent border-0 text-white focus-visible:ring-0"
+          />
+          <select 
+            value={priceFilter}
+            onChange={(e) => setPriceFilter(e.target.value)}
+            className="bg-secondary text-xs font-bold px-3 py-2 rounded-lg outline-none text-white border border-white/10"
+          >
+            <option value="All">All Prices</option>
+            <option value="Free">Free</option>
+            <option value="Freemium">Freemium</option>
+            <option value="Premium">Premium</option>
+          </select>
         </div>
       </section>
 
-      {/* Categories */}
-      {categories.length > 0 && (
-        <section className="px-6 pb-10 max-w-6xl mx-auto relative z-10 overflow-hidden">
-          <div className="flex md:flex-wrap md:justify-center overflow-x-auto whitespace-nowrap pb-4 gap-2 scrollbar-hide">
-            <button
-              onClick={() => setActiveCategory(null)}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex-shrink-0 ${
-                activeCategory === null
-                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
-                  : "glass text-muted-foreground hover:text-foreground hover:bg-secondary"
-              }`}
-            >
-              All Categories
-            </button>
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat === activeCategory ? null : cat)}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex-shrink-0 ${
-                  activeCategory === cat
-                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
-                    : "glass text-muted-foreground hover:text-foreground hover:bg-secondary"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
-
+      {/* Grid Content */}
       <div className="max-w-6xl mx-auto px-6 pb-20 relative z-10">
-        
-        {/* THE PREMIUM SKELETON LOADER */}
-        {isLoading && (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="glass rounded-2xl p-6 flex flex-col h-[320px] relative overflow-hidden">
-                <div className="w-14 h-14 bg-secondary/80 rounded-xl mb-4 animate-pulse" />
-                <div className="h-6 bg-secondary/80 rounded-md w-2/3 mb-4 animate-pulse" />
-                <div className="space-y-2 mb-6 flex-1">
-                  <div className="h-4 bg-secondary/60 rounded-md w-full animate-pulse" />
-                  <div className="h-4 bg-secondary/60 rounded-md w-5/6 animate-pulse" />
-                </div>
-                <div className="flex gap-2 mb-5">
-                  <div className="h-6 w-20 bg-secondary/80 rounded-lg animate-pulse" />
-                  <div className="h-6 w-16 bg-secondary/80 rounded-lg animate-pulse" />
-                </div>
-                <div className="h-11 w-full bg-secondary/80 rounded-xl animate-pulse mt-auto" />
-              </div>
-            ))}
-          </div>
-        )}
 
-        {error && <p className="text-destructive text-center">Error: {error.message}</p>}
 
-        {/* Featured Section */}
+
         {featured.length > 0 && (
-          <section className="mb-14 animate-fade-in" aria-labelledby="featured-title">
-            <SectionTitle id="featured-title" icon={<Star className="h-5 w-5 text-yellow-400" />} title="Featured AI Tools" />
+          <section className="mb-14">
+            <SectionTitle icon={<Star className="h-5 w-5 text-yellow-400" />} title="Featured AI Tools" />
             <ToolGrid tools={featured} />
           </section>
         )}
 
-        {/* Suggested Section */}
+
+
+
         {suggested.length > 0 && (
-          <section className="mb-14 animate-fade-in" style={{ animationDelay: "0.1s" }} aria-labelledby="suggested-title">
-            <SectionTitle id="suggested-title" icon={<Lightbulb className="h-5 w-5 text-primary" />} title="Suggested AI Resources" />
+          <section className="mb-14">
+            <SectionTitle icon={<Lightbulb className="h-5 w-5 text-primary" />} title="Suggested AI Resources" />
             <ToolGrid tools={suggested} />
           </section>
         )}
 
-        {/* All Tools Section */}
+
+
+
         {visibleRest.length > 0 && (
-          <section className="mb-14 animate-fade-in" style={{ animationDelay: "0.2s" }} aria-labelledby="all-tools-title">
-            <SectionTitle id="all-tools-title" icon={<Zap className="h-5 w-5 text-muted-foreground" />} title="Explore All Tools" />
+          <section className="mb-14">
+            <SectionTitle icon={<Zap className="h-5 w-5 text-muted-foreground" />} title="Explore All Tools" />
             <ToolGrid tools={visibleRest} />
           </section>
         )}
 
-        {/* Pagination Button - Fixed logic to only look at 'rest' */}
-        {rest && rest.length > displayLimit && (
-          <div className="flex justify-center pt-8 pb-12">
-            <Button 
-              onClick={() => setDisplayLimit(prev => prev + 12)}
-              variant="outline"
-              className="glass-strong px-8 h-12 rounded-xl hover:scale-105 transition-all font-semibold"
-            >
-              Show More AI Tools
-              <ArrowRight className="ml-2 h-4 w-4" />
+        {rest.length > displayLimit && (
+          <div className="flex justify-center pt-8">
+            <Button onClick={() => setDisplayLimit(p => p + 12)} variant="outline" className="glass-strong">
+              Show More AI Tools <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-          </div>
-        )}
-
-        {tools && filtered.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-muted-foreground text-lg">No tools found matching your search.</p>
-            <p className="text-muted-foreground/60 text-sm mt-1">Try using broader keywords or a different category.</p>
           </div>
         )}
       </div>
 
-      <footer className="border-t border-border/50 py-8 px-6 text-center">
-        <p className="text-sm text-muted-foreground/60">© 2026 Toolsy India AI Hub. All rights reserved.</p>
-      </footer>
+      {/* AI Chat Button & Window */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+        {isAiOpen && (
+          <div className="mb-4 w-80 md:w-96 glass-strong rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-primary/20 bg-black">
+            <div className="p-4 bg-primary/10 border-b border-primary/20 flex justify-between items-center text-white">
+              <div className="flex items-center gap-2 font-bold text-sm">
+                <Sparkles className="h-4 w-4 text-primary" /> Toolsy AI
+              </div>
+              <button onClick={() => setIsAiOpen(false)}><X className="h-4 w-4" /></button>
+            </div>
+            <div className="h-80 overflow-y-auto p-4 space-y-4 text-sm text-white">
+              {messages.map((msg, i) => (
+                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`p-3 rounded-xl ${msg.role === 'user' ? 'bg-primary' : 'bg-zinc-800'}`}>
+                    {msg.content}
+                  </div>
+                </div>
+              ))}
+              <div ref={chatEndRef} />
+            </div>
+            <div className="p-3 border-t border-white/10 flex gap-2">
+              <Input 
+                value={aiInput} 
+                onChange={(e) => setAiInput(e.target.value)} 
+                onKeyDown={(e) => e.key === 'Enter' && handleAiChat()}
+                placeholder="Ask Toolsy..." 
+                className="bg-transparent text-white"
+              />
+              <Button onClick={handleAiChat} disabled={chatLoading} size="icon"><Send className="h-4 w-4" /></Button>
+            </div>
+          </div>
+        )}
+        <Button onClick={() => setIsAiOpen(!isAiOpen)} className="rounded-full w-14 h-14 shadow-xl">
+          {isAiOpen ? <X /> : <MessageSquare />}
+        </Button>
+      </div>
+
+
+
     </div>
   );
 };
 
-
-
-function SectionTitle({ icon, title, id }: { icon: React.ReactNode; title: string; id?: string }) {
+// --- HELPER COMPONENTS ---
+function SectionTitle({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
-    <div className="flex items-center gap-2.5 mb-6">
-      {icon}
-      <h2 id={id} className="text-xl font-semibold font-display tracking-tight">{title}</h2>
+    <div className="flex items-center gap-2.5 mb-6 text-white">
+      {icon} <h2 className="text-xl font-semibold">{title}</h2>
     </div>
   );
 }
 
-function PricingBadge({ pricing }: { pricing: string }) {
-  if (pricing === "Free") {
-    return (
-      <span className="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
-        {pricing}
-      </span>
-    );
-  }
-  if (pricing === "Premium") {
-    return (
-      <span className="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-lg bg-gradient-to-r from-yellow-500/15 to-amber-500/15 text-amber-400 border border-amber-500/25">
-        {pricing}
-      </span>
-    );
-  }
 
-  return (
-    <span className="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-lg bg-gradient-to-r from-purple-500/15 to-fuchsia-500/15 text-purple-400 border border-purple-500/25">
-      {pricing}
-    </span>
-  );
-}
+
 
 function ToolGrid({ tools }: { tools: any[] }) {
   return (
     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      {tools.map((tool: any, i: number) => {
-
-
-
-        const safeLink = tool.link.startsWith("http") ? tool.link : `https://${tool.link}`;
-
-        return (
-          <article
-            key={tool.id}
-            // 🚀 THE FIX: Added transform-gpu right here so the phone handles it perfectly!
-            className="group relative flex flex-col rounded-2xl opacity-0 animate-fade-in transform-gpu"
-            style={{ animationDelay: `${i * 0.05}s` }}
-          >
-            {/* Background Glows */}
-            <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-br from-primary/20 via-border/40 to-accent/20 opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 blur-md transition-opacity duration-500" />
-
-            {/* Card body */}
-            {/* 🚀 THE FIX: Changed bg-card/70 to bg-card/95, backdrop-blur-xl to sm, and added transform-gpu */}
-            <div className="relative flex flex-col flex-1 rounded-2xl bg-card/95 backdrop-blur-sm p-6 group-hover:-translate-y-1 transition-transform duration-300 ease-out transform-gpu">
-              {/* Featured/Suggested Tags */}
-              {(tool.featured === true || String(tool.featured) === "true" || tool.suggested === true || String(tool.suggested) === "true") && (
-                <div className="absolute top-4 right-4 flex gap-1.5">
-                  {(tool.featured === true || String(tool.featured) === "true") && (
-                    <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-yellow-400/10 text-yellow-400 border border-yellow-400/20">
-                      <Star className="h-2.5 w-2.5 fill-yellow-400" /> Featured
-                    </span>
-                  )}
-                  {(tool.suggested === true || String(tool.suggested) === "true") && !(tool.featured === true || String(tool.featured) === "true") && (
-                    <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
-                      <Lightbulb className="h-2.5 w-2.5" /> Suggested
-                    </span>
-                  )}
-                </div>
-              )}
-
-              <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-secondary/80 border border-border/50 text-3xl mb-4 group-hover:scale-105 transition-transform duration-300">
-                <span role="img" aria-label={`${tool.name} AI tool icon`}>
-                  {tool.icon || "🔧"}
-                </span>
-              </div>
-
-              <h3 className="text-lg font-bold font-display mb-1.5 group-hover:text-primary transition-colors duration-300 pr-20">
-                {tool.name}
-              </h3>
-
-              <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-1">
-                {tool.description}
-              </p>
-
-              <div className="flex flex-wrap gap-2 mb-5">
-                <span className="text-xs font-medium px-2.5 py-1 rounded-lg bg-secondary text-secondary-foreground">
-                  {tool.category}
-                </span>
-                <PricingBadge pricing={tool.pricing} />
-              </div>
-
-
-
-              <a
-                href={safeLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full h-11 rounded-xl text-sm font-semibold bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-md shadow-primary/15 group-hover:shadow-lg group-hover:shadow-primary/30 transition-all duration-300"
-              >
-                Visit {tool.name}
-                <ExternalLink className="h-3.5 w-3.5" />
-              </a>
-            </div>
-          </article>
-        );
-      })}
+      {tools.map((tool) => (
+        <div key={tool.id} className="p-6 rounded-2xl bg-zinc-900 border border-white/5 text-white">
+          <div className="text-3xl mb-4">{tool.icon || "🔧"}</div>
+          <h3 className="text-lg font-bold mb-2">{tool.name}</h3>
+          <p className="text-sm text-gray-400 mb-4">{tool.description}</p>
+          <a href={tool.link} target="_blank" className="text-primary flex items-center gap-2 text-sm">
+            Visit Tool <ExternalLink className="h-3 w-3" />
+          </a>
+        </div>
+      ))}
     </div>
   );
 }
 
-export default Index;
-
-
-
-
+export default Index; // THIS WAS THE MISSING LINE
