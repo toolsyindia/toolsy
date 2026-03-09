@@ -1,43 +1,58 @@
+// 1. MAGIC FIX: Load the secret keys from your file
+import dotenv from 'dotenv';
+dotenv.config({ path: './.env.local' });
+
 import { createClient } from '@supabase/supabase-js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-export default async function handler(req, res) {
-  // 1. Check if keys even exist in Vercel
-  const keysFound = {
-    gemini: !!process.env.GEMINI_API_KEY,
-    supabaseUrl: !!(process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL),
-    supabaseKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY
-  };
+// 2. KEYS
+const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+const geminiKey = process.env.GEMINI_API_KEY;
 
-  if (!keysFound.gemini || !keysFound.supabaseUrl || !keysFound.supabaseKey) {
-    return res.status(500).json({ 
-      error: "Missing Keys in Vercel!", 
-      diagnostic: keysFound 
-    });
-  }
+// 3. SETUP
+const supabase = createClient(supabaseUrl, supabaseKey);
+const genAI = new GoogleGenerativeAI(geminiKey || "MISSING_KEY");
+
+export default async function handler(req, res) {
+  // CORS Headers
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
+
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Only POST allowed' });
 
   const { question } = req.body;
-  if (!question) return res.status(400).json({ error: "No question" });
+  console.log("🧠 Brain received:", question);
 
   try {
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // 4. DATABASE SEARCH
+    const { data: tools, error } = await supabase
+      .from('tools')
+      .select('name, description, link') 
+      .ilike('description', `%${question}%`)
+      .limit(3);
+    
+    if (error) console.error("Supabase Search Error:", error.message);
 
-    // 2. Test Gemini connection directly first
-    const result = await model.generateContent("Say 'System Online'");
-    const response = await result.response;
-    const text = response.text();
+    // 5. ASK GEMINI (✅ NEW NUMBER: gemini-2.5-flash)
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    
+    const prompt = `User asked: "${question}". Context: ${JSON.stringify(tools || [])}. Answer in 1 short sentence.`;
+    
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
 
-    return res.status(200).json({ 
-      answer: `Gemini is working! It says: ${text}. Now try asking for a tool.` 
-    });
+    console.log("🤖 AI Answered:", text);
+    return res.status(200).json({ answer: text });
 
-  } catch (err) {
-    console.error("DIAGNOSTIC ERROR:", err.message);
-    // This will tell us if it's an "API Key Invalid" or "Network" error
-    return res.status(500).json({ 
-      error: "Gemini Fetch Failed", 
-      details: err.message 
-    });
+  } catch (error) {
+    console.error("💥 SERVER ERROR:", error.message);
+    return res.status(500).json({ error: error.message });
   }
 }
