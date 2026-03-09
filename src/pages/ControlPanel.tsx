@@ -131,8 +131,6 @@ export default function ControlPanel() {
   const [editingTool, setEditingTool] = useState<Tool | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
-  
-  // 🔍 STATE FOR SEARCH BAR
   const [searchQuery, setSearchQuery] = useState("");
 
   if (authLoading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground pt-28">Loading Admin Engine...</div>;
@@ -170,12 +168,9 @@ export default function ControlPanel() {
     }
   };
 
-  // 🚀 THE ULTIMATE FIX: Sends the ENTIRE tool object to the database so it doesn't get rejected!
   const toggleField = async (tool: Tool, field: "featured" | "suggested", newValue: boolean) => {
     try {
-      // We take the existing tool, and overwrite JUST the field we clicked
       const updatedTool = { ...tool, [field]: newValue };
-      
       await updateTool.mutateAsync(updatedTool);
       toast.success(`${field} status updated!`);
     } catch (err: any) {
@@ -183,19 +178,16 @@ export default function ControlPanel() {
     }
   };
 
-  // 🚀 FIXED: Stats cards strictly count booleans and string-booleans
   const totalTools = tools?.length || 0;
   const featuredTools = tools?.filter(t => t.featured === true || String(t.featured) === "true").length || 0;
   const suggestedTools = tools?.filter(t => t.suggested === true || String(t.suggested) === "true").length || 0;
 
-  // 🔍 SEARCH FILTER LOGIC
   const filteredTools = tools?.filter((tool) => 
     tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     tool.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    // 🛠️ FIXED: Added pt-28 so the navbar doesn't hide the top of your admin panel
     <div className="min-h-screen bg-background p-6 pt-28">
       <div className="max-w-6xl mx-auto space-y-8">
         
@@ -248,7 +240,7 @@ export default function ControlPanel() {
           </Card>
         </div>
 
-        {/* 🔍 LIVE SEARCH BAR UI */}
+        {/* 🔍 SEARCH BAR UI */}
         <div className="relative max-w-md w-full">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <Search className="h-4 w-4 text-muted-foreground" />
@@ -298,7 +290,6 @@ export default function ControlPanel() {
                       <TableCell><span className="bg-secondary px-2 py-1 rounded-md text-xs font-medium">{tool.category}</span></TableCell>
                       <TableCell><span className="text-sm font-medium">{tool.pricing}</span></TableCell>
                       
-                      {/* 🚀 UPGRADED SWITCHES: We pass `checked`, the EXACT boolean state, to toggleField */}
                       <TableCell>
                         <Switch 
                           checked={tool.featured === true || String(tool.featured) === "true"} 
@@ -311,7 +302,7 @@ export default function ControlPanel() {
                           onCheckedChange={(checked) => toggleField(tool, "suggested", checked)} 
                         />
                       </TableCell>
-                      
+
                       <TableCell className="text-right">
                         <div className="flex gap-2 justify-end">
                           <Button size="icon" variant="outline" className="h-8 w-8 text-blue-500 hover:text-blue-600" onClick={() => { setEditingTool(tool); setEditOpen(true); }}>
@@ -371,6 +362,3 @@ export default function ControlPanel() {
     </div>
   );
 }
-
-
-
