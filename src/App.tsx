@@ -26,6 +26,12 @@ const queryClient = new QueryClient({
   },
 });
 
+// 1. Add the import at the top
+import Advertise from "./pages/Advertise";
+
+// ... inside your <Routes>
+<Route path="/advertise" element={<Advertise />} />
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
