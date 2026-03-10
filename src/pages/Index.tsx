@@ -50,7 +50,7 @@ const Index = () => {
     <div className="min-h-screen bg-[#050505] text-foreground">
       {/* Hero Section */}
       {/* SPACING FIX: Tighter padding on mobile (pt-6, pb-4), but kept your original PC padding */}
-      <section className="relative pt-6 md:pt-28 pb-4 md:pb-12 px-6 text-center">
+      <section className="relative pt-12 md:pt-28 pb-4 md:pb-12 px-6 text-center">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[300px] md:h-[500px] bg-primary/10 blur-[80px] md:blur-[120px] rounded-full pointer-events-none" />
         <div className="relative z-10 max-w-4xl mx-auto">
           
