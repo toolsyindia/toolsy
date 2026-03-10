@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client"; // 🔥 IMPORTED SUPABASE FOR TRACKING
 
 const Index = () => {
   const { data: tools, isLoading } = useTools();
@@ -14,19 +15,29 @@ const Index = () => {
   const [priceFilter, setPriceFilter] = useState("All");
   const [displayLimit, setDisplayLimit] = useState(12);
 
-
-  
   const categories = useMemo(() => {
     if (!tools) return [];
     return ["All", ...new Set(tools.map((t) => t.category))].sort();
   }, [tools]);
 
-  // 🔥 NEW LOGIC: Check if tool is active and not expired
+  // 🔥 NEW FEATURE: CLICK TRACKING LOGIC
+  const trackClick = async (toolId: string, currentClicks: number) => {
+    try {
+      await supabase
+        .from('tools')
+        .update({ click_count: (currentClicks || 0) + 1 })
+        .eq('id', toolId);
+    } catch (error) {
+      console.error("Error tracking click:", error);
+    }
+  };
+
+  // 🔥 PRESERVED: Expiry Logic
   const isSponsorshipActive = (tool: any, type: 'featured' | 'suggested') => {
     const isMarked = tool[type] === true || String(tool[type]) === "true";
     if (!isMarked) return false;
+
     
-    // If no date is set, it's permanent. If date is set, check if today is before or equal to expiry.
     if (!tool.sponsored_until) return true;
     const expiryDate = new Date(tool.sponsored_until);
     const today = new Date();
@@ -38,7 +49,6 @@ const Index = () => {
     if (!tools) return [];
     let result = [...tools];
 
-    
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(
@@ -48,7 +58,8 @@ const Index = () => {
           t.category.toLowerCase().includes(q)
       );
 
-      // Sort: Active suggested tools jump to the top during search
+
+
       result.sort((a, b) => {
         const aSug = isSponsorshipActive(a, 'suggested');
         const bSug = isSponsorshipActive(b, 'suggested');
@@ -66,9 +77,10 @@ const Index = () => {
     return result; 
   }, [tools, search, activeCategory, priceFilter]);
 
-  // Featured only shows if the sponsorship is active (not expired)
+
+
   const featured = filtered.filter((t) => isSponsorshipActive(t, 'featured'));
-  
+
 
 
   const rest = filtered.filter((t) => !featured.includes(t));
@@ -164,7 +176,8 @@ const Index = () => {
                   <div className="h-8 md:h-10 w-1 bg-primary rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
                   <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Featured Tools</h2>
                 </div>
-                <ToolGrid tools={featured} isSearch={false} checkActive={isSponsorshipActive} />
+                {/* 🔥 Added onVisit handler */}
+                <ToolGrid tools={featured} isSearch={false} checkActive={isSponsorshipActive} onVisit={trackClick} />
               </section>
             )}
 
@@ -178,12 +191,14 @@ const Index = () => {
                      {search ? "Search Results" : "Explore Collection"}
                    </h2>
                 </div>
-                <ToolGrid tools={visibleRest} isSearch={!!search} checkActive={isSponsorshipActive} />
+                {/* 🔥 Added onVisit handler */}
+                <ToolGrid tools={visibleRest} isSearch={!!search} checkActive={isSponsorshipActive} onVisit={trackClick} />
               </section>
             )}
 
             {rest.length > displayLimit && (
               <div className="flex justify-center pt-8 md:pt-12">
+
 
 
                 <Button onClick={() => setDisplayLimit(p => p + 12)} size="lg" variant="outline" className="h-12 md:h-14 px-8 md:px-10 rounded-xl md:rounded-2xl bg-white/5 border-white/10 hover:bg-primary/20 hover:text-white transition-all text-sm md:text-base">
@@ -198,7 +213,8 @@ const Index = () => {
   );
 };
 
-function ToolGrid({ tools, isSearch, checkActive }: { tools: any[], isSearch: boolean, checkActive: any }) {
+// 🔥 UPDATED ToolGrid PROPS
+function ToolGrid({ tools, isSearch, checkActive, onVisit }: { tools: any[], isSearch: boolean, checkActive: any, onVisit: (id: string, clicks: number) => void }) {
   return (
     <div className="grid gap-6 md:gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {tools.map((tool) => {
@@ -246,6 +262,7 @@ function ToolGrid({ tools, isSearch, checkActive }: { tools: any[], isSearch: bo
                 href={tool.link?.startsWith('http') ? tool.link : `https://${tool.link}`} 
                 target="_blank" 
                 rel="noopener noreferrer" 
+                onClick={() => onVisit(tool.id, tool.click_count || 0)} // 🔥 TRACKS THE CLICK ON CLICK
                 className="flex items-center gap-1.5 md:gap-2 bg-white/5 hover:bg-primary text-white text-[10px] md:text-xs font-bold py-2 md:py-2.5 px-4 md:px-5 rounded-lg md:rounded-xl transition-all border border-white/10 hover:border-primary"
               >
                 Visit <ArrowRight className="h-3 md:h-4 w-3 md:w-4" />
