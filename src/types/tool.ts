@@ -1,6 +1,5 @@
 export interface Tool {
   id: number;
-  created_at: string;
   name: string;
   description: string;
   category: string;
@@ -8,7 +7,11 @@ export interface Tool {
   featured: boolean;
   suggested: boolean;
   link: string;
-  icon: string;
+  icon?: string;
+  // 🔥 ADD THESE TWO LINES BELOW
+  click_count?: number;
+  sponsored_until?: string;
+  created_at?: string;
 }
 
 export type ToolInsert = Omit<Tool, "id" | "created_at">;

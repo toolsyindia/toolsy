@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTools, useAddTool, useUpdateTool, useDeleteTool } from "@/hooks/useTools";
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge"; // 🔥 ADDED THIS BADGE IMPORT
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, LogOut, LayoutDashboard, Star, TrendingUp, Search } from "lucide-react"; 
+import { Pencil, Trash2, Plus, LogOut, LayoutDashboard, Star, TrendingUp, Search, IndianRupee, MousePointer2, CalendarClock } from "lucide-react"; 
 import type { Tool } from "@/types/tool";
 
 const emptyTool = {
@@ -23,6 +24,8 @@ const emptyTool = {
   suggested: false,
   link: "",
   icon: "",
+  sponsored_until: "",
+  click_count: 0,
 };
 
 function LoginForm({ onLogin }: { onLogin: (email: string, password: string) => Promise<void> }) {
@@ -43,7 +46,7 @@ function LoginForm({ onLogin }: { onLogin: (email: string, password: string) => 
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 pt-28 max-w-7xl mx-auto">
+    <div className="min-h-screen bg-background p-4 pt-28 flex items-center justify-center">
       <Card className="w-full max-w-sm shadow-xl">
         <CardHeader>
           <CardTitle className="text-center text-2xl font-bold">Admin Login</CardTitle>
@@ -62,12 +65,29 @@ function LoginForm({ onLogin }: { onLogin: (email: string, password: string) => 
   );
 }
 
-function ToolForm({ initial, onSubmit, onCancel, submitLabel }: { initial: typeof emptyTool; onSubmit: (data: typeof emptyTool) => void; onCancel: () => void; submitLabel: string; }) {
+function ToolForm({ 
+  initial, 
+  onSubmit, 
+  onCancel, 
+  submitLabel,
+  featuredCount,
+  categorySuggestedCount
+}: { 
+  initial: any; 
+  onSubmit: (data: any) => void; 
+  onCancel: () => void; 
+  submitLabel: string;
+  featuredCount: number;
+  categorySuggestedCount: number;
+}) {
   const [form, setForm] = useState(initial);
   const set = (key: string, value: any) => setForm((f) => ({ ...f, [key]: value }));
 
+  const canFeature = form.featured || featuredCount < 6;
+  const canSuggest = form.suggested || categorySuggestedCount < 3;
+
   return (
-    <form onSubmit={(e) => { e.preventDefault(); onSubmit(form); }} className="space-y-5">
+    <form onSubmit={(e) => { e.preventDefault(); onSubmit(form); }} className="space-y-5 max-h-[80vh] overflow-y-auto px-1">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label>Name</Label>
@@ -103,16 +123,43 @@ function ToolForm({ initial, onSubmit, onCancel, submitLabel }: { initial: typeo
         <Label>Link (URL)</Label>
         <Input value={form.link} onChange={(e) => set("link", e.target.value)} required placeholder="https://..." />
       </div>
-      <div className="flex gap-8 p-4 bg-muted/50 rounded-lg border">
-        <div className="flex items-center gap-3">
-          <Switch checked={form.featured === true || String(form.featured) === "true"} onCheckedChange={(v) => set("featured", v)} />
-          <Label className="font-semibold cursor-pointer">⭐ Featured</Label>
+
+      <div className="space-y-2 p-4 bg-muted/30 rounded-lg border border-dashed text-foreground">
+        <Label className="flex items-center gap-2"><CalendarClock className="w-4 h-4 text-primary" /> Sponsorship Expiry Date</Label>
+        <Input type="date" value={form.sponsored_until || ""} onChange={(e) => set("sponsored_until", e.target.value)} className="bg-background" />
+        <p className="text-[10px] text-muted-foreground mt-1">Leave empty for permanent (Unsponsored) tools.</p>
+      </div>
+
+      <div className="grid gap-4 p-4 bg-muted/50 rounded-lg border">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Switch 
+              disabled={!canFeature}
+              checked={form.featured === true || String(form.featured) === "true"} 
+              onCheckedChange={(v) => set("featured", v)} 
+            />
+            <Label className={`font-semibold ${!canFeature ? 'text-muted-foreground' : 'cursor-pointer text-foreground'}`}>
+              ⭐ Featured Slot {featuredCount}/6
+            </Label>
+          </div>
+          {!canFeature && <span className="text-[10px] text-red-500 font-bold uppercase tracking-tighter">Slots Full</span>}
         </div>
-        <div className="flex items-center gap-3">
-          <Switch checked={form.suggested === true || String(form.suggested) === "true"} onCheckedChange={(v) => set("suggested", v)} />
-          <Label className="font-semibold cursor-pointer">📈 Suggested</Label>
+        
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Switch 
+              disabled={!canSuggest}
+              checked={form.suggested === true || String(form.suggested) === "true"} 
+              onCheckedChange={(v) => set("suggested", v)} 
+            />
+            <Label className={`font-semibold ${!canSuggest ? 'text-muted-foreground' : 'cursor-pointer text-foreground'}`}>
+              📈 Suggested In Category {categorySuggestedCount}/3
+            </Label>
+          </div>
+          {!canSuggest && <span className="text-[10px] text-red-500 font-bold uppercase tracking-tighter">Limit Reached</span>}
         </div>
       </div>
+
       <div className="flex gap-3 justify-end pt-4 border-t">
         <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
         <Button type="submit" className="font-bold">{submitLabel}</Button>
@@ -136,7 +183,28 @@ export default function ControlPanel() {
   if (authLoading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground pt-28">Loading Admin Engine...</div>;
   if (!user) return <LoginForm onLogin={signIn} />;
 
-  const handleAdd = async (data: typeof emptyTool) => {
+  const isSponsorshipActive = (tool: any, type: 'featured' | 'suggested') => {
+    const isMarked = tool[type] === true || String(tool[type]) === "true";
+    if (!isMarked) return false;
+    if (!tool.sponsored_until) return true;
+    const expiryDate = new Date(tool.sponsored_until);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); 
+    return expiryDate >= today;
+  };
+
+  const totalTools = tools?.length || 0;
+  const activeFeatured = tools?.filter(t => isSponsorshipActive(t, 'featured')).length || 0;
+  const activeSuggested = tools?.filter(t => isSponsorshipActive(t, 'suggested')).length || 0;
+  const totalClicks = tools?.reduce((acc, tool) => acc + (tool.click_count || 0), 0) || 0;
+  const estimatedWeeklyRevenue = (activeFeatured * 300) + (activeSuggested * 99);
+
+  const filteredTools = tools?.filter((tool) => 
+    tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    tool.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleAdd = async (data: any) => {
     try {
       await addTool.mutateAsync(data);
       toast.success("Tool added successfully! 🚀");
@@ -146,7 +214,7 @@ export default function ControlPanel() {
     }
   };
 
-  const handleEdit = async (data: typeof emptyTool) => {
+  const handleEdit = async (data: any) => {
     if (!editingTool) return;
     try {
       await updateTool.mutateAsync({ id: editingTool.id, ...data });
@@ -169,6 +237,16 @@ export default function ControlPanel() {
   };
 
   const toggleField = async (tool: Tool, field: "featured" | "suggested", newValue: boolean) => {
+    if (newValue === true) {
+      if (field === "featured" && activeFeatured >= 6) {
+        return toast.error("Maximum 6 Featured slots allowed!");
+      }
+      if (field === "suggested") {
+        const catCount = tools?.filter(t => t.category === tool.category && isSponsorshipActive(t, 'suggested')).length || 0;
+        if (catCount >= 3) return toast.error("Maximum 3 suggested tools per category!");
+      }
+    }
+
     try {
       const updatedTool = { ...tool, [field]: newValue };
       await updateTool.mutateAsync(updatedTool);
@@ -178,179 +256,178 @@ export default function ControlPanel() {
     }
   };
 
-  const totalTools = tools?.length || 0;
-  const featuredTools = tools?.filter(t => t.featured === true || String(t.featured) === "true").length || 0;
-  const suggestedTools = tools?.filter(t => t.suggested === true || String(t.suggested) === "true").length || 0;
-
-  const filteredTools = tools?.filter((tool) => 
-    tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    tool.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
-    <div className="min-h-screen bg-background p-6 pt-28">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-[#050505] text-foreground p-4 md:p-8 pt-24 md:pt-32">
+      <div className="max-w-7xl mx-auto space-y-8">
         
-        {/* HEADER */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight">Toolsy Control Panel</h1>
-            <p className="text-muted-foreground">Manage your AI empire and toggle features live.</p>
+            <h1 className="text-3xl font-black tracking-tighter text-white">Toolsy <span className="text-primary">Admin</span> Hub</h1>
+            <p className="text-gray-500 text-sm">Automated sponsorship management and real-time analytics.</p>
           </div>
           <div className="flex gap-3">
             <Dialog open={addOpen} onOpenChange={setAddOpen}>
               <DialogTrigger asChild>
-                <Button size="lg" className="shadow-lg shadow-primary/20 font-bold">
-                  <Plus className="mr-2 h-5 w-5" /> Add New Tool
+                <Button className="bg-primary hover:bg-primary/90 text-white font-black px-6">
+                  <Plus className="mr-2 h-5 w-5" /> Add Tool
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-lg sm:max-w-xl">
-                <DialogHeader><DialogTitle className="text-2xl">Add New Tool</DialogTitle></DialogHeader>
-                <ToolForm initial={emptyTool} onSubmit={handleAdd} onCancel={() => setAddOpen(false)} submitLabel="Publish Tool" />
+              <DialogContent className="max-w-lg sm:max-w-xl bg-background border-border/50">
+                <DialogHeader><DialogTitle className="text-2xl font-black text-foreground">Add New AI Tool</DialogTitle></DialogHeader>
+                <ToolForm 
+                  initial={emptyTool} 
+                  onSubmit={handleAdd} 
+                  onCancel={() => setAddOpen(false)} 
+                  submitLabel="Add to Directory"
+                  featuredCount={activeFeatured}
+                  categorySuggestedCount={0}
+                />
               </DialogContent>
             </Dialog>
-            <Button variant="outline" size="lg" onClick={signOut}>
+            <Button variant="outline" className="border-white/10 text-gray-400 hover:text-white" onClick={signOut}>
               <LogOut className="mr-2 h-4 w-4" /> Sign Out
             </Button>
           </div>
         </div>
 
-        {/* PRO STATS CARDS */}
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card className="shadow-sm">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Card className="bg-white/5 border-white/10 shadow-xl">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Live Tools</CardTitle>
-              <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-xs font-black uppercase text-gray-500 tracking-widest">Active Revenue</CardTitle>
+              <IndianRupee className="h-4 w-4 text-emerald-500" />
             </CardHeader>
-            <CardContent><div className="text-3xl font-bold">{totalTools}</div></CardContent>
+            <CardContent>
+              <div className="text-3xl font-black text-white">₹{estimatedWeeklyRevenue}</div>
+              <p className="text-[10px] text-emerald-500 font-bold mt-1 uppercase">Estimated Weekly</p>
+            </CardContent>
           </Card>
-          <Card className="shadow-sm border-primary/20 bg-primary/5">
+
+          <Card className="bg-white/5 border-white/10">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-primary">Featured (Ad Spots)</CardTitle>
-              <Star className="h-4 w-4 text-primary" />
+              <CardTitle className="text-xs font-black uppercase text-gray-500 tracking-widest">Traffic</CardTitle>
+              <MousePointer2 className="h-4 w-4 text-primary" />
             </CardHeader>
-            <CardContent><div className="text-3xl font-bold text-primary">{featuredTools}</div></CardContent>
+            <CardContent>
+              <div className="text-3xl font-black text-white">{totalClicks}</div>
+              <p className="text-[10px] text-primary font-bold mt-1 uppercase">Total Clicks</p>
+            </CardContent>
           </Card>
-          <Card className="shadow-sm border-blue-500/20 bg-blue-500/5">
+
+          <Card className={`bg-white/5 border-white/10 ${activeFeatured >= 6 ? 'border-red-500/30' : ''}`}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-blue-500">Suggested (Trending)</CardTitle>
+              <CardTitle className="text-xs font-black uppercase text-gray-500 tracking-widest">Featured Slots</CardTitle>
+              <Star className={`h-4 w-4 ${activeFeatured >= 6 ? 'text-red-500' : 'text-yellow-500'}`} />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-black text-white">{activeFeatured}<span className="text-gray-600 text-lg">/6</span></div>
+              <p className={`text-[10px] font-bold mt-1 ${activeFeatured >= 6 ? 'text-red-500' : 'text-yellow-500 uppercase'}`}>
+                {activeFeatured >= 6 ? 'SLOTS FULL' : 'Premium Slots'}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/5 border-white/10">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-xs font-black uppercase text-gray-500 tracking-widest">Suggested</CardTitle>
               <TrendingUp className="h-4 w-4 text-blue-500" />
             </CardHeader>
-            <CardContent><div className="text-3xl font-bold text-blue-500">{suggestedTools}</div></CardContent>
+            <CardContent>
+              <div className="text-3xl font-black text-white">{activeSuggested}</div>
+              <p className="text-[10px] text-blue-500 font-bold mt-1 uppercase">Search Ads</p>
+            </CardContent>
           </Card>
         </div>
 
-        {/* 🔍 SEARCH BAR UI */}
-        <div className="relative max-w-md w-full">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-4 w-4 text-muted-foreground" />
+        <div className="space-y-4">
+          <div className="flex items-center gap-4 max-w-md bg-white/5 rounded-2xl p-1 px-4 border border-white/10">
+            <Search className="h-4 w-4 text-gray-500" />
+            <Input 
+              type="text" 
+              placeholder="Filter by name or category..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-transparent border-0 focus-visible:ring-0 text-white placeholder:text-gray-600"
+            />
           </div>
-          <Input 
-            type="text" 
-            placeholder="Search tools by name or category..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 shadow-sm border-border/50 bg-background"
-          />
-        </div>
 
-        {/* TOOL DATABASE TABLE */}
-        {isLoading ? (
-          <div className="text-center py-10 text-muted-foreground animate-pulse">Loading database...</div>
-        ) : filteredTools && filteredTools.length > 0 ? (
-          <Card className="shadow-md overflow-hidden">
+          <Card className="bg-[#0F0F0F] border-white/5 overflow-hidden shadow-2xl">
             <div className="overflow-x-auto">
               <Table>
-                <TableHeader className="bg-muted/50">
-                  <TableRow>
-                    <TableHead className="w-[300px]">Tool</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Pricing</TableHead>
-                    <TableHead>Featured</TableHead>
-                    <TableHead>Suggested</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                <TableHeader className="bg-white/5">
+                  <TableRow className="border-white/5 hover:bg-transparent">
+                    <TableHead className="text-gray-400 font-black uppercase text-[10px] tracking-widest py-4">Tool & Traffic</TableHead>
+                    <TableHead className="text-gray-400 font-black uppercase text-[10px] tracking-widest">Category</TableHead>
+                    <TableHead className="text-gray-400 font-black uppercase text-[10px] tracking-widest">Status / Expiry</TableHead>
+                    <TableHead className="text-right text-gray-400 font-black uppercase text-[10px] tracking-widest">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredTools.map((tool) => (
-                    <TableRow key={tool.id} className="hover:bg-muted/30">
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          {tool.icon && (
-                            <span className="text-2xl bg-muted p-2 rounded-md" role="img" aria-label="icon">
-                              {tool.icon}
-                            </span>
-                          )}
-                          <div className="flex flex-col">
-                            <span className="font-bold text-base">{tool.name}</span>
-                            <span className="text-xs text-muted-foreground truncate w-48">{tool.link}</span>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell><span className="bg-secondary px-2 py-1 rounded-md text-xs font-medium">{tool.category}</span></TableCell>
-                      <TableCell><span className="text-sm font-medium">{tool.pricing}</span></TableCell>
-                      
-                      <TableCell>
-                        <Switch 
-                          checked={tool.featured === true || String(tool.featured) === "true"} 
-                          onCheckedChange={(checked) => toggleField(tool, "featured", checked)} 
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Switch 
-                          checked={tool.suggested === true || String(tool.suggested) === "true"} 
-                          onCheckedChange={(checked) => toggleField(tool, "suggested", checked)} 
-                        />
-                      </TableCell>
+                  {filteredTools?.map((tool) => {
+                    const featuredActive = isSponsorshipActive(tool, 'featured');
+                    const suggestedActive = isSponsorshipActive(tool, 'suggested');
 
-                      <TableCell className="text-right">
-                        <div className="flex gap-2 justify-end">
-                          <Button size="icon" variant="outline" className="h-8 w-8 text-blue-500 hover:text-blue-600" onClick={() => { setEditingTool(tool); setEditOpen(true); }}>
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button size="icon" variant="outline" className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(tool.id)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                    return (
+                      <TableRow key={tool.id} className="border-white/5 hover:bg-white/[0.02] transition-colors">
+                        <TableCell className="py-4">
+                          <div className="flex items-center gap-4">
+                            <span className="text-2xl p-2 bg-white/5 rounded-xl border border-white/5">{tool.icon || "⚡"}</span>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-white text-base">{tool.name}</span>
+                              <span className="text-[10px] text-primary font-black uppercase tracking-widest">📈 {tool.click_count || 0} clicks</span>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="bg-white/5 border-white/10 text-gray-400 text-[10px] uppercase font-bold tracking-tight px-2 py-0.5">
+                            {tool.category}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col gap-2">
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-2">
+                                <Switch checked={featuredActive} onCheckedChange={(v) => toggleField(tool, "featured", v)} />
+                                <Star className={`w-3 h-3 ${featuredActive ? 'text-yellow-500 fill-yellow-500' : 'text-gray-700'}`} />
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Switch checked={suggestedActive} onCheckedChange={(v) => toggleField(tool, "suggested", v)} />
+                                <TrendingUp className={`w-3 h-3 ${suggestedActive ? 'text-blue-500' : 'text-gray-700'}`} />
+                              </div>
+                            </div>
+                            {tool.sponsored_until && (
+                              <span className="text-[10px] font-bold text-gray-600 flex items-center gap-1">
+                                <CalendarClock className="w-3 h-3" /> Ends: {new Date(tool.sponsored_until).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex gap-2 justify-end">
+                            <Button size="icon" variant="outline" className="bg-white/5 border-white/10 text-blue-500 hover:bg-blue-500/10" onClick={() => { setEditingTool(tool); setEditOpen(true); }}>
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button size="icon" variant="outline" className="bg-white/5 border-white/10 text-red-500 hover:bg-red-500/10" onClick={() => handleDelete(tool.id)}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>
           </Card>
-        ) : (
-          <div className="text-center py-20 border-2 border-dashed rounded-xl border-muted-foreground/20">
-            {searchQuery ? (
-              <>
-                <h3 className="text-xl font-bold mb-2">No tools found!</h3>
-                <p className="text-muted-foreground">We couldn't find any tool matching "{searchQuery}".</p>
-              </>
-            ) : (
-              <>
-                <h3 className="text-xl font-bold mb-2">Your database is empty!</h3>
-                <p className="text-muted-foreground mb-6">Click the button above to add your first AI tool.</p>
-              </>
-            )}
-          </div>
-        )}
+        </div>
 
-        {/* EDIT TOOL MODAL */}
         <Dialog open={editOpen} onOpenChange={(o) => { setEditOpen(o); if (!o) setEditingTool(null); }}>
-          <DialogContent className="max-w-lg sm:max-w-xl">
-            <DialogHeader><DialogTitle className="text-2xl">Edit Tool</DialogTitle></DialogHeader>
+          <DialogContent className="max-w-lg sm:max-w-xl bg-background border-border/50">
+            <DialogHeader><DialogTitle className="text-2xl font-black text-foreground">Edit Tool & Ads</DialogTitle></DialogHeader>
             {editingTool && (
               <ToolForm
-                initial={{
-                  name: editingTool.name,
-                  description: editingTool.description,
-                  category: editingTool.category,
-                  pricing: editingTool.pricing,
-                  featured: editingTool.featured,
-                  suggested: editingTool.suggested,
-                  link: editingTool.link,
-                  icon: editingTool.icon,
-                }}
+                initial={editingTool}
+                featuredCount={activeFeatured}
+                categorySuggestedCount={tools?.filter(t => t.id !== editingTool.id && t.category === editingTool.category && isSponsorshipActive(t, 'suggested')).length || 0}
                 onSubmit={handleEdit}
                 onCancel={() => { setEditOpen(false); setEditingTool(null); }}
                 submitLabel="Save Changes"
