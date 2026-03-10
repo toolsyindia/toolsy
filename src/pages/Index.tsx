@@ -49,8 +49,8 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-[#050505] text-foreground">
       {/* Hero Section */}
-      {/* SPACING FIX: Tighter padding on mobile (pt-6, pb-4), but kept your original PC padding */}
-      <section className="relative pt-12 md:pt-28 pb-4 md:pb-12 px-6 text-center">
+      {/* FIX: Changed pt-12 to pt-24 on mobile so it clears the navbar safely */}
+      <section className="relative pt-24 md:pt-28 pb-4 md:pb-12 px-6 text-center">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[300px] md:h-[500px] bg-primary/10 blur-[80px] md:blur-[120px] rounded-full pointer-events-none" />
         <div className="relative z-10 max-w-4xl mx-auto">
           
@@ -73,19 +73,20 @@ const Index = () => {
       </section>
 
       {/* Search & Categories Section */}
-      {/* SPACING FIX: Removed negative margin, kept tight on mobile (mb-6) */}
+      
       <section className="px-4 md:px-6 max-w-5xl mx-auto relative z-10 mb-6 md:mb-20">
         <div className="p-1.5 md:p-2 rounded-2xl md:rounded-3xl bg-white/5 border border-white/10 backdrop-blur-2xl shadow-2xl">
           <div className="relative flex items-center pr-2">
             <Search className="absolute left-4 md:left-6 h-4 md:h-5 w-4 md:w-5 text-muted-foreground" />
-            {/* RESTORED: Your original text-base on mobile */}
+
             <Input
+          
               placeholder="Search AI tools (e.g. 'coding', 'video', 'free')..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-12 md:pl-16 h-12 md:h-16 bg-transparent border-0 text-white text-base md:text-lg focus-visible:ring-0 placeholder:text-gray-600"
             />
-            {/* RESTORED: Your original text-xs on mobile */}
+
             <select 
               value={priceFilter}
               onChange={(e) => setPriceFilter(e.target.value)}
@@ -128,7 +129,7 @@ const Index = () => {
               <section>
                 <div className="flex items-center gap-3 mb-6 md:mb-10">
                   <div className="h-8 md:h-10 w-1 bg-primary rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
-                  {/* RESTORED: Your original text-2xl on mobile */}
+
                   <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Featured Tools</h2>
                 </div>
                 <ToolGrid tools={featured} />
@@ -157,7 +158,7 @@ const Index = () => {
 
             {rest.length > displayLimit && (
               <div className="flex justify-center pt-8 md:pt-12">
-                {/* RESTORED: Your original button size on mobile */}
+
                 <Button onClick={() => setDisplayLimit(p => p + 12)} size="lg" variant="outline" className="h-12 md:h-14 px-8 md:px-10 rounded-xl md:rounded-2xl bg-white/5 border-white/10 hover:bg-primary/20 hover:text-white transition-all text-sm md:text-base">
                   Load More Tools <ArrowRight className="ml-2 h-4 md:h-5 w-4 md:w-5" />
                 </Button>
@@ -181,7 +182,7 @@ function ToolGrid({ tools }: { tools: any[] }) {
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/5 blur-[60px] group-hover:bg-primary/10 transition-all" />
 
           <div className="flex justify-between items-start mb-4 md:mb-6">
-            {/* RESTORED: Your original icon sizing */}
+
             <div className="text-4xl md:text-5xl p-3 md:p-4 bg-white/5 rounded-xl md:rounded-2xl border border-white/5 group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-500">
               {tool.icon || "⚡"}
             </div>
@@ -192,18 +193,19 @@ function ToolGrid({ tools }: { tools: any[] }) {
             )}
           </div>
           
-          {/* RESTORED: Your original text-xl on mobile */}
+
           <h3 className="text-xl md:text-2xl font-bold text-white mb-2 md:mb-3 tracking-tight group-hover:text-primary transition-colors line-clamp-1">
             {tool.name}
           </h3>
           
-          {/* RESTORED: Your original text-xs on mobile */}
+
           <p className="text-gray-500 text-xs md:text-sm leading-relaxed mb-6 md:mb-8 line-clamp-3 flex-grow group-hover:text-gray-400">
             {tool.description}
           </p>
           
+          
           <div className="pt-4 md:pt-6 border-t border-white/5 mt-auto flex items-center justify-between">
-            {/* RESTORED: Your original text size for the category badge */}
+
             <span className="text-[9px] md:text-[10px] font-black text-zinc-600 uppercase tracking-widest bg-white/5 px-2 py-1 rounded-md">
               {tool.category}
             </span>
