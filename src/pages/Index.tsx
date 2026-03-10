@@ -54,8 +54,8 @@ const Index = () => {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[300px] md:h-[500px] bg-primary/10 blur-[80px] md:blur-[120px] rounded-full pointer-events-none" />
         <div className="relative z-10 max-w-4xl mx-auto">
           
-          {/* RESTORED: Your original tracking-widest badge */}
-          <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1 md:py-1.5 rounded-full bg-white/5 border border-white/10 mb-4 md:mb-8 text-[10px] md:text-xs font-medium text-primary uppercase tracking-widest">
+          {/* MODIFIED: Added "hidden md:inline-flex" to remove this badge on mobile only */}
+          <div className="hidden md:inline-flex items-center gap-2 px-3 md:px-4 py-1 md:py-1.5 rounded-full bg-white/5 border border-white/10 mb-4 md:mb-8 text-[10px] md:text-xs font-medium text-primary uppercase tracking-widest">
             <Sparkles className="h-3 w-3" />
             <span>Premium AI Tools Directory</span>
           </div>
@@ -223,3 +223,4 @@ function ToolGrid({ tools }: { tools: any[] }) {
 }
 
 export default Index;
+
