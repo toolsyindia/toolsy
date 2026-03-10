@@ -14,17 +14,31 @@ const Index = () => {
   const [priceFilter, setPriceFilter] = useState("All");
   const [displayLimit, setDisplayLimit] = useState(12);
 
+
   
   const categories = useMemo(() => {
     if (!tools) return [];
     return ["All", ...new Set(tools.map((t) => t.category))].sort();
   }, [tools]);
 
+  // 🔥 NEW LOGIC: Check if tool is active and not expired
+  const isSponsorshipActive = (tool: any, type: 'featured' | 'suggested') => {
+    const isMarked = tool[type] === true || String(tool[type]) === "true";
+    if (!isMarked) return false;
+    
+    // If no date is set, it's permanent. If date is set, check if today is before or equal to expiry.
+    if (!tool.sponsored_until) return true;
+    const expiryDate = new Date(tool.sponsored_until);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); 
+    return expiryDate >= today;
+  };
+
   const filtered = useMemo(() => {
     if (!tools) return [];
     let result = [...tools];
+
     
-    // 1. Filtering Logic
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(
@@ -34,11 +48,10 @@ const Index = () => {
           t.category.toLowerCase().includes(q)
       );
 
-      // 🔥 SEARCH-ONLY SUGGESTION LOGIC: 
-      // This only triggers when the user is typing.
+      // Sort: Active suggested tools jump to the top during search
       result.sort((a, b) => {
-        const aSug = a.suggested === true || String(a.suggested) === "true";
-        const bSug = b.suggested === true || String(b.suggested) === "true";
+        const aSug = isSponsorshipActive(a, 'suggested');
+        const bSug = isSponsorshipActive(b, 'suggested');
         return aSug === bSug ? 0 : aSug ? -1 : 1;
       });
     }
@@ -53,32 +66,33 @@ const Index = () => {
     return result; 
   }, [tools, search, activeCategory, priceFilter]);
 
-  // Featured is for your high-paying homepage slots (Top 4)
-  const featured = filtered.filter((t) => t.featured === true || String(t.featured) === "true");
+  // Featured only shows if the sponsorship is active (not expired)
+  const featured = filtered.filter((t) => isSponsorshipActive(t, 'featured'));
   
-  // The rest includes regular tools AND suggested tools (they will be at the top if search is active)
+
+
   const rest = filtered.filter((t) => !featured.includes(t));
   const visibleRest = rest.slice(0, displayLimit);
 
   return (
     <div className="min-h-screen bg-[#050505] text-foreground">
-      {/* Hero Section */}
-      
-      
+
+
       <section className="relative pt-24 md:pt-28 pb-4 md:pb-12 px-6 text-center">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[300px] md:h-[500px] bg-primary/10 blur-[80px] md:blur-[120px] rounded-full pointer-events-none" />
         <div className="relative z-10 max-w-4xl mx-auto">
-          
-          
+
+
           <div className="hidden md:inline-flex items-center gap-2 px-3 md:px-4 py-1 md:py-1.5 rounded-full bg-white/5 border border-white/10 mb-4 md:mb-8 text-[10px] md:text-xs font-medium text-primary uppercase tracking-widest">
             <Sparkles className="h-3 w-3" />
             <span>Premium AI Tools Directory</span>
           </div>
 
-          
+
           <h1 className="text-4xl md:text-7xl font-black tracking-tighter mb-4 md:mb-6 text-white leading-[1.1]">
             Toolsy: India's <span className="text-primary">Largest</span> AI Hub
           </h1>
+
 
           <p className="text-gray-400 text-sm md:text-lg max-w-2xl mx-auto mb-6 md:mb-12">
             Discover the best AI tools to supercharge your workflow. curated daily for developers, designers, and creators.
@@ -86,21 +100,21 @@ const Index = () => {
         </div>
       </section>
 
-      
-      {/* Search & Categories Section */}
+
 
       <section className="px-4 md:px-6 max-w-5xl mx-auto relative z-10 mb-6 md:mb-20">
         <div className="p-1.5 md:p-2 rounded-2xl md:rounded-3xl bg-white/5 border border-white/10 backdrop-blur-2xl shadow-2xl">
           <div className="relative flex items-center pr-2">
-            
-          <Search className="absolute left-4 md:left-6 h-4 md:h-5 w-4 md:w-5 text-muted-foreground" />
+            <Search className="absolute left-4 md:left-6 h-4 md:h-5 w-4 md:w-5 text-muted-foreground" />
             <Input
+
 
               placeholder="Search AI tools (e.g. 'coding', 'video', 'free')..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-12 md:pl-16 h-12 md:h-16 bg-transparent border-0 text-white text-base md:text-lg focus-visible:ring-0 placeholder:text-gray-600"
             />
+
 
             <select 
               value={priceFilter}
@@ -113,6 +127,7 @@ const Index = () => {
               <option value="Premium">Paid</option>
             </select>
           </div>
+
 
 
           <div className="flex gap-2 overflow-x-auto p-2 md:p-4 no-scrollbar border-t border-white/5 mt-1 md:mt-2">
@@ -134,25 +149,27 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Grid Content */}
+
+
       <div className="max-w-7xl mx-auto px-4 md:px-6 pb-20 md:pb-32 space-y-12 md:space-y-20 relative z-10">
         {isLoading ? (
           <div className="text-center py-20 text-primary animate-pulse font-bold uppercase tracking-widest text-sm md:text-base">Syncing Database...</div>
         ) : (
           <>
-            {/* 1. Featured Section - ONLY ON HOMEPAGE */}
+
+
             {featured.length > 0 && !search && (
               <section>
                 <div className="flex items-center gap-3 mb-6 md:mb-10">
-                  
-                <div className="h-8 md:h-10 w-1 bg-primary rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+                  <div className="h-8 md:h-10 w-1 bg-primary rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
                   <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Featured Tools</h2>
                 </div>
-                <ToolGrid tools={featured} isSearch={false} />
+                <ToolGrid tools={featured} isSearch={false} checkActive={isSponsorshipActive} />
               </section>
             )}
 
-            {/* 2. Main Collection (Contains Suggested tools during search) */}
+
+
             {visibleRest.length > 0 && (
               <section>
                 <div className="flex items-center gap-3 mb-6 md:mb-10">
@@ -161,8 +178,7 @@ const Index = () => {
                      {search ? "Search Results" : "Explore Collection"}
                    </h2>
                 </div>
-                {/* We pass search status to the grid to handle the Suggested badge */}
-                <ToolGrid tools={visibleRest} isSearch={!!search} />
+                <ToolGrid tools={visibleRest} isSearch={!!search} checkActive={isSponsorshipActive} />
               </section>
             )}
 
@@ -182,19 +198,17 @@ const Index = () => {
   );
 };
 
-// --- 🔥 PRO TOOL CARD DESIGN 🔥 ---
-
-function ToolGrid({ tools, isSearch }: { tools: any[], isSearch: boolean }) {
+function ToolGrid({ tools, isSearch, checkActive }: { tools: any[], isSearch: boolean, checkActive: any }) {
   return (
     <div className="grid gap-6 md:gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {tools.map((tool) => {
-        // Show suggested badge ONLY during search
-        const showSuggested = isSearch && (tool.suggested === true || String(tool.suggested) === "true");
+        const showSuggested = isSearch && checkActive(tool, 'suggested');
+        const showFeaturedGlow = !isSearch && checkActive(tool, 'featured');
         
         return (
-          <div key={tool.id} className={`group relative bg-[#0F0F0F] border rounded-3xl md:rounded-[2rem] p-5 md:p-7 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full overflow-hidden ${showSuggested ? 'border-primary/40 shadow-[0_0_40px_-10px_rgba(var(--primary),0.2)]' : 'border-white/5 hover:border-primary/40'}`}>
+          <div key={tool.id} className={`group relative bg-[#0F0F0F] border rounded-3xl md:rounded-[2rem] p-5 md:p-7 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full overflow-hidden ${(showSuggested || showFeaturedGlow) ? 'border-primary/40 shadow-[0_0_40px_-10px_rgba(var(--primary),0.2)]' : 'border-white/5 hover:border-primary/40'}`}>
             
-            <div className={`absolute -top-24 -right-24 w-48 h-48 blur-[60px] transition-all ${showSuggested ? 'bg-primary/20' : 'bg-primary/5 group-hover:bg-primary/10'}`} />
+            <div className={`absolute -top-24 -right-24 w-48 h-48 blur-[60px] transition-all ${(showSuggested || showFeaturedGlow) ? 'bg-primary/20' : 'bg-primary/5 group-hover:bg-primary/10'}`} />
 
             <div className="flex justify-between items-start mb-4 md:mb-6">
               <div className="text-4xl md:text-5xl p-3 md:p-4 bg-white/5 rounded-xl md:rounded-2xl border border-white/5 group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-500">
@@ -206,7 +220,8 @@ function ToolGrid({ tools, isSearch }: { tools: any[], isSearch: boolean }) {
                     {tool.pricing}
                   </Badge>
                 )}
-                {/* 🔥 PULSING SUGGESTED BADGE - ONLY IN SEARCH */}
+
+
                 {showSuggested && (
                   <Badge className="bg-primary text-white border-0 text-[9px] md:text-[10px] uppercase font-black tracking-widest px-2.5 md:px-3 py-1 rounded-full animate-pulse shadow-[0_0_15px_rgba(var(--primary),0.5)]">
                     Suggested
