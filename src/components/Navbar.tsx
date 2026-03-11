@@ -4,13 +4,9 @@ import { Button } from "@/components/ui/button";
 
 export default function Navbar() {
 
-  
   const [isOpen, setIsOpen] = useState(false);
-
-
   const [showSupport, setShowSupport] = useState(false);
   const [copied, setCopied] = useState(false);
-
 
   const myUpiId = "8465073056@ybl"; 
 
@@ -25,16 +21,16 @@ export default function Navbar() {
       <nav className="fixed top-0 left-0 right-0 z-40 glass border-b border-border/50 backdrop-blur-xl bg-background/60">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           
-          {/* Logo */}
-          <a href="/" className="flex items-center gap-3 group">
-            <div className="w-14 h-14 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+          {/* Logo - SIZE REDUCED HERE */}
+          <a href="/" className="flex items-center gap-2 group">
+            <div className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
               <img 
                 src="/logo.png" 
                 alt="Toolsy Logo" 
                 className="w-full h-full object-contain drop-shadow-2xl" 
               />
             </div>
-            <span className="text-3xl font-bold font-display tracking-tighter">Toolsy</span>
+            <span className="text-2xl md:text-3xl font-bold font-display tracking-tighter">Toolsy</span>
           </a>
 
           {/* Desktop Links */}
@@ -60,9 +56,7 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Menu Icon */}
-          
           <div className="md:hidden flex items-center gap-4">
-            
             <button onClick={() => setShowSupport(true)} className="text-primary p-1 animate-pulse">
               <Heart className="w-6 h-6 fill-primary" />
             </button>
@@ -77,7 +71,7 @@ export default function Navbar() {
         {isOpen && (
           <div className="md:hidden glass border-b border-border/50 bg-background/95 px-6 py-6 flex flex-col gap-5 shadow-2xl animate-fade-in text-foreground">
             <a href="/" className="text-xl font-bold hover:text-primary flex items-center gap-4">
-              <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain" />
+              <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
               Explore Tools
             </a>
 
@@ -127,12 +121,9 @@ export default function Navbar() {
               </p>
             </div>
 
-
             <div className="w-52 h-52 mx-auto bg-white rounded-2xl p-4 shadow-inner flex items-center justify-center mb-6 border border-primary/20 overflow-hidden text-black">
               <img src="/qr.png" alt="UPI Support QR" className="w-full h-full object-contain" />
             </div>
-
-            
 
             <div className="bg-secondary/50 rounded-xl p-1 flex items-center border border-border/50">
               <div className="flex-1 px-4 text-xs font-mono font-bold text-center truncate text-foreground">
@@ -152,4 +143,3 @@ export default function Navbar() {
     </>
   );
 }
-
