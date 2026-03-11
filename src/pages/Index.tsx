@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useTools } from "@/hooks/useTools";
 import { Input } from "@/components/ui/input";
 import { 
-  Search, Sparkles, ArrowRight, Star, TrendingUp, Bookmark, BookmarkCheck, LayoutGrid, Gift 
+  Search, Sparkles, ArrowRight, Star, TrendingUp, Bookmark, BookmarkCheck, LayoutGrid, Gift, ChevronDown, Check 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +19,10 @@ const Index = () => {
   
   // 🔥 NEW: SAVED TOOLS LOGIC
   const [savedToolIds, setSavedToolIds] = useState<string[]>([]);
+
+  // 🔥 NEW: CUSTOM PREMIUM PRICING DROPDOWN STATE
+  const [pricingFilter, setPricingFilter] = useState<string>("All");
+  const [isPricingOpen, setIsPricingOpen] = useState(false);
 
   // Load saved tools from local storage when page loads
   useEffect(() => {
@@ -95,16 +99,20 @@ const Index = () => {
       result = result.filter((t) => t.category === activeCategory);
     }
 
-    // 🔥 3. APPLY TAB FILTER (All, Free, Saved)
+    // 3. APPLY TAB FILTER (All, Free, Saved)
     if (activeTab === "free") {
       result = result.filter((t) => t.pricing && t.pricing.toLowerCase() === "free");
     } else if (activeTab === "saved") {
-      // 🛠️ FIXED: Force t.id to be a string
       result = result.filter((t) => savedToolIds.includes(String(t.id)));
+    }
+
+    // 🔥 4. APPLY CUSTOM PRICING DROPDOWN FILTER
+    if (pricingFilter !== "All") {
+      result = result.filter((t) => t.pricing && t.pricing.toLowerCase() === pricingFilter.toLowerCase());
     }
     
     return result; 
-  }, [tools, search, activeCategory, activeTab, savedToolIds]);
+  }, [tools, search, activeCategory, activeTab, savedToolIds, pricingFilter]);
 
   const featured = filtered.filter((t) => isSponsorshipActive(t, 'featured'));
 
@@ -124,9 +132,9 @@ const Index = () => {
             <span>Premium AI Tools Directory</span>
           </div>
 
-         <h1 className="text-4xl md:text-7xl font-black tracking-tighter mb-4 md:mb-6 text-white leading-[1.1]">
-  Discover the <span className="text-primary">Best</span> AI Tools
-</h1>
+          <h1 className="text-4xl md:text-7xl font-black tracking-tighter mb-4 md:mb-6 text-white leading-[1.1]">
+            Discover the <span className="text-primary">Best</span> AI Tools
+          </h1>
 
           <p className="text-gray-400 text-sm md:text-lg max-w-2xl mx-auto mb-6 md:mb-12">
             Discover the best AI tools to supercharge your workflow. curated daily for developers, designers, and creators.
@@ -135,19 +143,59 @@ const Index = () => {
       </section>
 
       {/* SEARCH AND FILTERS SECTION */}
-      <section className="px-4 md:px-6 max-w-5xl mx-auto relative z-10 mb-6 md:mb-12">
-        <div className="p-1.5 md:p-2 rounded-2xl md:rounded-3xl bg-white/5 border border-white/10 backdrop-blur-2xl shadow-2xl">
-          <div className="relative flex items-center pr-2">
-            <Search className="absolute left-4 md:left-6 h-4 md:h-5 w-4 md:w-5 text-muted-foreground" />
-            <Input
-              placeholder="Search AI tools (e.g. 'coding', 'video', 'free')..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-12 md:pl-16 h-12 md:h-16 bg-transparent border-0 text-white text-base md:text-lg focus-visible:ring-0 placeholder:text-gray-600"
-            />
+      <section className="px-4 md:px-6 max-w-5xl mx-auto relative z-30 mb-6 md:mb-12">
+        <div className="rounded-2xl md:rounded-3xl bg-white/5 border border-white/10 backdrop-blur-2xl shadow-2xl flex flex-col">
+          
+          <div className="flex flex-col md:flex-row items-center w-full relative">
+            {/* Search Input */}
+            <div className="relative flex-1 flex items-center w-full">
+              <Search className="absolute left-4 md:left-6 h-4 md:h-5 w-4 md:w-5 text-muted-foreground" />
+              <Input
+                placeholder="Search AI tools (e.g. 'coding', 'video', 'free')..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-12 md:pl-16 h-14 md:h-16 w-full bg-transparent border-0 text-white text-base md:text-lg focus-visible:ring-0 placeholder:text-gray-600 rounded-none md:rounded-tl-3xl md:rounded-bl-none"
+              />
+            </div>
+
+            {/* 🔥 NEW: CUSTOM PREMIUM DROPDOWN */}
+            <div className="relative w-full md:w-auto px-3 pb-3 md:p-0 md:pr-4 flex justify-end md:border-l border-white/10">
+              <button
+                onClick={() => setIsPricingOpen(!isPricingOpen)}
+                className="flex items-center justify-between w-full md:w-44 gap-2 px-4 h-12 bg-[#1A1A1A] hover:bg-white/10 border border-white/10 rounded-xl text-sm font-bold text-white transition-all shadow-inner"
+              >
+                <span className="text-gray-300">
+                  {pricingFilter === "All" ? "Pricing: All" : pricingFilter}
+                </span>
+                <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-300 ${isPricingOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {/* The Dropdown Menu */}
+              {isPricingOpen && (
+                <div className="absolute top-full right-3 md:right-4 mt-2 w-[calc(100%-24px)] md:w-48 bg-[#0F0F0F] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.9)] overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2">
+                  {["All", "Free", "Freemium", "Premium"].map((price) => (
+                    <button
+                      key={price}
+                      onClick={() => {
+                        setPricingFilter(price);
+                        setIsPricingOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-bold transition-all border-b border-white/5 last:border-0 ${
+                        pricingFilter === price 
+                          ? "bg-primary/10 text-primary" 
+                          : "text-gray-400 hover:bg-white/5 hover:text-white"
+                      }`}
+                    >
+                      {price === "All" ? "Any Price" : price}
+                      {pricingFilter === price && <Check className="w-4 h-4" />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="flex gap-2 overflow-x-auto p-2 md:p-4 no-scrollbar border-t border-white/5 mt-1 md:mt-2">
+          <div className="flex gap-2 overflow-x-auto p-2 md:p-4 no-scrollbar border-t border-white/5">
             <style>{`.no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
             {categories.map((cat) => (
               <button
@@ -282,6 +330,29 @@ const Index = () => {
                 </Button>
               </div>
             )}
+            
+            {/* GLOBAL SUPPORT SECTION */}
+            <section className="pt-20 border-t border-white/5">
+              <div className="max-w-3xl mx-auto p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 text-center backdrop-blur-sm">
+                <div className="inline-flex p-3 rounded-2xl bg-primary/10 text-primary mb-6">
+                  <Star className="w-6 h-6 fill-primary" />
+                </div>
+                <h2 className="text-2xl md:text-3xl font-black text-white mb-4 tracking-tight">
+                  Help Us Keep <span className="text-primary">Toolsy</span> Alive
+                </h2>
+                <p className="text-gray-400 text-sm md:text-base leading-relaxed mb-8 max-w-xl mx-auto">
+                  Toolsy is a global mission to map the AI universe. If our curated hub saved you time or money, consider fueling our next update. Your support helps us stay 100% independent and ad-free.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button variant="outline" className="rounded-2xl h-12 px-8 border-white/10 hover:bg-white/5 text-white font-bold" onClick={() => window.open('YOUR_PAYMENT_OR_COFFEE_LINK', '_blank')}>
+                    ☕ Fuel the Mission
+                  </Button>
+                  <Button variant="ghost" className="rounded-2xl h-12 px-8 text-gray-500 hover:text-white" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+                    Back to Top
+                  </Button>
+                </div>
+              </div>
+            </section>
           </>
         )}
       </div>
