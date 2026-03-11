@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useTools } from "@/hooks/useTools";
 import { Input } from "@/components/ui/input";
 import { 
-  Search, Sparkles, ArrowRight, Star, TrendingUp, Bookmark, BookmarkCheck 
+  Search, Sparkles, ArrowRight, Star, TrendingUp, Bookmark, BookmarkCheck, LayoutGrid, Gift 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -47,7 +47,6 @@ const Index = () => {
     return ["All", ...new Set(tools.map((t) => t.category))].sort();
   }, [tools]);
 
-  
   const trackClick = async (toolId: string, currentClicks: number) => {
     try {
       await supabase
@@ -59,12 +58,9 @@ const Index = () => {
     }
   };
 
-
-
   const isSponsorshipActive = (tool: any, type: 'featured' | 'suggested') => {
     const isMarked = tool[type] === true || String(tool[type]) === "true";
     if (!isMarked) return false;
-
 
     if (!tool.sponsored_until) return true;
     const expiryDate = new Date(tool.sponsored_until);
@@ -86,8 +82,6 @@ const Index = () => {
           t.description.toLowerCase().includes(q) ||
           t.category.toLowerCase().includes(q)
       );
-
-
 
       result.sort((a, b) => {
         const aSug = isSponsorshipActive(a, 'suggested');
@@ -114,8 +108,6 @@ const Index = () => {
 
   const featured = filtered.filter((t) => isSponsorshipActive(t, 'featured'));
 
-
-
   const rest = filtered.filter((t) => !featured.includes(t));
   const visibleRest = rest.slice(0, displayLimit);
 
@@ -132,13 +124,9 @@ const Index = () => {
             <span>Premium AI Tools Directory</span>
           </div>
 
-
-
-          <h1 className="text-4xl md:text-7xl font-black tracking-tighter mb-4 md:mb-6 text-white leading-[1.1]">
-            Toolsy: India's <span className="text-primary">Largest</span> AI Hub
-          </h1>
-
-
+         <h1 className="text-4xl md:text-7xl font-black tracking-tighter mb-4 md:mb-6 text-white leading-[1.1]">
+  Discover the <span className="text-primary">Best</span> AI Tools
+</h1>
 
           <p className="text-gray-400 text-sm md:text-lg max-w-2xl mx-auto mb-6 md:mb-12">
             Discover the best AI tools to supercharge your workflow. curated daily for developers, designers, and creators.
@@ -152,19 +140,12 @@ const Index = () => {
           <div className="relative flex items-center pr-2">
             <Search className="absolute left-4 md:left-6 h-4 md:h-5 w-4 md:w-5 text-muted-foreground" />
             <Input
-
-
               placeholder="Search AI tools (e.g. 'coding', 'video', 'free')..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-12 md:pl-16 h-12 md:h-16 bg-transparent border-0 text-white text-base md:text-lg focus-visible:ring-0 placeholder:text-gray-600"
             />
-
-
-
           </div>
-
-
 
           <div className="flex gap-2 overflow-x-auto p-2 md:p-4 no-scrollbar border-t border-white/5 mt-1 md:mt-2">
             <style>{`.no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
@@ -185,31 +166,57 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 🔥 NEW: THE 3 TABS SYSTEM */}
+      {/* 🔥 UPGRADED 3-TAB SYSTEM (MOBILE OPTIMIZED APP UI) */}
       <div className="max-w-7xl mx-auto px-4 md:px-6 mb-8 relative z-10">
-        <div className="flex justify-center md:justify-start gap-2 border-b border-white/10 pb-4 overflow-x-auto no-scrollbar">
-          <Button 
-            variant="ghost" 
+        <div className="flex w-full justify-between md:justify-start gap-2 md:gap-4 border-b border-white/10 pb-4">
+          
+          {/* ALL TOOLS TAB */}
+          <button 
             onClick={() => setActiveTab("all")} 
-            className={`font-black uppercase tracking-widest text-xs md:text-sm rounded-xl px-6 h-12 ${activeTab === "all" ? "bg-white/10 text-white border border-white/20" : "text-gray-500 hover:text-white hover:bg-white/5"}`}
+            className={`group flex flex-col md:flex-row items-center justify-center gap-1.5 md:gap-2 flex-1 md:flex-none py-3 md:px-6 rounded-2xl md:rounded-xl transition-all duration-300 active:scale-95 ${
+              activeTab === "all" 
+                ? "bg-white/10 text-white border border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.05)] translate-y-0" 
+                : "text-gray-500 bg-transparent hover:text-white hover:bg-white/5 hover:-translate-y-1"
+            }`}
           >
-            All Tools
-          </Button>
-          <Button 
-            variant="ghost" 
+            <LayoutGrid className={`w-5 h-5 md:w-4 md:h-4 transition-transform duration-300 ${activeTab === "all" ? "scale-110" : "group-hover:scale-110"}`} />
+            <span className="font-black uppercase tracking-widest text-[10px] md:text-sm">All Tools</span>
+          </button>
+
+          {/* FREE TOOLS TAB */}
+          <button 
             onClick={() => setActiveTab("free")} 
-            className={`font-black uppercase tracking-widest text-xs md:text-sm rounded-xl px-6 h-12 ${activeTab === "free" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.2)]" : "text-gray-500 hover:text-white hover:bg-white/5"}`}
+            className={`group flex flex-col md:flex-row items-center justify-center gap-1.5 md:gap-2 flex-1 md:flex-none py-3 md:px-6 rounded-2xl md:rounded-xl transition-all duration-300 active:scale-95 ${
+              activeTab === "free" 
+                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.2)] translate-y-0" 
+                : "text-gray-500 bg-transparent hover:text-white hover:bg-white/5 hover:-translate-y-1"
+            }`}
           >
-            100% Free
-          </Button>
-          <Button 
-            variant="ghost" 
+            <Gift className={`w-5 h-5 md:w-4 md:h-4 transition-transform duration-300 ${activeTab === "free" ? "scale-110" : "group-hover:scale-110"}`} />
+            <span className="font-black uppercase tracking-widest text-[10px] md:text-sm">100% Free</span>
+          </button>
+
+          {/* SAVED TOOLS TAB */}
+          <button 
             onClick={() => setActiveTab("saved")} 
-            className={`font-black uppercase tracking-widest text-xs md:text-sm rounded-xl px-6 h-12 ${activeTab === "saved" ? "bg-primary/20 text-primary border border-primary/30 shadow-[0_0_15px_rgba(var(--primary),0.2)]" : "text-gray-500 hover:text-white hover:bg-white/5"}`}
+            className={`group flex flex-col md:flex-row items-center justify-center gap-1.5 md:gap-2 flex-1 md:flex-none py-3 md:px-6 rounded-2xl md:rounded-xl transition-all duration-300 active:scale-95 ${
+              activeTab === "saved" 
+                ? "bg-primary/20 text-primary border border-primary/30 shadow-[0_0_20px_rgba(var(--primary),0.2)] translate-y-0" 
+                : "text-gray-500 bg-transparent hover:text-white hover:bg-white/5 hover:-translate-y-1"
+            }`}
           >
-            <Bookmark className="w-4 h-4 mr-2" />
-            Saved ({savedToolIds.length})
-          </Button>
+            <div className="relative">
+              <Bookmark className={`w-5 h-5 md:w-4 md:h-4 transition-transform duration-300 ${activeTab === "saved" ? "scale-110 fill-primary/20" : "group-hover:scale-110"}`} />
+              {/* App-style notification dot */}
+              {savedToolIds.length > 0 && (
+                <span className="absolute -top-1.5 -right-2 md:-top-2 md:-right-3 flex h-3.5 w-3.5 md:h-4 md:w-4 items-center justify-center rounded-full bg-primary text-[8px] md:text-[9px] text-white font-black shadow-lg">
+                  {savedToolIds.length}
+                </span>
+              )}
+            </div>
+            <span className="font-black uppercase tracking-widest text-[10px] md:text-sm">Saved</span>
+          </button>
+
         </div>
       </div>
 
@@ -258,11 +265,11 @@ const Index = () => {
             ) : (
               // EMPTY STATE FOR SAVED TAB
               activeTab === "saved" && (
-                <div className="text-center py-20 border border-dashed border-white/10 rounded-3xl bg-white/5">
+                <div className="text-center py-20 border border-dashed border-white/10 rounded-3xl bg-white/5 transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
                   <Bookmark className="w-12 h-12 text-gray-600 mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-white mb-2">No tools saved yet</h3>
                   <p className="text-gray-500">Click the bookmark icon on any tool to save it for later.</p>
-                  <Button onClick={() => setActiveTab("all")} className="mt-6 font-bold bg-primary text-white">Explore Tools</Button>
+                  <Button onClick={() => setActiveTab("all")} className="mt-6 font-bold bg-primary text-white transition-transform hover:scale-105">Explore Tools</Button>
                 </div>
               )
             )}
@@ -270,10 +277,7 @@ const Index = () => {
             {/* LOAD MORE BUTTON */}
             {rest.length > displayLimit && (
               <div className="flex justify-center pt-8 md:pt-12">
-
-
-
-                <Button onClick={() => setDisplayLimit(p => p + 12)} size="lg" variant="outline" className="h-12 md:h-14 px-8 md:px-10 rounded-xl md:rounded-2xl bg-white/5 border-white/10 hover:bg-primary/20 hover:text-white transition-all text-sm md:text-base">
+                <Button onClick={() => setDisplayLimit(p => p + 12)} size="lg" variant="outline" className="h-12 md:h-14 px-8 md:px-10 rounded-xl md:rounded-2xl bg-white/5 border-white/10 hover:bg-primary/20 hover:text-white transition-all duration-300 hover:-translate-y-1 text-sm md:text-base">
                   Load More Tools <ArrowRight className="ml-2 h-4 md:h-5 w-4 md:w-5" />
                 </Button>
               </div>
@@ -322,12 +326,11 @@ function ToolGrid({
               <div className="flex flex-col items-end gap-2">
                 {/* 🔥 BOOKMARK BUTTON */}
                 <button 
-                  // 🛠️ FIXED: Force tool.id to be a string
                   onClick={() => onToggleSave(String(tool.id))}
-                  className={`p-2 rounded-full border transition-all ${isSaved ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-white/5 border-white/10 text-gray-500 hover:text-white hover:bg-white/10'}`}
+                  className={`p-2.5 rounded-full border transition-all duration-300 active:scale-75 ${isSaved ? 'bg-primary/20 border-primary/50 text-primary shadow-[0_0_15px_rgba(var(--primary),0.3)]' : 'bg-white/5 border-white/10 text-gray-500 hover:text-white hover:bg-white/10 hover:rotate-12'}`}
                   title={isSaved ? "Remove from Saved" : "Save Tool"}
                 >
-                  {isSaved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+                  {isSaved ? <BookmarkCheck className="w-4 h-4 scale-110" /> : <Bookmark className="w-4 h-4" />}
                 </button>
 
                 {tool.pricing && (
@@ -335,8 +338,6 @@ function ToolGrid({
                     {tool.pricing}
                   </Badge>
                 )}
-
-
 
                 {showSuggested && (
                   <Badge className="bg-primary text-white border-0 text-[9px] md:text-[10px] uppercase font-black tracking-widest px-2.5 md:px-3 py-1 rounded-full animate-pulse shadow-[0_0_15px_rgba(var(--primary),0.5)]">
@@ -376,4 +377,3 @@ function ToolGrid({
 }
 
 export default Index;
-

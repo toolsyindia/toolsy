@@ -123,9 +123,7 @@ export default function Navbar() {
               </div>
               <h2 className="text-2xl font-bold font-display mb-2">Support the Developer</h2>
               <p className="text-muted-foreground text-sm leading-relaxed">
-                I'm a 17-year-old developer and a 2nd-year student 
-                coding late into the night to build Toolsy. 
-                Your support isn't just a tip; it's a vote of confidence! ❤️
+                "Maintaining a global AI directory requires constant research and infrastructure. Contributions support the ongoing development and scaling of Toolsy for creators worldwide."
               </p>
             </div>
 
