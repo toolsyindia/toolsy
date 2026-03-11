@@ -204,16 +204,7 @@ export default function ControlPanel() {
     tool.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleAdd = async (data: any) => {
-    try {
-      await addTool.mutateAsync(data);
-      toast.success("Tool added successfully! 🚀");
-      setAddOpen(false);
-    } catch (err: any) {
-      toast.error(err.message);
-    }
-  };
-
+  // 🔥 KEPT ONLY THE FIXED VERSION OF handleAdd
   const handleAdd = async (data: any) => {
     try {
       // 🔥 FIX: If the date is empty, send 'null' so Supabase doesn't complain
