@@ -214,10 +214,32 @@ export default function ControlPanel() {
     }
   };
 
+  const handleAdd = async (data: any) => {
+    try {
+      // 🔥 FIX: If the date is empty, send 'null' so Supabase doesn't complain
+      const payload = { ...data };
+      if (!payload.sponsored_until) {
+        payload.sponsored_until = null;
+      }
+
+      await addTool.mutateAsync(payload);
+      toast.success("Tool added successfully! 🚀");
+      setAddOpen(false);
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
+
   const handleEdit = async (data: any) => {
     if (!editingTool) return;
     try {
-      await updateTool.mutateAsync({ id: editingTool.id, ...data });
+      // 🔥 FIX: If the date is empty, send 'null' so Supabase doesn't complain
+      const payload = { ...data };
+      if (!payload.sponsored_until) {
+        payload.sponsored_until = null;
+      }
+
+      await updateTool.mutateAsync({ id: editingTool.id, ...payload });
       toast.success("Tool updated! 🛠️");
       setEditOpen(false);
       setEditingTool(null);
