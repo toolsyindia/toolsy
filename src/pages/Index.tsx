@@ -27,10 +27,16 @@ const QuizOverlay = ({
 
   const handleFinish = () => {
     let tagToSearch = "";
+    
+    // 🔥 UPGRADED MATCHMAKING LOGIC
     if (answers.problem === "Video Editing") tagToSearch = "video";
-    else if (answers.problem === "Coding") tagToSearch = "code";
-    else if (answers.problem === "Design") tagToSearch = "design";
+    else if (answers.problem === "Coding & Websites") tagToSearch = "code";
+    else if (answers.problem === "Design & Images") tagToSearch = "design";
     else if (answers.problem === "Writing Content") tagToSearch = "writing";
+    else if (answers.problem === "Audio & Music") tagToSearch = "audio";
+    else if (answers.problem === "Automation") tagToSearch = "automation";
+    else if (answers.problem === "Data & Analytics") tagToSearch = "data";
+    else if (answers.problem === "Useful Utilities") tagToSearch = "utility";
 
     console.log("Captured Email:", email); 
     onComplete(tagToSearch);
@@ -103,12 +109,18 @@ const QuizOverlay = ({
             </div>
             <h2 className="text-3xl md:text-4xl font-black text-gray-900 text-center mb-2 tracking-tight">What is your biggest struggle?</h2>
             <p className="text-gray-500 text-center mb-8">Pick your headache, we will fix it.</p>
-            <div className="space-y-4">
-              {["Video Editing", "Writing Content", "Coding", "Design"].map((opt) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {/* 🔥 EXPANDED BUTTON LIST */}
+              {[
+                "Video Editing", "Writing Content", 
+                "Coding & Websites", "Design & Images",
+                "Audio & Music", "Automation",
+                "Data & Analytics", "Useful Utilities"
+              ].map((opt) => (
                 <button 
                   key={opt}
                   onClick={() => handleAnswer("problem", opt, 3)}
-                  className="w-full p-5 text-left bg-white border-2 border-gray-100 rounded-2xl hover:border-indigo-500 hover:bg-indigo-50 text-gray-800 font-bold text-lg transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
+                  className="w-full p-4 text-left bg-white border-2 border-gray-100 rounded-2xl hover:border-indigo-500 hover:bg-indigo-50 text-gray-800 font-bold text-sm md:text-base transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
                 >
                   {opt}
                 </button>

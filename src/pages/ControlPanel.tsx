@@ -137,10 +137,15 @@ function ToolForm({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="none">No Tag (Skip in Quiz)</SelectItem>
-            <SelectItem value="video">Video Editing / Generation</SelectItem>
-            <SelectItem value="code">Coding / Web Dev</SelectItem>
-            <SelectItem value="design">Design / Image Generation</SelectItem>
-            <SelectItem value="writing">Writing / Chatbots</SelectItem>
+            <SelectItem value="video">🎬 Video Editing / Generation</SelectItem>
+            <SelectItem value="code">💻 Coding & Web Dev</SelectItem>
+            <SelectItem value="design">🎨 Design & Images</SelectItem>
+            <SelectItem value="writing">✍️ Writing & Chatbots</SelectItem>
+            {/* 🔥 NEW TAGS ADDED BELOW */}
+            <SelectItem value="audio">🎵 Audio & Voice</SelectItem>
+            <SelectItem value="automation">⚙️ Automation & Workflows</SelectItem>
+            <SelectItem value="data">📊 Data & Analytics</SelectItem>
+            <SelectItem value="utility">🛠️ Everyday Utilities</SelectItem>
           </SelectContent>
         </Select>
         <p className="text-[10px] text-gray-500 mt-1">
