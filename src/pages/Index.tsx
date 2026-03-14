@@ -25,10 +25,9 @@ const QuizOverlay = ({
     setStep(nextStep);
   };
 
-  const handleFinish = () => {
+ const handleFinish = async () => {
     let tagToSearch = "";
     
-    // 🔥 UPGRADED MATCHMAKING LOGIC
     if (answers.problem === "Video Editing") tagToSearch = "video";
     else if (answers.problem === "Coding & Websites") tagToSearch = "code";
     else if (answers.problem === "Design & Images") tagToSearch = "design";
@@ -38,10 +37,30 @@ const QuizOverlay = ({
     else if (answers.problem === "Data & Analytics") tagToSearch = "data";
     else if (answers.problem === "Useful Utilities") tagToSearch = "utility";
 
-    console.log("Captured Email:", email); 
+    // 🔥 Send data to your FREE Unlimited Google Sheet
+    if (email.trim() !== "") {
+      try {
+        await fetch("https://script.google.com/macros/s/AKfycbzf2hzxyEqdbOshBuRBti6wmYjHX4yc8BAGqgRmzQnv-p9QKNm73KA-ZH-cpathXc3K4w/exec", {
+          method: "POST",
+          mode: "no-cors", 
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+            goal: answers.goal,
+            role: answers.role,
+            problem: answers.problem
+          }),
+        });
+        console.log("Sent successfully to Google Sheets!");
+      } catch (error) {
+        console.error("Failed to send to Google Sheets:", error);
+      }
+    }
+
     onComplete(tagToSearch);
   };
-
   return (
     <div className="fixed inset-0 z-[999] bg-[#F9FAFB] flex flex-col justify-center items-center p-6 animate-in fade-in duration-500">
       
