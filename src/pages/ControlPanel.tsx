@@ -12,10 +12,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge"; 
 import { toast } from "sonner";
-// 🔥 Added 'Ban' icon for the 1-click Revoke feature
-import { Pencil, Trash2, Plus, LogOut, LayoutDashboard, Star, TrendingUp, Search, MousePointer2, CalendarClock, Ban } from "lucide-react"; 
+import { Pencil, Trash2, Plus, LogOut, LayoutDashboard, Star, TrendingUp, Search, MousePointer2, CalendarClock, Ban, Tags } from "lucide-react"; 
 import type { Tool } from "@/types/tool";
 
+// 🔥 Added tags to emptyTool
 const emptyTool = {
   name: "",
   description: "",
@@ -27,6 +27,7 @@ const emptyTool = {
   icon: "",
   sponsored_until: "",
   click_count: 0,
+  tags: "", 
 };
 
 function LoginForm({ onLogin }: { onLogin: (email: string, password: string) => Promise<void> }) {
@@ -66,6 +67,7 @@ function LoginForm({ onLogin }: { onLogin: (email: string, password: string) => 
   );
 }
 
+// 🔥 ONLY MODIFIED ToolForm TO ADD THE TAG SELECTOR
 function ToolForm({ 
   initial, 
   onSubmit, 
@@ -120,6 +122,32 @@ function ToolForm({
           </Select>
         </div>
       </div>
+
+      {/* 🔥 NEW: SELECTABLE DROPDOWN FOR TAGS */}
+      <div className="space-y-2 p-4 bg-indigo-500/5 rounded-lg border border-indigo-500/20">
+        <Label className="flex items-center gap-2 text-indigo-400">
+          <Tags className="w-4 h-4" /> Matchmaker Tag (For Quiz)
+        </Label>
+        <Select 
+          value={form.tags || "none"} 
+          onValueChange={(v) => set("tags", v === "none" ? "" : v)}
+        >
+          <SelectTrigger className="border-indigo-500/20 focus:ring-indigo-500">
+            <SelectValue placeholder="Select a matching tag" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">No Tag (Skip in Quiz)</SelectItem>
+            <SelectItem value="video">Video Editing / Generation</SelectItem>
+            <SelectItem value="code">Coding / Web Dev</SelectItem>
+            <SelectItem value="design">Design / Image Generation</SelectItem>
+            <SelectItem value="writing">Writing / Chatbots</SelectItem>
+          </SelectContent>
+        </Select>
+        <p className="text-[10px] text-gray-500 mt-1">
+          Select the category this tool belongs to in the Front-End Quiz.
+        </p>
+      </div>
+
       <div className="space-y-2">
         <Label>Link (URL)</Label>
         <Input value={form.link} onChange={(e) => set("link", e.target.value)} required placeholder="https://..." />
@@ -176,7 +204,6 @@ export default function ControlPanel() {
   const updateTool = useUpdateTool();
   const deleteTool = useDeleteTool();
   
-  // 🔥 NEW STATE: Toggles between standard database and Ad Manager
   const [view, setView] = useState<"database" | "ads">("database");
   
   const [editingTool, setEditingTool] = useState<Tool | null>(null);
@@ -202,11 +229,9 @@ export default function ControlPanel() {
   const activeSuggested = tools?.filter(t => isSponsorshipActive(t, 'suggested')).length || 0;
   const totalClicks = tools?.reduce((acc, tool) => acc + (tool.click_count || 0), 0) || 0;
 
-  // For the Ad Manager View
   const featuredTools = tools?.filter(t => isSponsorshipActive(t, 'featured')) || [];
   const suggestedTools = tools?.filter(t => isSponsorshipActive(t, 'suggested')) || [];
   
-  // Create exactly 6 slots for the visual grid
   const premiumSlots = Array.from({ length: 6 }).map((_, i) => featuredTools[i] || null);
 
   const filteredTools = tools?.filter((tool) => 
@@ -273,7 +298,6 @@ export default function ControlPanel() {
     }
   };
 
-  // 🔥 NEW: 1-Click Revoke for Ad Manager
   const handleRevokeAd = async (tool: Tool, field: "featured" | "suggested") => {
     if (!confirm(`Are you sure you want to kick ${tool.name} out of the ${field} slot?`)) return;
     try {
@@ -322,7 +346,6 @@ export default function ControlPanel() {
 
         {/* 📈 METRICS CARDS */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {/* 🔥 UPGRADED CARD: TOTAL TOOLS (Replaced Fake Revenue) */}
           <Card className="bg-white/5 border-white/10 shadow-xl">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-xs font-black uppercase text-gray-500 tracking-widest">Total Tools</CardTitle>
@@ -390,9 +413,6 @@ export default function ControlPanel() {
           </Button>
         </div>
 
-        {/* ============================================================== */}
-        {/* VIEW 1: FULL DATABASE (Original view) */}
-        {/* ============================================================== */}
         {view === "database" && (
           <div className="space-y-4 animate-in fade-in duration-300">
             <div className="flex items-center gap-4 max-w-md bg-white/5 rounded-2xl p-1 px-4 border border-white/10">
@@ -477,13 +497,8 @@ export default function ControlPanel() {
           </div>
         )}
 
-        {/* ============================================================== */}
-        {/* VIEW 2: AD MANAGER PRO (Visual Dashboard) */}
-        {/* ============================================================== */}
         {view === "ads" && (
           <div className="space-y-8 animate-in fade-in duration-300">
-            
-            {/* 6 PREMIUM SLOTS VISUALIZER */}
             <div>
               <h2 className="text-xl font-black text-white flex items-center gap-2 mb-4">
                 <Star className="text-yellow-500 fill-yellow-500 w-5 h-5" /> 
@@ -492,7 +507,6 @@ export default function ControlPanel() {
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {premiumSlots.map((tool, index) => {
                   if (tool) {
-                    // SLOT IS FILLED
                     return (
                       <Card key={tool.id} className="bg-white/5 border-yellow-500/30 shadow-[0_0_15px_rgba(234,179,8,0.1)]">
                         <CardHeader className="pb-2">
@@ -523,7 +537,6 @@ export default function ControlPanel() {
                       </Card>
                     );
                   } else {
-                    // SLOT IS EMPTY
                     return (
                       <Card key={`empty-${index}`} className="bg-transparent border-dashed border-white/20 flex flex-col justify-center items-center min-h-[160px]">
                         <CardContent className="flex flex-col items-center text-center p-6">
@@ -540,7 +553,6 @@ export default function ControlPanel() {
               </div>
             </div>
 
-            {/* ACTIVE SEARCH ADS TABLE */}
             <div className="pt-6 border-t border-white/10">
               <h2 className="text-xl font-black text-white flex items-center gap-2 mb-4">
                 <TrendingUp className="text-blue-500 w-5 h-5" /> 
@@ -588,7 +600,6 @@ export default function ControlPanel() {
                 </Card>
               )}
             </div>
-
           </div>
         )}
 
