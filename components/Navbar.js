@@ -23,7 +23,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
             <div className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              <img src="/logo.png" alt="Toolsy Logo" className="w-full h-full object-contain drop-shadow-2xl" />
+              <img src="/logo.png" alt="Toolsy Logo" style={{ width: "32px", height: "32px", objectFit: "contain" }} />
             </div>
             <span className="text-2xl md:text-3xl font-bold tracking-tighter text-white">Toolsy</span>
           </Link>
