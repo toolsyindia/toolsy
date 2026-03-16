@@ -136,10 +136,8 @@ function ToolGrid({ tools, isSearch, checkActive, onVisit, savedIds, onToggleSav
             onMouseOver={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.borderColor = "rgba(139, 92, 246, 0.6)"; }}
             onMouseOut={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.borderColor = isHighlighted ? "rgba(139, 92, 246, 0.5)" : "rgba(255,255,255,0.08)"; }}>
             
-            {/* Background Glow for Featured */}
             <div style={{ position: "absolute", top: "-50px", right: "-50px", width: "140px", height: "140px", borderRadius: "50%", background: `rgba(139, 92, 246, ${isHighlighted ? "0.15" : "0.03"})`, filter: "blur(40px)", pointerEvents: "none" }} />
             
-            {/* Header: Icon & Badges */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.25rem", position: "relative", zIndex: 1, boxSizing: "border-box" }}>
               <div style={{ fontSize: "2.25rem", padding: "0.625rem", background: "rgba(255,255,255,0.03)", borderRadius: "0.75rem", border: "1px solid rgba(255,255,255,0.05)", lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>{tool.icon || "⚡"}</div>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.5rem" }}>
@@ -150,14 +148,12 @@ function ToolGrid({ tools, isSearch, checkActive, onVisit, savedIds, onToggleSav
               </div>
             </div>
             
-            {/* Content Area */}
             <div style={{ display: "flex", flexDirection: "column", flexGrow: 1, position: "relative", zIndex: 1, boxSizing: "border-box" }}>
               <span style={{ fontSize: "0.65rem", fontWeight: 800, color: "#8b5cf6", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.5rem", display: "block" }}>{tool.category}</span>
               <h3 style={{ fontSize: "1.25rem", fontWeight: 700, color: "white", marginBottom: "0.5rem", letterSpacing: "-0.01em", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tool.name}</h3>
               <p style={{ color: "#a1a1aa", fontSize: "0.85rem", lineHeight: 1.6, marginBottom: "1.5rem", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{tool.description}</p>
             </div>
             
-            {/* CTA Button */}
             <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "1.25rem", position: "relative", zIndex: 1, boxSizing: "border-box", marginTop: "auto" }}>
               <a href={tool.link?.startsWith("http") ? tool.link : `https://${tool.link}`} target="_blank" rel="noopener noreferrer" onClick={() => onVisit(tool.id, tool.click_count || 0)}
                 style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", width: "100%", background: "rgba(255,255,255,0.03)", color: "white", fontSize: "0.85rem", fontWeight: 700, padding: "0.75rem 1rem", borderRadius: "0.75rem", border: "1px solid rgba(255,255,255,0.08)", textDecoration: "none", transition: "all 0.2s", boxSizing: "border-box" }}
@@ -269,7 +265,7 @@ export default function Home() {
 
       <div style={{ minHeight: "100vh", background: "#0d0d0d", color: "white" }}>
 
-        {/* HERO */}
+        {/* HERO SECTION UPGRADE - BIGGER, TIGHTER TEXT LIKE THE OLD DESIGN */}
         <section style={{ position: "relative", paddingTop: "5rem", paddingBottom: "1rem", textAlign: "center", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: "700px", height: "450px", background: "radial-gradient(ellipse at 50% 0%, rgba(var(--primary),0.15) 0%, transparent 65%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 1, maxWidth: "820px", margin: "0 auto", padding: "0 1rem" }}>
@@ -277,30 +273,38 @@ export default function Home() {
               <Sparkles size={11} color="rgb(var(--primary))" style={{ flexShrink: 0 }} />
               <span style={{ fontSize: "10px", fontWeight: 600, color: "rgb(var(--primary))", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>Premium AI Tools Directory</span>
             </div>
-            <h1 style={{ fontSize: "clamp(2rem, 9vw, 6rem)", fontWeight: 900, letterSpacing: "-0.03em", lineHeight: 1.05, marginBottom: "1rem", color: "white" }}>
+            
+            {/* UPDATED FONT SETTINGS: Heavier, tighter letter spacing, much larger clamp */}
+            <h1 style={{ fontSize: "clamp(3.5rem, 10vw, 6.5rem)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 1, marginBottom: "1.25rem", color: "white" }}>
               Discover the{" "}
               <span style={{ color: "rgb(var(--primary))" }}>Best</span>
               {" "}AI Tools
             </h1>
+            
             <p style={{ color: "#6b7280", fontSize: "clamp(0.85rem, 2.5vw, 1.1rem)", maxWidth: "540px", margin: "0 auto 2rem", lineHeight: 1.6 }}>
               Stop wasting hours on Google. We curate the internet&apos;s most powerful tools for developers, designers, and creators.
             </p>
           </div>
         </section>
 
-        {/* SEARCH & FILTERS */}
-        <section style={{ maxWidth: "760px", margin: "0 auto", padding: "0 1rem 1.25rem" }}>
-          <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.75rem" }}>
-            <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: "0.5rem", background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "0.875rem", padding: "0 0.75rem" }}>
-              <Search size={15} color="#4b5563" style={{ flexShrink: 0 }} />
-              <input placeholder="Search AI tools..." value={search} onChange={(e) => setSearch(e.target.value)}
-                style={{ flex: 1, minWidth: 0, background: "transparent", border: "none", outline: "none", color: "white", fontSize: "0.875rem", padding: "0.825rem 0", fontFamily: "inherit" }} />
+        {/* SEARCH & FILTERS UPGRADE - WIDER SEARCH BAR */}
+        <section style={{ maxWidth: "880px", margin: "0 auto", padding: "0 1rem 1.5rem" }}>
+          <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.25rem" }}>
+            {/* UPDATED SEARCH BAR: Taller, wider, premium background and glowing border on focus */}
+            <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: "0.75rem", background: "#121212", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "1rem", padding: "0 1.25rem", height: "3.5rem", transition: "border-color 0.2s" }}
+                 onFocusCapture={e => e.currentTarget.style.borderColor = "rgb(var(--primary))"}
+                 onBlurCapture={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"}>
+              <Search size={18} color="#6b7280" style={{ flexShrink: 0 }} />
+              <input placeholder="Search AI tools (e.g. 'coding', 'video')..." value={search} onChange={(e) => setSearch(e.target.value)}
+                style={{ flex: 1, minWidth: 0, background: "transparent", border: "none", outline: "none", color: "white", fontSize: "1rem", fontFamily: "inherit", height: "100%" }} />
             </div>
             <div style={{ position: "relative", flexShrink: 0 }}>
               <button onClick={() => setIsPricingOpen(!isPricingOpen)}
-                style={{ display: "flex", alignItems: "center", gap: "0.375rem", height: "100%", padding: "0 0.875rem", background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "0.875rem", color: "#9ca3af", cursor: "pointer", fontWeight: 700, fontSize: "0.85rem", fontFamily: "inherit", whiteSpace: "nowrap" }}>
-                <SlidersHorizontal size={15} />
-                <span className="filter-label" style={{ fontSize: "0.85rem" }}>{pricingFilter === "All" ? "Filters" : pricingFilter}</span>
+                style={{ display: "flex", alignItems: "center", gap: "0.5rem", height: "3.5rem", padding: "0 1.25rem", background: "#121212", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "1rem", color: "#9ca3af", cursor: "pointer", fontWeight: 700, fontSize: "0.95rem", fontFamily: "inherit", whiteSpace: "nowrap", transition: "all 0.2s" }}
+                onMouseOver={e => { e.currentTarget.style.borderColor = "rgb(var(--primary))"; e.currentTarget.style.color = "white"; }}
+                onMouseOut={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; e.currentTarget.style.color = "#9ca3af"; }}>
+                <SlidersHorizontal size={18} />
+                <span className="filter-label" style={{ fontSize: "0.95rem" }}>{pricingFilter === "All" ? "Filters" : pricingFilter}</span>
               </button>
               {isPricingOpen && (
                 <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, width: "175px", background: "#111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "1rem", overflow: "hidden", zIndex: 100, boxShadow: "0 20px 60px rgba(0,0,0,0.8)" }}>
@@ -316,13 +320,15 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Categories */}
-          <div style={{ display: "flex", flexWrap: "nowrap", gap: "0.4rem", overflowX: "auto", paddingBottom: "0.5rem", scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}>
+          {/* CATEGORIES UPGRADE - STRICT SINGLE LINE, BETTER PADDING, PREMIUM HOVER */}
+          <div style={{ display: "flex", flexWrap: "nowrap", gap: "0.6rem", overflowX: "auto", paddingBottom: "1rem", scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}>
             {categories.map((cat) => {
               const isActive = (activeCategory === cat) || (cat === "All" && activeCategory === null);
               return (
                 <button key={cat} onClick={() => setActiveCategory(cat === "All" ? null : cat)}
-                  style={{ flexShrink: 0, flexGrow: 0, padding: "0.4rem 0.875rem", borderRadius: "9999px", fontSize: "0.75rem", fontWeight: 700, whiteSpace: "nowrap", cursor: "pointer", fontFamily: "inherit", background: isActive ? "rgb(var(--primary))" : "#1a1a1a", color: isActive ? "white" : "#6b7280", border: `1px solid ${isActive ? "rgb(var(--primary))" : "rgba(255,255,255,0.08)"}`, transition: "all 0.2s" }}>
+                  style={{ flexShrink: 0, flexGrow: 0, padding: "0.6rem 1.25rem", borderRadius: "9999px", fontSize: "0.875rem", fontWeight: 700, whiteSpace: "nowrap", cursor: "pointer", fontFamily: "inherit", background: isActive ? "rgb(var(--primary))" : "#161616", color: isActive ? "white" : "#a1a1aa", border: `1px solid ${isActive ? "rgb(var(--primary))" : "rgba(255,255,255,0.08)"}`, transition: "all 0.2s" }}
+                  onMouseOver={e => { if(!isActive) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"; e.currentTarget.style.color = "white"; } }}
+                  onMouseOut={e => { if(!isActive) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; e.currentTarget.style.color = "#a1a1aa"; } }}>
                   {cat}
                 </button>
               );
