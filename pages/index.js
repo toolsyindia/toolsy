@@ -126,37 +126,48 @@ const QuizOverlay = ({ onComplete, onSkip }) => {
 
 function ToolGrid({ tools, isSearch, checkActive, onVisit, savedIds, onToggleSave }) {
   return (
-    <div style={{ display: "grid", gap: "1.25rem", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 250px), 1fr))" }}>
+    <div style={{ display: "grid", gap: "1.5rem", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 280px), 1fr))" }}>
       {tools.map((tool) => {
         const isHighlighted = (isSearch && checkActive(tool, "suggested")) || (!isSearch && checkActive(tool, "featured"));
         const isSaved = savedIds.includes(String(tool.id));
         return (
           <div key={tool.id}
-            style={{ position: "relative", background: "#161616", border: `1px solid ${isHighlighted ? "rgba(var(--primary),0.4)" : "rgba(255,255,255,0.06)"}`, borderRadius: "1.25rem", padding: "1.25rem", transition: "transform 0.25s, border-color 0.25s", display: "flex", flexDirection: "column", overflow: "hidden" }}
-            onMouseOver={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.borderColor = "rgba(var(--primary),0.35)"; }}
-            onMouseOut={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.borderColor = isHighlighted ? "rgba(var(--primary),0.4)" : "rgba(255,255,255,0.06)"; }}>
-            <div style={{ position: "absolute", top: "-50px", right: "-50px", width: "140px", height: "140px", borderRadius: "50%", background: `rgba(var(--primary),${isHighlighted ? "0.1" : "0.03"})`, filter: "blur(35px)", pointerEvents: "none" }} />
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.875rem", position: "relative", zIndex: 1 }}>
-              <div style={{ fontSize: "2.25rem", padding: "0.625rem", background: "rgba(255,255,255,0.05)", borderRadius: "0.75rem", border: "1px solid rgba(255,255,255,0.06)", lineHeight: 1 }}>{tool.icon || "⚡"}</div>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.375rem" }}>
-                <button onClick={() => onToggleSave(String(tool.id))} style={{ padding: "0.4rem", borderRadius: "50%", border: `1px solid ${isSaved ? "rgba(var(--primary),0.5)" : "rgba(255,255,255,0.1)"}`, background: isSaved ? "rgba(var(--primary),0.15)" : "rgba(255,255,255,0.04)", color: isSaved ? "rgb(var(--primary))" : "#6b7280", cursor: "pointer" }}>
-                  {isSaved ? <BookmarkCheck size={15} /> : <Bookmark size={15} />}
+            style={{ position: "relative", background: "#161616", border: `1px solid ${isHighlighted ? "rgba(139, 92, 246, 0.5)" : "rgba(255,255,255,0.08)"}`, borderRadius: "1.25rem", padding: "1.5rem", transition: "transform 0.25s, border-color 0.25s", display: "flex", flexDirection: "column", overflow: "hidden", boxSizing: "border-box" }}
+            onMouseOver={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.borderColor = "rgba(139, 92, 246, 0.6)"; }}
+            onMouseOut={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.borderColor = isHighlighted ? "rgba(139, 92, 246, 0.5)" : "rgba(255,255,255,0.08)"; }}>
+            
+            {/* Background Glow for Featured */}
+            <div style={{ position: "absolute", top: "-50px", right: "-50px", width: "140px", height: "140px", borderRadius: "50%", background: `rgba(139, 92, 246, ${isHighlighted ? "0.15" : "0.03"})`, filter: "blur(40px)", pointerEvents: "none" }} />
+            
+            {/* Header: Icon & Badges */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.25rem", position: "relative", zIndex: 1, boxSizing: "border-box" }}>
+              <div style={{ fontSize: "2.25rem", padding: "0.625rem", background: "rgba(255,255,255,0.03)", borderRadius: "0.75rem", border: "1px solid rgba(255,255,255,0.05)", lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>{tool.icon || "⚡"}</div>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.5rem" }}>
+                <button onClick={() => onToggleSave(String(tool.id))} style={{ padding: "0.5rem", borderRadius: "50%", border: `1px solid ${isSaved ? "rgba(139, 92, 246, 0.5)" : "rgba(255,255,255,0.1)"}`, background: isSaved ? "rgba(139, 92, 246, 0.15)" : "rgba(255,255,255,0.04)", color: isSaved ? "#8b5cf6" : "#6b7280", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  {isSaved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
                 </button>
-                {tool.pricing && <span style={{ background: "rgba(255,255,255,0.07)", color: "#9ca3af", border: "1px solid rgba(255,255,255,0.06)", fontSize: "8px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", padding: "3px 7px", borderRadius: "9999px" }}>{tool.pricing}</span>}
+                {tool.pricing && <span style={{ background: "rgba(255,255,255,0.05)", color: "#a1a1aa", border: "1px solid rgba(255,255,255,0.08)", fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", padding: "0.25rem 0.5rem", borderRadius: "9999px" }}>{tool.pricing}</span>}
               </div>
             </div>
-            <span style={{ fontSize: "9px", fontWeight: 800, color: "#71717a", textTransform: "uppercase", letterSpacing: "0.08em", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", padding: "2px 7px", borderRadius: "4px", display: "inline-block", marginBottom: "0.5rem", position: "relative", zIndex: 1 }}>{tool.category}</span>
-            <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "white", marginBottom: "0.4rem", letterSpacing: "-0.01em", lineHeight: 1.3, position: "relative", zIndex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tool.name}</h3>
-            <p style={{ color: "#6b7280", fontSize: "0.775rem", lineHeight: 1.6, marginBottom: "1rem", flexGrow: 1, position: "relative", zIndex: 1, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{tool.description}</p>
-            <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "0.875rem", position: "relative", zIndex: 1 }}>
+            
+            {/* Content Area */}
+            <div style={{ display: "flex", flexDirection: "column", flexGrow: 1, position: "relative", zIndex: 1, boxSizing: "border-box" }}>
+              <span style={{ fontSize: "0.65rem", fontWeight: 800, color: "#8b5cf6", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.5rem", display: "block" }}>{tool.category}</span>
+              <h3 style={{ fontSize: "1.25rem", fontWeight: 700, color: "white", marginBottom: "0.5rem", letterSpacing: "-0.01em", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tool.name}</h3>
+              <p style={{ color: "#a1a1aa", fontSize: "0.85rem", lineHeight: 1.6, marginBottom: "1.5rem", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{tool.description}</p>
+            </div>
+            
+            {/* CTA Button */}
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "1.25rem", position: "relative", zIndex: 1, boxSizing: "border-box", marginTop: "auto" }}>
               <a href={tool.link?.startsWith("http") ? tool.link : `https://${tool.link}`} target="_blank" rel="noopener noreferrer" onClick={() => onVisit(tool.id, tool.click_count || 0)}
-                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.4rem", width: "100%", background: "rgba(255,255,255,0.05)", color: "white", fontSize: "0.775rem", fontWeight: 700, padding: "0.6rem 1rem", borderRadius: "0.6rem", border: "1px solid rgba(255,255,255,0.09)", textDecoration: "none", transition: "all 0.2s" }}
-                onMouseOver={e => { e.currentTarget.style.background = "rgb(var(--primary))"; e.currentTarget.style.borderColor = "rgb(var(--primary))"; }}
-                onMouseOut={e => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.09)"; }}>
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", width: "100%", background: "rgba(255,255,255,0.03)", color: "white", fontSize: "0.85rem", fontWeight: 700, padding: "0.75rem 1rem", borderRadius: "0.75rem", border: "1px solid rgba(255,255,255,0.08)", textDecoration: "none", transition: "all 0.2s", boxSizing: "border-box" }}
+                onMouseOver={e => { e.currentTarget.style.background = "#8b5cf6"; e.currentTarget.style.borderColor = "#8b5cf6"; }}
+                onMouseOut={e => { e.currentTarget.style.background = "rgba(255,255,255,0.03)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; }}>
                 {tool.pricing?.toLowerCase() === "free" ? "Claim Free Tool" : tool.pricing?.toLowerCase() === "freemium" ? "Start for Free" : tool.pricing?.toLowerCase() === "premium" ? "Get Official Tool" : "Visit Website"}
-                <ArrowRight size={13} />
+                <ArrowRight size={14} />
               </a>
             </div>
+            
           </div>
         );
       })}
