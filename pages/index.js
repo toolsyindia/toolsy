@@ -339,26 +339,29 @@ export default function Home() {
         </section>
 
         {/* TABS UPGRADE - PREMIUM SAAS SEGMENTED CONTROL */}
-        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 1rem 2rem", overflowX: "auto" }}>
-          <div style={{ display: "inline-flex", gap: "0.25rem", background: "#121212", border: "1px solid rgba(255,255,255,0.08)", padding: "0.35rem", borderRadius: "1rem", flexWrap: "nowrap", boxShadow: "0 4px 20px -10px rgba(0,0,0,0.5)" }}>
-            {[{ id: "all", label: "All Tools", icon: <LayoutGrid size={16} /> }, { id: "free", label: "Free", icon: <Gift size={16} /> }, { id: "saved", label: "Saved", icon: <Bookmark size={16} /> }].map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
-                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                  style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.6rem 1.25rem", borderRadius: "0.75rem", border: "none", cursor: "pointer", fontWeight: 700, fontSize: "0.9rem", fontFamily: "inherit", transition: "all 0.2s ease", background: isActive ? "rgba(255,255,255,0.12)" : "transparent", color: isActive ? "white" : "#808080", boxShadow: isActive ? "0 2px 10px rgba(0,0,0,0.2)" : "none" }}
-                  onMouseOver={e => { if(!isActive) { e.currentTarget.style.color = "white"; e.currentTarget.style.background = "rgba(255,255,255,0.04)"; } }}
-                  onMouseOut={e => { if(!isActive) { e.currentTarget.style.color = "#808080"; e.currentTarget.style.background = "transparent"; } }}>
-                  {tab.icon} {tab.label}
-                  {tab.id === "saved" && savedToolIds.length > 0 && (
-                    <span style={{ background: "rgb(var(--primary))", color: "white", fontSize: "10px", fontWeight: 900, padding: "2px 6px", borderRadius: "9999px", marginLeft: "0.25rem" }}>{savedToolIds.length}</span>
-                  )}
-                </button>
-              );
-            })}
+        {/* TABS UPGRADE - CENTERED ON DESKTOP, SCROLLABLE ON MOBILE */}
+        <div style={{ width: "100%", display: "flex", justifyContent: "center", padding: "0 1rem 2.5rem" }}>
+          <div style={{ maxWidth: "100%", overflowX: "auto", scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch", padding: "0.25rem" }}>
+            <div style={{ display: "inline-flex", gap: "0.25rem", background: "#121212", border: "1px solid rgba(255,255,255,0.08)", padding: "0.35rem", borderRadius: "1rem", flexWrap: "nowrap", boxShadow: "0 4px 20px -10px rgba(0,0,0,0.5)" }}>
+              {[{ id: "all", label: "All Tools", icon: <LayoutGrid size={16} /> }, { id: "free", label: "Free", icon: <Gift size={16} /> }, { id: "saved", label: "Saved", icon: <Bookmark size={16} /> }].map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                    style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.6rem 1.25rem", borderRadius: "0.75rem", border: "none", cursor: "pointer", fontWeight: 700, fontSize: "0.9rem", fontFamily: "inherit", transition: "all 0.2s ease", background: isActive ? "rgba(255,255,255,0.12)" : "transparent", color: isActive ? "white" : "#808080", boxShadow: isActive ? "0 2px 10px rgba(0,0,0,0.2)" : "none", whiteSpace: "nowrap" }}
+                    onMouseOver={e => { if(!isActive) { e.currentTarget.style.color = "white"; e.currentTarget.style.background = "rgba(255,255,255,0.04)"; } }}
+                    onMouseOut={e => { if(!isActive) { e.currentTarget.style.color = "#808080"; e.currentTarget.style.background = "transparent"; } }}>
+                    {tab.icon} {tab.label}
+                    {tab.id === "saved" && savedToolIds.length > 0 && (
+                      <span style={{ background: "rgb(var(--primary))", color: "white", fontSize: "10px", fontWeight: 900, padding: "2px 6px", borderRadius: "9999px", marginLeft: "0.25rem" }}>{savedToolIds.length}</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        
+
         {/* TOOLS */}
         <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 1rem 5rem" }}>
           {isLoading ? (
