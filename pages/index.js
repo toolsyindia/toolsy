@@ -3,14 +3,11 @@ import Head from "next/head";
 import { useTools } from "@/hooks/useTools";
 import { supabase } from "@/lib/supabase";
 import {
-  Search, Sparkles, ArrowRight, Star, Bookmark, BookmarkCheck,
-  LayoutGrid, Gift, ChevronDown, Check, Target, User, Lightbulb,
+  Search, Sparkles, ArrowRight, Bookmark, BookmarkCheck,
+  LayoutGrid, Gift, Check, Target, User, Lightbulb,
   X, SlidersHorizontal
 } from "lucide-react";
 
-// ============================================================
-// QUIZ OVERLAY
-// ============================================================
 const QuizOverlay = ({ onComplete, onSkip }) => {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({ goal: "", role: "", problem: "" });
@@ -28,186 +25,136 @@ const QuizOverlay = ({ onComplete, onSkip }) => {
 
   const handleFinish = async () => {
     const tagMap = {
-      "Video Editing": "video",
-      "Coding & Websites": "code",
-      "Design & Images": "design",
-      "Writing Content": "writing",
-      "Audio & Music": "audio",
-      "Automation": "automation",
-      "Data & Analytics": "data",
-      "Useful Utilities": "utility",
+      "Video Editing": "video", "Coding & Websites": "code",
+      "Design & Images": "design", "Writing Content": "writing",
+      "Audio & Music": "audio", "Automation": "automation",
+      "Data & Analytics": "data", "Useful Utilities": "utility",
     };
     const tagToSearch = tagMap[answers.problem] || "";
-
     if (email.trim() !== "") {
       try {
         await fetch("https://script.google.com/macros/s/AKfycbzf2hzxyEqdbOshBuRBti6wmYjHX4yc8BAGqgRmzQnv-p9QKNm73KA-ZH-cpathXc3K4w/exec", {
-          method: "POST",
-          mode: "no-cors",
+          method: "POST", mode: "no-cors",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, ...answers }),
         });
-      } catch (error) {
-        console.error("Failed to send to Google Sheets:", error);
-      }
+      } catch (error) { console.error("Failed:", error); }
     }
     onComplete(tagToSearch);
   };
 
+  const qBtn = { padding: "1.25rem", textAlign: "left", background: "white", border: "2px solid #f3f4f6", borderRadius: "1rem", color: "#1f2937", fontWeight: 700, fontSize: "1rem", cursor: "pointer", width: "100%", fontFamily: "inherit", transition: "border-color 0.2s" };
+
   return (
-    <div className="fixed inset-0 z-[999] bg-[#F9FAFB] overflow-y-auto flex flex-col items-center justify-start md:justify-center p-6 pt-16 pb-24 animate-in fade-in duration-500">
-      <div className="fixed top-0 left-0 w-full h-1.5 bg-gray-200 z-[1000]">
-        <div className="h-full bg-indigo-500 transition-all duration-500 ease-out" style={{ width: `${(step / 3) * 100}%` }} />
+    <div style={{ position: "fixed", inset: 0, zIndex: 999, background: "#F9FAFB", overflowY: "auto", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "1.5rem" }}>
+      <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "4px", background: "#e5e7eb", zIndex: 1000 }}>
+        <div style={{ height: "100%", background: "rgb(var(--primary))", width: `${(step / 3) * 100}%`, transition: "width 0.5s ease" }} />
       </div>
-
-      <div className="w-full max-w-xl flex flex-col my-auto">
+      <div style={{ width: "100%", maxWidth: "480px" }}>
         {step === 0 && (
-          <div className="animate-in slide-in-from-bottom-4 duration-500 w-full">
-            <div className="flex justify-center mb-6">
-              <div className="p-4 bg-indigo-100 rounded-full text-indigo-600"><Target className="w-8 h-8" /></div>
+          <div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "1.5rem" }}>
+              <div style={{ padding: "1rem", background: "rgba(var(--primary),0.1)", borderRadius: "50%", color: "rgb(var(--primary))" }}><Target size={32} /></div>
             </div>
-            <h2 className="text-3xl md:text-4xl font-black text-gray-900 text-center mb-2 tracking-tight">What is your goal today?</h2>
-            <p className="text-gray-500 text-center mb-8">Let&apos;s find the exact AI tools you need.</p>
-            <div className="space-y-4">
+            <h2 style={{ fontSize: "2rem", fontWeight: 900, color: "#111", textAlign: "center", marginBottom: "0.5rem", letterSpacing: "-0.02em" }}>What is your goal today?</h2>
+            <p style={{ color: "#6b7280", textAlign: "center", marginBottom: "2rem" }}>Let&apos;s find the exact AI tools you need.</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
               {["Make Money", "Save Time", "Just Exploring"].map((opt) => (
-                <button key={opt} onClick={() => handleAnswer("goal", opt, 1)}
-                  className="w-full p-5 text-left bg-white border-2 border-gray-100 rounded-2xl hover:border-indigo-500 hover:bg-indigo-50 text-gray-800 font-bold text-lg transition-all active:scale-[0.98] shadow-sm hover:shadow-md">
-                  {opt}
-                </button>
+                <button key={opt} onClick={() => handleAnswer("goal", opt, 1)} style={qBtn}
+                  onMouseOver={e => e.currentTarget.style.borderColor = "rgb(var(--primary))"}
+                  onMouseOut={e => e.currentTarget.style.borderColor = "#f3f4f6"}>{opt}</button>
               ))}
             </div>
           </div>
         )}
-
         {step === 1 && (
-          <div className="animate-in slide-in-from-right-8 duration-500 w-full">
-            <div className="flex justify-center mb-6">
-              <div className="p-4 bg-indigo-100 rounded-full text-indigo-600"><User className="w-8 h-8" /></div>
+          <div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "1.5rem" }}>
+              <div style={{ padding: "1rem", background: "rgba(var(--primary),0.1)", borderRadius: "50%", color: "rgb(var(--primary))" }}><User size={32} /></div>
             </div>
-            <h2 className="text-3xl md:text-4xl font-black text-gray-900 text-center mb-2 tracking-tight">Who are you?</h2>
-            <p className="text-gray-500 text-center mb-8">This helps us personalize your tool stack.</p>
-            <div className="space-y-4">
+            <h2 style={{ fontSize: "2rem", fontWeight: 900, color: "#111", textAlign: "center", marginBottom: "0.5rem", letterSpacing: "-0.02em" }}>Who are you?</h2>
+            <p style={{ color: "#6b7280", textAlign: "center", marginBottom: "2rem" }}>This helps us personalize your tool stack.</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
               {["Content Creator", "Developer / Student", "Business Owner"].map((opt) => (
-                <button key={opt} onClick={() => handleAnswer("role", opt, 2)}
-                  className="w-full p-5 text-left bg-white border-2 border-gray-100 rounded-2xl hover:border-indigo-500 hover:bg-indigo-50 text-gray-800 font-bold text-lg transition-all active:scale-[0.98] shadow-sm hover:shadow-md">
-                  {opt}
-                </button>
+                <button key={opt} onClick={() => handleAnswer("role", opt, 2)} style={qBtn}
+                  onMouseOver={e => e.currentTarget.style.borderColor = "rgb(var(--primary))"}
+                  onMouseOut={e => e.currentTarget.style.borderColor = "#f3f4f6"}>{opt}</button>
               ))}
             </div>
           </div>
         )}
-
         {step === 2 && (
-          <div className="animate-in slide-in-from-right-8 duration-500 w-full">
-            <div className="flex justify-center mb-6">
-              <div className="p-4 bg-indigo-100 rounded-full text-indigo-600"><Lightbulb className="w-8 h-8" /></div>
+          <div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "1.5rem" }}>
+              <div style={{ padding: "1rem", background: "rgba(var(--primary),0.1)", borderRadius: "50%", color: "rgb(var(--primary))" }}><Lightbulb size={32} /></div>
             </div>
-            <h2 className="text-3xl md:text-4xl font-black text-gray-900 text-center mb-2 tracking-tight">What is your biggest struggle?</h2>
-            <p className="text-gray-500 text-center mb-8">Pick your headache, we will fix it.</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-8 md:pb-0">
+            <h2 style={{ fontSize: "2rem", fontWeight: 900, color: "#111", textAlign: "center", marginBottom: "0.5rem", letterSpacing: "-0.02em" }}>What&apos;s your biggest struggle?</h2>
+            <p style={{ color: "#6b7280", textAlign: "center", marginBottom: "2rem" }}>Pick your headache, we will fix it.</p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.625rem" }}>
               {["Video Editing", "Writing Content", "Coding & Websites", "Design & Images", "Audio & Music", "Automation", "Data & Analytics", "Useful Utilities"].map((opt) => (
-                <button key={opt} onClick={() => handleAnswer("problem", opt, 3)}
-                  className="w-full p-4 text-left bg-white border-2 border-gray-100 rounded-2xl hover:border-indigo-500 hover:bg-indigo-50 text-gray-800 font-bold text-sm md:text-base transition-all active:scale-[0.98] shadow-sm hover:shadow-md">
-                  {opt}
-                </button>
+                <button key={opt} onClick={() => handleAnswer("problem", opt, 3)} style={{ ...qBtn, fontSize: "0.875rem", padding: "1rem" }}
+                  onMouseOver={e => e.currentTarget.style.borderColor = "rgb(var(--primary))"}
+                  onMouseOut={e => e.currentTarget.style.borderColor = "#f3f4f6"}>{opt}</button>
               ))}
             </div>
           </div>
         )}
-
         {step === 3 && (
-          <div className="animate-in zoom-in-95 duration-700 ease-out w-full bg-white p-8 md:p-10 rounded-3xl shadow-2xl border border-indigo-100 text-center relative overflow-hidden">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-32 bg-gradient-to-b from-indigo-50 to-transparent pointer-events-none" />
-            <div className="relative z-10">
-              <div className="inline-flex p-4 rounded-full bg-indigo-50 text-indigo-600 mb-6 shadow-inner">
-                <Sparkles className="w-8 h-8" />
-              </div>
-              <h2 className="text-3xl font-black text-gray-900 mb-3 tracking-tight">Match Found! 🎯</h2>
-              <h3 className="text-xl md:text-2xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-5 leading-snug">
-                We found the best AI tools that fix your exact problem.
-              </h3>
-              <p className="text-gray-500 mb-8 max-w-sm mx-auto font-medium">
-                Enter your email to see your matches and get notified whenever the best new AI tools are added.
-              </p>
-              <div className="flex flex-col gap-4">
-                <input type="email" placeholder="Your email address" value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium text-lg focus:outline-none focus:border-indigo-500 focus:bg-white transition-all placeholder:text-gray-400" />
-                <button onClick={handleFinish}
-                  className="w-full py-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-black text-lg rounded-xl shadow-[0_10px_30px_rgba(79,70,229,0.3)] transition-all hover:-translate-y-1 active:scale-95 flex justify-center items-center gap-2 group">
-                  Show Matches <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </button>
-              </div>
+          <div style={{ background: "white", padding: "2.5rem", borderRadius: "1.5rem", boxShadow: "0 25px 50px rgba(0,0,0,0.12)", border: "1px solid #e0e7ff", textAlign: "center" }}>
+            <div style={{ display: "inline-flex", padding: "1rem", borderRadius: "50%", background: "rgba(var(--primary),0.1)", color: "rgb(var(--primary))", marginBottom: "1.5rem" }}><Sparkles size={32} /></div>
+            <h2 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#111", marginBottom: "0.75rem" }}>Match Found! 🎯</h2>
+            <p style={{ fontSize: "1rem", fontWeight: 700, color: "rgb(var(--primary))", marginBottom: "1rem" }}>We found the best AI tools for your exact problem.</p>
+            <p style={{ color: "#6b7280", marginBottom: "1.5rem", fontSize: "0.875rem" }}>Enter your email to see your matches.</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+              <input type="email" placeholder="Your email address" value={email} onChange={(e) => setEmail(e.target.value)}
+                style={{ padding: "1rem 1.5rem", background: "#f9fafb", border: "2px solid #e5e7eb", borderRadius: "0.75rem", fontSize: "1rem", outline: "none", color: "#111", fontFamily: "inherit" }} />
+              <button onClick={handleFinish} style={{ padding: "1rem", background: "rgb(var(--primary))", color: "white", fontWeight: 900, fontSize: "1rem", borderRadius: "0.75rem", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", fontFamily: "inherit" }}>
+                Show Matches <ArrowRight size={18} />
+              </button>
             </div>
           </div>
         )}
       </div>
-
       {step < 3 && (
-        <button onClick={onSkip}
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 text-gray-400 font-medium hover:text-gray-600 transition-colors flex items-center gap-1 bg-[#F9FAFB] px-4 py-2 rounded-full shadow-sm md:shadow-none z-[1000]">
-          Skip to explore all tools <ArrowRight className="w-3 h-3" />
+        <button onClick={onSkip} style={{ position: "fixed", bottom: "1.5rem", left: "50%", transform: "translateX(-50%)", color: "#9ca3af", background: "#F9FAFB", padding: "0.5rem 1.25rem", borderRadius: "9999px", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.25rem", fontSize: "0.875rem", fontFamily: "inherit" }}>
+          Skip to explore all tools <ArrowRight size={12} />
         </button>
       )}
     </div>
   );
 };
 
-// ============================================================
-// TOOL GRID
-// ============================================================
 function ToolGrid({ tools, isSearch, checkActive, onVisit, savedIds, onToggleSave }) {
   return (
-    <div className="grid gap-6 md:gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div style={{ display: "grid", gap: "1.25rem", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))" }}>
       {tools.map((tool) => {
-        const showSuggested = isSearch && checkActive(tool, "suggested");
-        const showFeaturedGlow = !isSearch && checkActive(tool, "featured");
+        const isHighlighted = (isSearch && checkActive(tool, "suggested")) || (!isSearch && checkActive(tool, "featured"));
         const isSaved = savedIds.includes(String(tool.id));
-
         return (
           <div key={tool.id}
-            className={`group relative bg-[#0F0F0F] border rounded-3xl md:rounded-[2rem] p-5 md:p-7 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full overflow-hidden ${(showSuggested || showFeaturedGlow) ? "border-primary/40 shadow-[0_0_40px_-10px_rgba(var(--primary),0.2)]" : "border-white/5 hover:border-primary/40"}`}>
-            <div className={`absolute -top-24 -right-24 w-48 h-48 blur-[60px] transition-all ${(showSuggested || showFeaturedGlow) ? "bg-primary/20" : "bg-primary/5 group-hover:bg-primary/10"}`} />
-
-            <div className="flex justify-between items-start mb-4 md:mb-5 z-10">
-              <div className="text-4xl md:text-5xl p-3 md:p-4 bg-white/5 rounded-xl md:rounded-2xl border border-white/5 group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-500">
-                {tool.icon || "⚡"}
-              </div>
-              <div className="flex flex-col items-end gap-2">
-                <button onClick={() => onToggleSave(String(tool.id))}
-                  className={`p-2.5 rounded-full border transition-all duration-300 active:scale-75 ${isSaved ? "bg-primary/20 border-primary/50 text-primary shadow-[0_0_15px_rgba(var(--primary),0.3)]" : "bg-white/5 border-white/10 text-gray-500 hover:text-white hover:bg-white/10 hover:rotate-12"}`}>
-                  {isSaved ? <BookmarkCheck className="w-4 h-4 scale-110" /> : <Bookmark className="w-4 h-4" />}
+            style={{ position: "relative", background: "#161616", border: `1px solid ${isHighlighted ? "rgba(var(--primary),0.4)" : "rgba(255,255,255,0.06)"}`, borderRadius: "1.25rem", padding: "1.25rem", transition: "transform 0.25s, border-color 0.25s", display: "flex", flexDirection: "column", overflow: "hidden" }}
+            onMouseOver={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.borderColor = "rgba(var(--primary),0.35)"; }}
+            onMouseOut={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.borderColor = isHighlighted ? "rgba(var(--primary),0.4)" : "rgba(255,255,255,0.06)"; }}>
+            <div style={{ position: "absolute", top: "-50px", right: "-50px", width: "140px", height: "140px", borderRadius: "50%", background: `rgba(var(--primary),${isHighlighted ? "0.1" : "0.03"})`, filter: "blur(35px)", pointerEvents: "none" }} />
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.875rem", position: "relative", zIndex: 1 }}>
+              <div style={{ fontSize: "2.25rem", padding: "0.625rem", background: "rgba(255,255,255,0.05)", borderRadius: "0.75rem", border: "1px solid rgba(255,255,255,0.06)", lineHeight: 1 }}>{tool.icon || "⚡"}</div>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.375rem" }}>
+                <button onClick={() => onToggleSave(String(tool.id))} style={{ padding: "0.4rem", borderRadius: "50%", border: `1px solid ${isSaved ? "rgba(var(--primary),0.5)" : "rgba(255,255,255,0.1)"}`, background: isSaved ? "rgba(var(--primary),0.15)" : "rgba(255,255,255,0.04)", color: isSaved ? "rgb(var(--primary))" : "#6b7280", cursor: "pointer" }}>
+                  {isSaved ? <BookmarkCheck size={15} /> : <Bookmark size={15} />}
                 </button>
-                {tool.pricing && (
-                  <span className="bg-white/10 text-gray-300 border border-white/5 text-[9px] md:text-[10px] uppercase font-bold tracking-widest px-2.5 md:px-3 py-1 rounded-full mt-1">
-                    {tool.pricing}
-                  </span>
-                )}
+                {tool.pricing && <span style={{ background: "rgba(255,255,255,0.07)", color: "#9ca3af", border: "1px solid rgba(255,255,255,0.06)", fontSize: "8px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", padding: "3px 7px", borderRadius: "9999px" }}>{tool.pricing}</span>}
               </div>
             </div>
-
-            <div className="mb-3 z-10 flex">
-              <span className="text-[9px] md:text-[10px] font-black text-zinc-400 uppercase tracking-widest bg-white/5 border border-white/10 px-2.5 py-1 rounded-md">
-                {tool.category}
-              </span>
-            </div>
-
-            <h3 className="text-xl md:text-2xl font-bold text-white mb-2 md:mb-3 tracking-tight group-hover:text-primary transition-colors line-clamp-1 z-10">
-              {tool.name}
-            </h3>
-            <p className="text-gray-500 text-xs md:text-sm leading-relaxed mb-6 md:mb-8 line-clamp-3 flex-grow group-hover:text-gray-400 z-10">
-              {tool.description}
-            </p>
-
-            <div className="pt-4 md:pt-5 border-t border-white/5 mt-auto z-10 w-full">
-              <a href={tool.link?.startsWith("http") ? tool.link : `https://${tool.link}`}
-                target="_blank" rel="noopener noreferrer"
-                onClick={() => onVisit(tool.id, tool.click_count || 0)}
-                className="flex items-center justify-center w-full gap-2 bg-white/5 hover:bg-primary text-white text-[11px] md:text-sm font-bold py-3 px-4 rounded-xl transition-all border border-white/10 hover:border-primary shadow-sm">
-                {tool.pricing?.toLowerCase() === "free" ? "Claim Free Tool" :
-                  tool.pricing?.toLowerCase() === "freemium" ? "Start for Free" :
-                  tool.pricing?.toLowerCase() === "premium" ? "Get Official Tool" : "Visit Website"}
-                <ArrowRight className="h-4 w-4" />
+            <span style={{ fontSize: "9px", fontWeight: 800, color: "#71717a", textTransform: "uppercase", letterSpacing: "0.08em", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", padding: "2px 7px", borderRadius: "4px", display: "inline-block", marginBottom: "0.5rem", position: "relative", zIndex: 1 }}>{tool.category}</span>
+            <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "white", marginBottom: "0.4rem", letterSpacing: "-0.01em", lineHeight: 1.3, position: "relative", zIndex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tool.name}</h3>
+            <p style={{ color: "#6b7280", fontSize: "0.775rem", lineHeight: 1.6, marginBottom: "1rem", flexGrow: 1, position: "relative", zIndex: 1, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{tool.description}</p>
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "0.875rem", position: "relative", zIndex: 1 }}>
+              <a href={tool.link?.startsWith("http") ? tool.link : `https://${tool.link}`} target="_blank" rel="noopener noreferrer" onClick={() => onVisit(tool.id, tool.click_count || 0)}
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.4rem", width: "100%", background: "rgba(255,255,255,0.05)", color: "white", fontSize: "0.775rem", fontWeight: 700, padding: "0.6rem 1rem", borderRadius: "0.6rem", border: "1px solid rgba(255,255,255,0.09)", textDecoration: "none", transition: "all 0.2s" }}
+                onMouseOver={e => { e.currentTarget.style.background = "rgb(var(--primary))"; e.currentTarget.style.borderColor = "rgb(var(--primary))"; }}
+                onMouseOut={e => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.09)"; }}>
+                {tool.pricing?.toLowerCase() === "free" ? "Claim Free Tool" : tool.pricing?.toLowerCase() === "freemium" ? "Start for Free" : tool.pricing?.toLowerCase() === "premium" ? "Get Official Tool" : "Visit Website"}
+                <ArrowRight size={13} />
               </a>
             </div>
           </div>
@@ -217,9 +164,6 @@ function ToolGrid({ tools, isSearch, checkActive, onVisit, savedIds, onToggleSav
   );
 }
 
-// ============================================================
-// MAIN PAGE
-// ============================================================
 export default function Home() {
   const { data: tools, isLoading } = useTools();
   const [search, setSearch] = useState("");
@@ -234,9 +178,7 @@ export default function Home() {
 
   useEffect(() => {
     const saved = localStorage.getItem("toolsy_saved");
-    if (saved) {
-      try { setSavedToolIds(JSON.parse(saved)); } catch (e) { }
-    }
+    if (saved) { try { setSavedToolIds(JSON.parse(saved)); } catch (e) { } }
     const quizCompleted = localStorage.getItem("toolsy_quiz_done");
     if (!quizCompleted) {
       const timer = setTimeout(() => setShowQuiz(true), 1500);
@@ -244,19 +186,9 @@ export default function Home() {
     }
   }, []);
 
-  const handleQuizComplete = (tag) => {
-    if (tag) setQuizFilterTag(tag);
-    setShowQuiz(false);
-    localStorage.setItem("toolsy_quiz_done", "true");
-  };
-
-  const handleQuizSkip = () => {
-    setShowQuiz(false);
-    localStorage.setItem("toolsy_quiz_done", "true");
-  };
-
+  const handleQuizComplete = (tag) => { if (tag) setQuizFilterTag(tag); setShowQuiz(false); localStorage.setItem("toolsy_quiz_done", "true"); };
+  const handleQuizSkip = () => { setShowQuiz(false); localStorage.setItem("toolsy_quiz_done", "true"); };
   const clearQuizFilter = () => setQuizFilterTag(null);
-
   const toggleSaveTool = (id) => {
     setSavedToolIds((prev) => {
       const newSaved = prev.includes(id) ? prev.filter(tId => tId !== id) : [...prev, id];
@@ -271,11 +203,8 @@ export default function Home() {
   }, [tools]);
 
   const trackClick = async (toolId, currentClicks) => {
-    try {
-      await supabase.from("tools").update({ click_count: (currentClicks || 0) + 1 }).eq("id", toolId);
-    } catch (error) {
-      console.error("Error tracking click:", error);
-    }
+    try { await supabase.from("tools").update({ click_count: (currentClicks || 0) + 1 }).eq("id", toolId); }
+    catch (error) { console.error("Error:", error); }
   };
 
   const isSponsorshipActive = (tool, type) => {
@@ -283,47 +212,23 @@ export default function Home() {
     if (!isMarked) return false;
     if (!tool.sponsored_until) return true;
     const expiryDate = new Date(tool.sponsored_until);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = new Date(); today.setHours(0, 0, 0, 0);
     return expiryDate >= today;
   };
 
   const filtered = useMemo(() => {
     if (!tools) return [];
     let result = [...tools];
-
     if (search.trim()) {
       const q = search.toLowerCase();
-      result = result.filter(t =>
-        t.name.toLowerCase().includes(q) ||
-        t.description.toLowerCase().includes(q) ||
-        t.category.toLowerCase().includes(q)
-      );
-      result.sort((a, b) => {
-        const aSug = isSponsorshipActive(a, "suggested");
-        const bSug = isSponsorshipActive(b, "suggested");
-        return aSug === bSug ? 0 : aSug ? -1 : 1;
-      });
+      result = result.filter(t => t.name.toLowerCase().includes(q) || t.description.toLowerCase().includes(q) || t.category.toLowerCase().includes(q));
+      result.sort((a, b) => { const aSug = isSponsorshipActive(a, "suggested"); const bSug = isSponsorshipActive(b, "suggested"); return aSug === bSug ? 0 : aSug ? -1 : 1; });
     }
-
-    if (activeCategory && activeCategory !== "All") {
-      result = result.filter(t => t.category === activeCategory);
-    }
-
-    if (activeTab === "free") {
-      result = result.filter(t => t.pricing?.toLowerCase() === "free");
-    } else if (activeTab === "saved") {
-      result = result.filter(t => savedToolIds.includes(String(t.id)));
-    }
-
-    if (pricingFilter !== "All") {
-      result = result.filter(t => t.pricing?.toLowerCase() === pricingFilter.toLowerCase());
-    }
-
-    if (quizFilterTag) {
-      result = result.filter(t => t.tags?.toLowerCase().includes(quizFilterTag.toLowerCase()));
-    }
-
+    if (activeCategory && activeCategory !== "All") result = result.filter(t => t.category === activeCategory);
+    if (activeTab === "free") result = result.filter(t => t.pricing?.toLowerCase() === "free");
+    else if (activeTab === "saved") result = result.filter(t => savedToolIds.includes(String(t.id)));
+    if (pricingFilter !== "All") result = result.filter(t => t.pricing?.toLowerCase() === pricingFilter.toLowerCase());
+    if (quizFilterTag) result = result.filter(t => t.tags?.toLowerCase().includes(quizFilterTag.toLowerCase()));
     return result;
   }, [tools, search, activeCategory, activeTab, savedToolIds, pricingFilter, quizFilterTag]);
 
@@ -336,9 +241,9 @@ export default function Home() {
       <Head>
         <title>Toolsy AI | Discover The Best AI Tools & Websites (Updated Daily)</title>
         <meta name="description" content="Stop wasting hours on Google. Toolsy curates the internet's most powerful AI tools for developers, designers, and creators. Updated daily." />
-        <meta name="keywords" content="AI tools, best AI tools, AI directory, artificial intelligence tools, free AI tools, AI for creators, AI for developers" />
+        <meta name="keywords" content="AI tools, best AI tools, AI directory, artificial intelligence tools, free AI tools" />
         <meta property="og:title" content="Toolsy AI | Discover The Best AI Tools" />
-        <meta property="og:description" content="The internet's best curated AI tools directory. Find the perfect AI tool for your needs." />
+        <meta property="og:description" content="The internet's best curated AI tools directory." />
         <meta property="og:url" content="https://toolsyai.xyz" />
         <meta property="og:type" content="website" />
         <link rel="canonical" href="https://toolsyai.xyz" />
@@ -346,170 +251,135 @@ export default function Home() {
 
       {showQuiz && <QuizOverlay onComplete={handleQuizComplete} onSkip={handleQuizSkip} />}
 
-      <div className="min-h-screen bg-[#050505] text-white transition-all duration-700">
+      <div style={{ minHeight: "100vh", background: "#0d0d0d", color: "white" }}>
 
         {/* HERO */}
-        <section className="relative pt-24 md:pt-28 pb-4 md:pb-12 px-6 text-center">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[300px] md:h-[500px] bg-primary/10 blur-[80px] md:blur-[120px] rounded-full pointer-events-none" />
-          <div className="relative z-10 max-w-4xl mx-auto">
-            <div className="hidden md:inline-flex items-center gap-2 px-3 md:px-4 py-1 md:py-1.5 rounded-full bg-white/5 border border-white/10 mb-4 md:mb-8 text-[10px] md:text-xs font-medium text-primary uppercase tracking-widest">
-              <Sparkles className="h-3 w-3" />
-              <span>Premium AI Tools Directory</span>
+        <section style={{ position: "relative", paddingTop: "6.5rem", paddingBottom: "1.5rem", textAlign: "center", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: "700px", height: "450px", background: "radial-gradient(ellipse at 50% 0%, rgba(var(--primary),0.15) 0%, transparent 65%)", pointerEvents: "none" }} />
+          <div style={{ position: "relative", zIndex: 1, maxWidth: "820px", margin: "0 auto", padding: "0 1.5rem" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.35rem 1rem", borderRadius: "9999px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", marginBottom: "1.75rem" }}>
+              <Sparkles size={12} color="rgb(var(--primary))" />
+              <span style={{ fontSize: "11px", fontWeight: 600, color: "rgb(var(--primary))", textTransform: "uppercase", letterSpacing: "0.1em" }}>Premium AI Tools Directory</span>
             </div>
-            <h1 className="text-4xl md:text-7xl font-black tracking-tighter mb-4 md:mb-6 text-white leading-[1.1]">
-              Discover the <span className="text-primary">Best</span> AI Tools
+            <h1 style={{ fontSize: "clamp(2.75rem, 8vw, 6rem)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.0, marginBottom: "1.25rem", color: "white" }}>
+              Discover the{" "}
+              <span style={{ color: "rgb(var(--primary))" }}>Best</span>
+              {" "}AI Tools
             </h1>
-            <p className="text-gray-400 text-sm md:text-lg max-w-2xl mx-auto mb-6 md:mb-12">
+            <p style={{ color: "#6b7280", fontSize: "clamp(0.9rem, 2vw, 1.1rem)", maxWidth: "540px", margin: "0 auto 3rem", lineHeight: 1.65 }}>
               Stop wasting hours on Google. We curate the internet&apos;s most powerful tools for developers, designers, and creators.
             </p>
           </div>
         </section>
 
         {/* SEARCH & FILTERS */}
-        <section className="px-4 md:px-6 max-w-5xl mx-auto relative z-30 mb-6 md:mb-10">
-          <div className="flex flex-col gap-4 md:gap-5">
-            <div className="flex w-full gap-2 relative">
-              <div className="relative flex-1 flex items-center bg-[#1A1A1A] border border-white/10 hover:border-white/20 transition-all rounded-xl md:rounded-2xl overflow-hidden shadow-inner">
-                <Search className="absolute left-4 h-4 md:h-5 w-4 md:w-5 text-gray-500" />
-                <input
-                  placeholder="Search AI tools (e.g. 'coding', 'video')..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-11 md:pl-12 h-12 md:h-14 w-full bg-transparent border-0 text-white text-sm md:text-base outline-none placeholder:text-gray-500"
-                />
-              </div>
-
-              <div className="relative shrink-0">
-                <button onClick={() => setIsPricingOpen(!isPricingOpen)}
-                  className="flex items-center justify-center w-12 md:w-auto md:px-5 h-12 md:h-14 bg-[#1A1A1A] hover:bg-white/10 border border-white/10 rounded-xl md:rounded-2xl transition-all shadow-inner group">
-                  <SlidersHorizontal className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
-                  <span className="hidden md:block ml-2 text-sm font-bold text-gray-300 group-hover:text-white transition-colors">
-                    {pricingFilter === "All" ? "Filters" : pricingFilter}
-                  </span>
-                </button>
-
-                {isPricingOpen && (
-                  <div className="absolute top-full right-0 mt-2 w-48 bg-[#0F0F0F] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.9)] overflow-hidden z-[100]">
-                    {["All", "Free", "Freemium", "Premium"].map((price) => (
-                      <button key={price}
-                        onClick={() => { setPricingFilter(price); setIsPricingOpen(false); }}
-                        className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-bold transition-all border-b border-white/5 last:border-0 ${pricingFilter === price ? "bg-primary/10 text-primary" : "text-gray-400 hover:bg-white/5 hover:text-white"}`}>
-                        {price === "All" ? "Any Price" : price}
-                        {pricingFilter === price && <Check className="w-4 h-4 text-primary" />}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+        <section style={{ maxWidth: "760px", margin: "0 auto", padding: "0 1rem 1.25rem" }}>
+          <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.75rem" }}>
+            <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "0.625rem", background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "0.875rem", padding: "0 1rem" }}>
+              <Search size={16} color="#4b5563" style={{ flexShrink: 0 }} />
+              <input placeholder="Search AI tools (e.g. 'coding', 'video')..." value={search} onChange={(e) => setSearch(e.target.value)}
+                style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: "white", fontSize: "0.9rem", padding: "0.875rem 0", fontFamily: "inherit" }} />
             </div>
+            <div style={{ position: "relative" }}>
+              <button onClick={() => setIsPricingOpen(!isPricingOpen)}
+                style={{ display: "flex", alignItems: "center", gap: "0.5rem", height: "100%", padding: "0 1.125rem", background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "0.875rem", color: "#9ca3af", cursor: "pointer", fontWeight: 700, fontSize: "0.85rem", fontFamily: "inherit", whiteSpace: "nowrap" }}>
+                <SlidersHorizontal size={16} />
+                <span style={{ fontSize: "0.85rem" }}>{pricingFilter === "All" ? "Filters" : pricingFilter}</span>
+              </button>
+              {isPricingOpen && (
+                <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, width: "175px", background: "#111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "1rem", overflow: "hidden", zIndex: 100, boxShadow: "0 20px 60px rgba(0,0,0,0.8)" }}>
+                  {["All", "Free", "Freemium", "Premium"].map((price) => (
+                    <button key={price} onClick={() => { setPricingFilter(price); setIsPricingOpen(false); }}
+                      style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.825rem 1rem", fontSize: "0.875rem", fontWeight: 700, background: pricingFilter === price ? "rgba(var(--primary),0.1)" : "transparent", color: pricingFilter === price ? "rgb(var(--primary))" : "#9ca3af", border: "none", borderBottom: "1px solid rgba(255,255,255,0.05)", cursor: "pointer", fontFamily: "inherit" }}>
+                      {price === "All" ? "Any Price" : price}
+                      {pricingFilter === price && <Check size={13} />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
 
-            <div className="w-full flex gap-2 overflow-x-auto pb-3 custom-scrollbar">
-              <style>{`
-                .custom-scrollbar::-webkit-scrollbar { height: 5px; }
-                .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
-                @media (max-width: 768px) {
-                  .custom-scrollbar::-webkit-scrollbar { display: none; }
-                  .custom-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-                }
-              `}</style>
-              {categories.map((cat) => (
-                <button key={cat}
-                  onClick={() => setActiveCategory(cat === "All" ? null : cat)}
-                  className={`shrink-0 px-4 md:px-5 py-2 md:py-2.5 rounded-full text-xs md:text-sm font-bold whitespace-nowrap transition-all border ${
-                    (activeCategory === cat) || (cat === "All" && activeCategory === null)
-                      ? "bg-primary text-white border-primary shadow-[0_0_15px_rgba(var(--primary),0.3)]"
-                      : "bg-[#1A1A1A] text-gray-400 border-white/10 hover:bg-white/10 hover:text-white"
-                  }`}>
+          {/* Categories */}
+          <div style={{ display: "flex", gap: "0.4rem", overflowX: "auto", paddingBottom: "0.5rem", scrollbarWidth: "none" }}>
+            {categories.map((cat) => {
+              const isActive = (activeCategory === cat) || (cat === "All" && activeCategory === null);
+              return (
+                <button key={cat} onClick={() => setActiveCategory(cat === "All" ? null : cat)}
+                  style={{ flexShrink: 0, padding: "0.4rem 0.9rem", borderRadius: "9999px", fontSize: "0.78rem", fontWeight: 700, whiteSpace: "nowrap", cursor: "pointer", fontFamily: "inherit", background: isActive ? "rgb(var(--primary))" : "#1a1a1a", color: isActive ? "white" : "#6b7280", border: `1px solid ${isActive ? "rgb(var(--primary))" : "rgba(255,255,255,0.08)"}`, transition: "all 0.2s" }}>
                   {cat}
                 </button>
-              ))}
-            </div>
+              );
+            })}
           </div>
         </section>
 
         {/* TABS */}
-        <div className="max-w-7xl mx-auto px-4 md:px-6 mb-8 relative z-10">
-          <div className="flex w-full bg-[#1A1A1A] md:bg-transparent p-1 md:p-0 rounded-2xl md:rounded-none md:border-b border-white/10 md:pb-4 gap-1 md:gap-4">
-            <button onClick={() => setActiveTab("all")}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-3 md:px-6 rounded-xl transition-all duration-300 ${activeTab === "all" ? "bg-white/10 text-white shadow-md border border-white/10" : "text-gray-500 hover:text-gray-300"}`}>
-              <LayoutGrid className="w-4 h-4" />
-              <span className="font-bold text-[11px] md:text-sm whitespace-nowrap">All Tools</span>
-            </button>
-            <button onClick={() => setActiveTab("free")}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-3 md:px-6 rounded-xl transition-all duration-300 ${activeTab === "free" ? "bg-emerald-500/10 text-emerald-400 shadow-md border border-emerald-500/20" : "text-gray-500 hover:text-gray-300"}`}>
-              <Gift className="w-4 h-4" />
-              <span className="font-bold text-[11px] md:text-sm whitespace-nowrap">Free</span>
-            </button>
-            <button onClick={() => setActiveTab("saved")}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-3 md:px-6 rounded-xl transition-all duration-300 ${activeTab === "saved" ? "bg-primary/10 text-primary shadow-md border border-primary/20" : "text-gray-500 hover:text-gray-300"}`}>
-              <div className="relative">
-                <Bookmark className="w-4 h-4" />
-                {savedToolIds.length > 0 && (
-                  <span className="absolute -top-1.5 -right-2 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary text-[8px] text-white font-black shadow-lg">
-                    {savedToolIds.length}
-                  </span>
+        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 1rem 1.25rem" }}>
+          <div style={{ display: "inline-flex", gap: "0.2rem", background: "#1a1a1a", padding: "0.25rem", borderRadius: "0.875rem" }}>
+            {[{ id: "all", label: "All Tools", icon: <LayoutGrid size={14} /> }, { id: "free", label: "Free", icon: <Gift size={14} /> }, { id: "saved", label: "Saved", icon: <Bookmark size={14} /> }].map((tab) => (
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                style={{ display: "flex", alignItems: "center", gap: "0.375rem", padding: "0.55rem 1rem", borderRadius: "0.6rem", border: "none", cursor: "pointer", fontWeight: 700, fontSize: "0.8rem", fontFamily: "inherit", transition: "all 0.2s", background: activeTab === tab.id ? "rgba(255,255,255,0.08)" : "transparent", color: activeTab === tab.id ? "white" : "#6b7280" }}>
+                {tab.icon} {tab.label}
+                {tab.id === "saved" && savedToolIds.length > 0 && (
+                  <span style={{ background: "rgb(var(--primary))", color: "white", fontSize: "9px", fontWeight: 900, padding: "1px 5px", borderRadius: "9999px" }}>{savedToolIds.length}</span>
                 )}
-              </div>
-              <span className="font-bold text-[11px] md:text-sm whitespace-nowrap">Saved</span>
-            </button>
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* TOOLS GRID */}
-        <div className="max-w-7xl mx-auto px-4 md:px-6 pb-20 md:pb-32 space-y-12 md:space-y-20 relative z-10">
+        {/* TOOLS */}
+        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 1rem 5rem" }}>
           {isLoading ? (
-            <div className="text-center py-20 text-primary animate-pulse font-bold uppercase tracking-widest text-sm md:text-base">Syncing Database...</div>
+            <div style={{ textAlign: "center", padding: "5rem 0", color: "rgb(var(--primary))", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.875rem" }}>Syncing Database...</div>
           ) : (
-            <>
+            <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
               {activeTab === "all" && featured.length > 0 && !search && !quizFilterTag && (
                 <section>
-                  <div className="flex items-center gap-3 mb-6 md:mb-10">
-                    <div className="h-8 md:h-10 w-1 bg-primary rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
-                    <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Featured Tools</h2>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.25rem" }}>
+                    <div style={{ width: "3px", height: "1.75rem", background: "rgb(var(--primary))", borderRadius: "9999px" }} />
+                    <h2 style={{ fontSize: "1.4rem", fontWeight: 700, color: "white", letterSpacing: "-0.02em" }}>Featured Tools</h2>
                   </div>
                   <ToolGrid tools={featured} isSearch={false} checkActive={isSponsorshipActive} onVisit={trackClick} savedIds={savedToolIds} onToggleSave={toggleSaveTool} />
                 </section>
               )}
-
               {visibleRest.length > 0 ? (
                 <section>
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-10">
-                    <div className="flex items-center gap-3">
-                      <div className="h-8 md:h-10 w-1 bg-zinc-700 rounded-full" />
-                      <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem", flexWrap: "wrap", gap: "0.75rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                      <div style={{ width: "3px", height: "1.75rem", background: "#3f3f46", borderRadius: "9999px" }} />
+                      <h2 style={{ fontSize: "1.4rem", fontWeight: 700, color: "white", letterSpacing: "-0.02em" }}>
                         {quizFilterTag ? "Your Personalized AI Stack" : activeTab === "saved" ? "Your Bookmarks" : activeTab === "free" ? "Free Tools" : search ? "Search Results" : "Explore Collection"}
                       </h2>
                     </div>
                     {quizFilterTag && (
-                      <button onClick={clearQuizFilter} className="flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 text-gray-400 hover:text-white text-sm font-bold transition-all">
-                        Clear Matchmaker Filter <X className="w-4 h-4" />
+                      <button onClick={clearQuizFilter} style={{ display: "flex", alignItems: "center", gap: "0.4rem", padding: "0.45rem 0.9rem", borderRadius: "0.7rem", border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "#9ca3af", cursor: "pointer", fontWeight: 700, fontSize: "0.8rem", fontFamily: "inherit" }}>
+                        Clear Filter <X size={13} />
                       </button>
                     )}
                   </div>
                   <ToolGrid tools={visibleRest} isSearch={!!search || !!quizFilterTag} checkActive={isSponsorshipActive} onVisit={trackClick} savedIds={savedToolIds} onToggleSave={toggleSaveTool} />
                 </section>
               ) : (
-                <div className="text-center py-20 border border-dashed border-white/10 rounded-3xl bg-white/5">
-                  <Bookmark className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-white mb-2">No exact matches found</h3>
-                  <p className="text-gray-500">We couldn&apos;t find a tool with those specific tags right now.</p>
-                  <button onClick={clearQuizFilter} className="mt-6 px-6 py-3 bg-primary text-white font-bold rounded-xl hover:scale-105 transition-transform">
-                    View All Tools
-                  </button>
+                <div style={{ textAlign: "center", padding: "4rem 1rem", border: "1px dashed rgba(255,255,255,0.1)", borderRadius: "1.5rem", background: "rgba(255,255,255,0.02)" }}>
+                  <Bookmark size={36} color="#3f3f46" style={{ margin: "0 auto 1rem" }} />
+                  <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "white", marginBottom: "0.5rem" }}>No matches found</h3>
+                  <p style={{ color: "#6b7280", marginBottom: "1.25rem", fontSize: "0.875rem" }}>We couldn&apos;t find a tool with those tags right now.</p>
+                  <button onClick={clearQuizFilter} style={{ padding: "0.7rem 1.5rem", background: "rgb(var(--primary))", color: "white", fontWeight: 700, borderRadius: "0.75rem", border: "none", cursor: "pointer", fontFamily: "inherit" }}>View All Tools</button>
                 </div>
               )}
-
               {rest.length > displayLimit && (
-                <div className="flex justify-center pt-8 md:pt-12">
+                <div style={{ textAlign: "center" }}>
                   <button onClick={() => setDisplayLimit(p => p + 12)}
-                    className="h-12 md:h-14 px-8 md:px-10 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 hover:bg-primary/20 hover:text-white transition-all duration-300 hover:-translate-y-1 text-sm md:text-base font-bold text-gray-300 flex items-center gap-2">
-                    Load More Tools <ArrowRight className="h-4 md:h-5 w-4 md:w-5" />
+                    style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.825rem 2rem", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "0.875rem", color: "#d1d5db", fontWeight: 700, fontSize: "0.875rem", cursor: "pointer", fontFamily: "inherit" }}
+                    onMouseOver={e => { e.currentTarget.style.background = "rgba(var(--primary),0.12)"; e.currentTarget.style.color = "white"; }}
+                    onMouseOut={e => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "#d1d5db"; }}>
+                    Load More Tools <ArrowRight size={15} />
                   </button>
                 </div>
               )}
-            </>
+            </div>
           )}
         </div>
       </div>
