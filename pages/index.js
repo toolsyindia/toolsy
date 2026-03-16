@@ -338,21 +338,27 @@ export default function Home() {
           </div>
         </section>
 
-        {/* TABS */}
-        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 1rem 1.25rem", overflowX: "auto" }}>
-          <div style={{ display: "inline-flex", gap: "0.2rem", background: "#1a1a1a", padding: "0.25rem", borderRadius: "0.875rem", flexWrap: "nowrap" }}>
-            {[{ id: "all", label: "All Tools", icon: <LayoutGrid size={14} /> }, { id: "free", label: "Free", icon: <Gift size={14} /> }, { id: "saved", label: "Saved", icon: <Bookmark size={14} /> }].map((tab) => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                style={{ display: "flex", alignItems: "center", gap: "0.375rem", padding: "0.55rem 1rem", borderRadius: "0.6rem", border: "none", cursor: "pointer", fontWeight: 700, fontSize: "0.8rem", fontFamily: "inherit", transition: "all 0.2s", background: activeTab === tab.id ? "rgba(255,255,255,0.08)" : "transparent", color: activeTab === tab.id ? "white" : "#6b7280" }}>
-                {tab.icon} {tab.label}
-                {tab.id === "saved" && savedToolIds.length > 0 && (
-                  <span style={{ background: "rgb(var(--primary))", color: "white", fontSize: "9px", fontWeight: 900, padding: "1px 5px", borderRadius: "9999px" }}>{savedToolIds.length}</span>
-                )}
-              </button>
-            ))}
+        {/* TABS UPGRADE - PREMIUM SAAS SEGMENTED CONTROL */}
+        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 1rem 2rem", overflowX: "auto" }}>
+          <div style={{ display: "inline-flex", gap: "0.25rem", background: "#121212", border: "1px solid rgba(255,255,255,0.08)", padding: "0.35rem", borderRadius: "1rem", flexWrap: "nowrap", boxShadow: "0 4px 20px -10px rgba(0,0,0,0.5)" }}>
+            {[{ id: "all", label: "All Tools", icon: <LayoutGrid size={16} /> }, { id: "free", label: "Free", icon: <Gift size={16} /> }, { id: "saved", label: "Saved", icon: <Bookmark size={16} /> }].map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                  style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.6rem 1.25rem", borderRadius: "0.75rem", border: "none", cursor: "pointer", fontWeight: 700, fontSize: "0.9rem", fontFamily: "inherit", transition: "all 0.2s ease", background: isActive ? "rgba(255,255,255,0.12)" : "transparent", color: isActive ? "white" : "#808080", boxShadow: isActive ? "0 2px 10px rgba(0,0,0,0.2)" : "none" }}
+                  onMouseOver={e => { if(!isActive) { e.currentTarget.style.color = "white"; e.currentTarget.style.background = "rgba(255,255,255,0.04)"; } }}
+                  onMouseOut={e => { if(!isActive) { e.currentTarget.style.color = "#808080"; e.currentTarget.style.background = "transparent"; } }}>
+                  {tab.icon} {tab.label}
+                  {tab.id === "saved" && savedToolIds.length > 0 && (
+                    <span style={{ background: "rgb(var(--primary))", color: "white", fontSize: "10px", fontWeight: 900, padding: "2px 6px", borderRadius: "9999px", marginLeft: "0.25rem" }}>{savedToolIds.length}</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
 
+        
         {/* TOOLS */}
         <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 1rem 5rem" }}>
           {isLoading ? (
