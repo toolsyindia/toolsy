@@ -275,10 +275,10 @@ export default function Home() {
             </div>
             
             {/* UPDATED FONT SETTINGS: Heavier, tighter letter spacing, much larger clamp */}
-            <h1 style={{ fontSize: "clamp(3.5rem, 10vw, 6.5rem)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 1, marginBottom: "1.25rem", color: "white" }}>
-              Discover the{" "}
-              <span style={{ color: "rgb(var(--primary))" }}>Best</span>
-              {" "}AI Tools
+            {/* RESTORED PREMIUM SAAS FONT: Cleaner weight, better spacing, exact line breaks */}
+            <h1 style={{ fontSize: "clamp(3rem, 8vw, 5.5rem)", fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.1, marginBottom: "1.25rem", color: "white" }}>
+              Discover the <br />
+              <span style={{ color: "rgb(var(--primary))" }}>Best</span> AI Tools
             </h1>
             
             <p style={{ color: "#6b7280", fontSize: "clamp(0.85rem, 2.5vw, 1.1rem)", maxWidth: "540px", margin: "0 auto 2rem", lineHeight: 1.6 }}>
