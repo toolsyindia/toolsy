@@ -276,7 +276,9 @@ export default function Home() {
             
             {/* UPDATED FONT SETTINGS: Heavier, tighter letter spacing, much larger clamp */}
             {/* RESTORED PREMIUM SAAS FONT: Cleaner weight, better spacing, exact line breaks */}
-            <h1 style={{ fontSize: "clamp(3rem, 8vw, 5.5rem)", fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.1, marginBottom: "1.25rem", color: "white" }}>
+            {/* ADDED fontFamily to change the actual font style! */}
+            {/* THE NEW PREMIUM FONT: Applied directly to the Hero Text */}
+            <h1 style={{ fontFamily: "'Outfit', sans-serif", fontSize: "clamp(3.5rem, 10vw, 6.5rem)", fontWeight: 800, letterSpacing: "-0.03em", lineHeight: 1.05, marginBottom: "1.25rem", color: "white" }}>
               Discover the <br />
               <span style={{ color: "rgb(var(--primary))" }}>Best</span> AI Tools
             </h1>
