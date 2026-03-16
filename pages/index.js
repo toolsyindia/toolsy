@@ -126,8 +126,8 @@ const QuizOverlay = ({ onComplete, onSkip }) => {
 
 function ToolGrid({ tools, isSearch, checkActive, onVisit, savedIds, onToggleSave }) {
   return (
-    // FIXED: Responsive grid using min() to prevent mobile overflow!
-    <div style={{ display: "grid", gap: "1.25rem", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 280px), 1fr))" }}>
+    // Lowered minmax to 250px so it fits nicely even on extremely narrow mobile screens
+    <div style={{ display: "grid", gap: "1.25rem", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 250px), 1fr))" }}>
       {tools.map((tool) => {
         const isHighlighted = (isSearch && checkActive(tool, "suggested")) || (!isSearch && checkActive(tool, "featured"));
         const isSaved = savedIds.includes(String(tool.id));
@@ -239,9 +239,10 @@ export default function Home() {
 
   return (
     <>
-      {/* RESTORED SEO TAGS */}
       <Head>
         <title>Toolsy AI | Discover The Best AI Tools & Websites (Updated Daily)</title>
+        {/* CRITICAL FIX: Added viewport meta tag so mobile doesn't scale weirdly! */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
         <meta name="description" content="Stop wasting hours on Google. Toolsy curates the internet's most powerful AI tools for developers, designers, and creators. Updated daily." />
         <meta name="keywords" content="AI tools, best AI tools, AI directory, artificial intelligence tools, free AI tools" />
         <meta property="og:title" content="Toolsy AI | Discover The Best AI Tools" />
@@ -259,12 +260,12 @@ export default function Home() {
         <section style={{ position: "relative", paddingTop: "5.5rem", paddingBottom: "1.5rem", textAlign: "center", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: "700px", height: "450px", background: "radial-gradient(ellipse at 50% 0%, rgba(139, 92, 246, 0.15) 0%, transparent 65%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 1, maxWidth: "820px", margin: "0 auto", padding: "0 1.5rem" }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.35rem 1rem", borderRadius: "9999px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", marginBottom: "1.5rem" }}>
+            <div style={{ display: "inline-flex", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: "0.5rem", padding: "0.35rem 1rem", borderRadius: "9999px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", marginBottom: "1.5rem" }}>
               <Sparkles size={12} color="#8b5cf6" />
-              <span style={{ fontSize: "11px", fontWeight: 600, color: "#a78bfa", textTransform: "uppercase", letterSpacing: "0.1em" }}>Premium AI Tools Directory</span>
+              <span style={{ fontSize: "11px", fontWeight: 600, color: "#a78bfa", textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "center" }}>Premium AI Tools Directory</span>
             </div>
-            {/* FIXED: Fluid typography for mobile hero text */}
-            <h1 style={{ fontSize: "clamp(2.5rem, 8vw, 5.5rem)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: "1rem", color: "white" }}>
+            {/* FIXED: Adjusted clamp to handle sub-300px widths smoothly */}
+            <h1 style={{ fontSize: "clamp(2rem, 8vw, 5.5rem)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: "1rem", color: "white" }}>
               Discover the{" "}
               <span style={{ color: "#8b5cf6" }}>Best</span>
               {" "}AI Tools
@@ -275,19 +276,19 @@ export default function Home() {
           </div>
         </section>
 
-        {/* SEARCH & FILTERS - FIXED for Mobile */}
+        {/* SEARCH & FILTERS - FIXED minWidth to stop flexbox blowout! */}
         <section style={{ maxWidth: "760px", margin: "0 auto", padding: "0 1rem 1.25rem" }}>
-          <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.75rem", width: "100%" }}>
-            <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "0.5rem", background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "0.875rem", padding: "0 0.875rem" }}>
+          <div style={{ display: "flex", flexWrap: "nowrap", gap: "0.5rem", marginBottom: "0.75rem", width: "100%" }}>
+            <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: "0.5rem", background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "0.875rem", padding: "0 0.875rem" }}>
               <Search size={16} color="#4b5563" style={{ flexShrink: 0 }} />
               <input placeholder="Search AI tools..." value={search} onChange={(e) => setSearch(e.target.value)}
-                style={{ flex: 1, width: "100%", background: "transparent", border: "none", outline: "none", color: "white", fontSize: "0.9rem", padding: "0.875rem 0", fontFamily: "inherit" }} />
+                style={{ flex: 1, minWidth: 0, width: "100%", background: "transparent", border: "none", outline: "none", color: "white", fontSize: "0.9rem", padding: "0.875rem 0", fontFamily: "inherit" }} />
             </div>
             <div style={{ position: "relative", flexShrink: 0 }}>
               <button onClick={() => setIsPricingOpen(!isPricingOpen)}
-                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", height: "100%", padding: "0 1rem", background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "0.875rem", color: "#9ca3af", cursor: "pointer", fontWeight: 700, fontSize: "0.85rem", fontFamily: "inherit", whiteSpace: "nowrap" }}>
-                <SlidersHorizontal size={16} />
-                <span className="hidden sm:inline" style={{ fontSize: "0.85rem" }}>{pricingFilter === "All" ? "Filters" : pricingFilter}</span>
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.4rem", height: "100%", padding: "0 0.8rem", background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "0.875rem", color: "#9ca3af", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap" }}>
+                <SlidersHorizontal size={16} style={{ flexShrink: 0 }} />
+                <span style={{ fontSize: "0.8rem" }}>{pricingFilter === "All" ? "Filters" : pricingFilter}</span>
               </button>
               {isPricingOpen && (
                 <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, width: "150px", background: "#111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "1rem", overflow: "hidden", zIndex: 100, boxShadow: "0 20px 60px rgba(0,0,0,0.8)" }}>
@@ -303,8 +304,8 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Categories - FIXED padding for mobile scroll */}
-          <div style={{ display: "flex", gap: "0.4rem", overflowX: "auto", paddingBottom: "0.5rem", paddingRight: "1rem", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
+          {/* Categories - FIXED to force horizontal swipe without wrapping! */}
+          <div style={{ display: "flex", flexWrap: "nowrap", gap: "0.4rem", overflowX: "auto", paddingBottom: "0.5rem", paddingRight: "1rem", scrollbarWidth: "none", WebkitOverflowScrolling: "touch", width: "100%" }}>
             {categories.map((cat) => {
               const isActive = (activeCategory === cat) || (cat === "All" && activeCategory === null);
               return (
@@ -317,12 +318,12 @@ export default function Home() {
           </div>
         </section>
 
-        {/* TABS - FIXED overflow */}
-        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 1rem 1.25rem", overflowX: "auto", scrollbarWidth: "none" }}>
-          <div style={{ display: "inline-flex", gap: "0.2rem", background: "#1a1a1a", padding: "0.25rem", borderRadius: "0.875rem" }}>
+        {/* TABS - FIXED overflow behavior so buttons don't stack on top of each other! */}
+        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 1rem 1.25rem", width: "100%", overflowX: "auto", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
+          <div style={{ display: "inline-flex", flexWrap: "nowrap", gap: "0.2rem", background: "#1a1a1a", padding: "0.25rem", borderRadius: "0.875rem", minWidth: "max-content" }}>
             {[{ id: "all", label: "All Tools", icon: <LayoutGrid size={14} /> }, { id: "free", label: "Free", icon: <Gift size={14} /> }, { id: "saved", label: "Saved", icon: <Bookmark size={14} /> }].map((tab) => (
               <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                style={{ display: "flex", alignItems: "center", gap: "0.375rem", padding: "0.55rem 1rem", borderRadius: "0.6rem", border: "none", cursor: "pointer", fontWeight: 700, fontSize: "0.8rem", fontFamily: "inherit", transition: "all 0.2s", background: activeTab === tab.id ? "rgba(255,255,255,0.08)" : "transparent", color: activeTab === tab.id ? "white" : "#6b7280", whiteSpace: "nowrap" }}>
+                style={{ flexShrink: 0, whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "0.375rem", padding: "0.55rem 1rem", borderRadius: "0.6rem", border: "none", cursor: "pointer", fontWeight: 700, fontSize: "0.8rem", fontFamily: "inherit", transition: "all 0.2s", background: activeTab === tab.id ? "rgba(255,255,255,0.08)" : "transparent", color: activeTab === tab.id ? "white" : "#6b7280" }}>
                 {tab.icon} {tab.label}
                 {tab.id === "saved" && savedToolIds.length > 0 && (
                   <span style={{ background: "#8b5cf6", color: "white", fontSize: "9px", fontWeight: 900, padding: "1px 5px", borderRadius: "9999px" }}>{savedToolIds.length}</span>
