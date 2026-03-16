@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /controlpanel
+
+Sitemap: https://toolsyai.xyz/sitemap.xml
