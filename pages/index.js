@@ -186,15 +186,32 @@ export default function Home() {
   useEffect(() => {
     const saved = localStorage.getItem("toolsy_saved");
     if (saved) { try { setSavedToolIds(JSON.parse(saved)); } catch (e) { } }
-    const quizCompleted = localStorage.getItem("toolsy_quiz_done");
-    if (!quizCompleted) {
+    
+    // --- CTO FIX: The 6-Hour Growth Hack Loop ---
+    const lastQuizTime = localStorage.getItem("toolsy_quiz_timestamp");
+    const now = Date.now();
+    const sixHoursInMs = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
+
+    // If never taken, OR if 6 hours have passed -> Show the Quiz!
+    if (!lastQuizTime || (now - parseInt(lastQuizTime, 10)) > sixHoursInMs) {
       const timer = setTimeout(() => setShowQuiz(true), 1500);
       return () => clearTimeout(timer);
     }
   }, []);
 
-  const handleQuizComplete = (tag) => { if (tag) setQuizFilterTag(tag); setShowQuiz(false); localStorage.setItem("toolsy_quiz_done", "true"); };
-  const handleQuizSkip = () => { setShowQuiz(false); localStorage.setItem("toolsy_quiz_done", "true"); };
+  const handleQuizComplete = (tag) => { 
+    if (tag) setQuizFilterTag(tag); 
+    setShowQuiz(false); 
+    // Save the exact millisecond they finished
+    localStorage.setItem("toolsy_quiz_timestamp", Date.now().toString()); 
+  };
+  
+  const handleQuizSkip = () => { 
+    setShowQuiz(false); 
+    // Save the exact millisecond they skipped
+    localStorage.setItem("toolsy_quiz_timestamp", Date.now().toString()); 
+  };
+  
   const clearQuizFilter = () => setQuizFilterTag(null);
   const toggleSaveTool = (id) => {
     setSavedToolIds((prev) => {
