@@ -102,7 +102,7 @@ const QuizOverlay = ({ onComplete, onSkip }) => {
        {step === 3 && (
           <div style={{ background: "white", padding: "2.5rem", borderRadius: "1.5rem", boxShadow: "0 25px 50px rgba(0,0,0,0.12)", border: "1px solid #e0e7ff", textAlign: "center" }}>
             <div style={{ display: "inline-flex", padding: "1rem", borderRadius: "50%", background: "rgba(var(--primary),0.1)", color: "rgb(var(--primary))", marginBottom: "1.5rem" }}><Sparkles size={32} /></div>
-            <h2 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#111", marginBottom: "0.75rem" }}>Match Found! 🎯</h2>
+            <h2 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#111", marginBottom: "0.75rem" }}>"⚡ Your Unfair Advantage is Ready"</h2>
             <p style={{ fontSize: "1rem", fontWeight: 700, color: "rgb(var(--primary))", marginBottom: "1rem" }}>We found the perfect AI stack for your exact goal.</p>
             
             {/* CTO FIX 1: Explicitly state that it is optional */}
@@ -121,7 +121,7 @@ const QuizOverlay = ({ onComplete, onSkip }) => {
             </div>
           </div>
         )}
-      </div>
+      </div>s
       {step < 3 && (
         <button onClick={onSkip} style={{ position: "fixed", bottom: "1.5rem", left: "50%", transform: "translateX(-50%)", color: "#9ca3af", background: "#F9FAFB", padding: "0.5rem 1.25rem", borderRadius: "9999px", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.25rem", fontSize: "0.875rem", fontFamily: "inherit" }}>
           Skip to explore all tools <ArrowRight size={12} />
