@@ -99,17 +99,24 @@ const QuizOverlay = ({ onComplete, onSkip }) => {
             </div>
           </div>
         )}
-        {step === 3 && (
+       {step === 3 && (
           <div style={{ background: "white", padding: "2.5rem", borderRadius: "1.5rem", boxShadow: "0 25px 50px rgba(0,0,0,0.12)", border: "1px solid #e0e7ff", textAlign: "center" }}>
             <div style={{ display: "inline-flex", padding: "1rem", borderRadius: "50%", background: "rgba(var(--primary),0.1)", color: "rgb(var(--primary))", marginBottom: "1.5rem" }}><Sparkles size={32} /></div>
             <h2 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#111", marginBottom: "0.75rem" }}>Match Found! 🎯</h2>
-            <p style={{ fontSize: "1rem", fontWeight: 700, color: "rgb(var(--primary))", marginBottom: "1rem" }}>We found the best AI tools for your exact problem.</p>
-            <p style={{ color: "#6b7280", marginBottom: "1.5rem", fontSize: "0.875rem" }}>Enter your email to see your matches.</p>
+            <p style={{ fontSize: "1rem", fontWeight: 700, color: "rgb(var(--primary))", marginBottom: "1rem" }}>We found the perfect AI stack for your exact goal.</p>
+            
+            {/* CTO FIX 1: Explicitly state that it is optional */}
+            <p style={{ color: "#6b7280", marginBottom: "1.5rem", fontSize: "0.875rem", fontWeight: 500 }}>
+              Want us to email you this list? <span style={{ color: "#9ca3af", fontStyle: "italic" }}>(Optional)</span>
+            </p>
+            
             <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-              <input type="email" placeholder="Your email address" value={email} onChange={(e) => setEmail(e.target.value)}
+              <input type="email" placeholder="Your best email address..." value={email} onChange={(e) => setEmail(e.target.value)}
                 style={{ padding: "1rem 1.5rem", background: "#f9fafb", border: "2px solid #e5e7eb", borderRadius: "0.75rem", fontSize: "1rem", outline: "none", color: "#111", fontFamily: "inherit" }} />
+              
+              {/* CTO FIX 2: Dynamic button text based on whether they typed an email or not */}
               <button onClick={handleFinish} style={{ padding: "1rem", background: "rgb(var(--primary))", color: "white", fontWeight: 900, fontSize: "1rem", borderRadius: "0.75rem", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", fontFamily: "inherit" }}>
-                Show Matches <ArrowRight size={18} />
+                {email.trim() !== "" ? "Send & Reveal My Stack" : "Skip & Reveal My Stack"} <ArrowRight size={18} />
               </button>
             </div>
           </div>
@@ -211,7 +218,7 @@ export default function Home() {
     // Save the exact millisecond they skipped
     localStorage.setItem("toolsy_quiz_timestamp", Date.now().toString()); 
   };
-  
+
   const clearQuizFilter = () => setQuizFilterTag(null);
   const toggleSaveTool = (id) => {
     setSavedToolIds((prev) => {
