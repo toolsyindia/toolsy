@@ -144,6 +144,35 @@ const QuizOverlay = ({ onComplete, onSkip }) => {
   );
 };
 
+// --- CTO FIX: Pro Skeleton Loader Component ---
+function SkeletonGrid() {
+  return (
+    <div style={{ display: "grid", gap: "1.5rem", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 280px), 1fr))" }}>
+      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((i) => (
+        <div key={i} className="skeleton-card" style={{ background: "#161616", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "1.25rem", padding: "1.5rem", display: "flex", flexDirection: "column", minHeight: "280px", boxSizing: "border-box" }}>
+          
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.25rem" }}>
+            <div style={{ width: "3.5rem", height: "3.5rem", background: "rgba(255,255,255,0.05)", borderRadius: "0.75rem" }} />
+            <div style={{ width: "60px", height: "24px", background: "rgba(255,255,255,0.05)", borderRadius: "9999px" }} />
+          </div>
+          
+          <div style={{ display: "flex", flexDirection: "column", flexGrow: 1, gap: "0.75rem" }}>
+            <div style={{ width: "40%", height: "12px", background: "rgba(255,255,255,0.05)", borderRadius: "4px" }} />
+            <div style={{ width: "80%", height: "20px", background: "rgba(255,255,255,0.08)", borderRadius: "4px" }} />
+            <div style={{ width: "100%", height: "12px", background: "rgba(255,255,255,0.03)", borderRadius: "4px", marginTop: "0.5rem" }} />
+            <div style={{ width: "90%", height: "12px", background: "rgba(255,255,255,0.03)", borderRadius: "4px" }} />
+          </div>
+          
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "1.25rem", marginTop: "1.5rem" }}>
+            <div style={{ width: "100%", height: "40px", background: "rgba(255,255,255,0.05)", borderRadius: "0.75rem" }} />
+          </div>
+          
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function ToolGrid({ tools, isSearch, checkActive, onVisit, savedIds, onToggleSave }) {
   return (
     <div style={{ display: "grid", gap: "1.5rem", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 280px), 1fr))" }}>
@@ -310,6 +339,16 @@ export default function Home() {
       <style>{`
         @media (max-width: 480px) { .filter-label { display: none !important; } }
         ::-webkit-scrollbar { display: none; }
+        
+        /* CTO FIX: Skeleton Pulse Animation */
+        @keyframes skeleton-pulse {
+          0% { opacity: 0.4; }
+          50% { opacity: 1; }
+          100% { opacity: 0.4; }
+        }
+        .skeleton-card {
+          animation: skeleton-pulse 1.5s ease-in-out infinite;
+        }
       `}</style>
 
       <div style={{ minHeight: "100vh", background: "#0d0d0d", color: "white" }}>
@@ -430,7 +469,8 @@ export default function Home() {
         {/* TOOLS */}
         <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 1rem 5rem" }}>
           {isLoading ? (
-            <div style={{ textAlign: "center", padding: "5rem 0", color: "rgb(var(--primary))", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.875rem" }}>Syncing Database...</div>
+            /* CTO FIX: Pro Skeleton Loader applied here! */
+            <SkeletonGrid />
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
               {activeTab === "all" && featured.length > 0 && !search && !quizFilterTag && (
