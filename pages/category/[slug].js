@@ -63,7 +63,7 @@ export default function CategoryPage({ tools, categoryName, allCategories }) {
   const router = useRouter();
   const [savedToolIds, setSavedToolIds] = useState([]);
 
-  // CTO FIX: Translate the DB category to the Premium Goal for human eyes
+  // Translate the DB category to the Premium Goal for human eyes
   const displayCategoryName = categoryMap[categoryName] || categoryName;
 
   useEffect(() => {
@@ -96,7 +96,6 @@ export default function CategoryPage({ tools, categoryName, allCategories }) {
   return (
     <>
       <Head>
-        {/* CTO FIX: Keep the raw database categoryName here so Google rankings and keywords DO NOT BREAK */}
         <title>{categoryName} AI Tools | Best {categoryName} Tools in 2026 - Toolsy</title>
         <meta name="description" content={`Discover the best ${categoryName} AI tools in 2026. Browse ${tools.length} curated ${categoryName} tools including ${freeCount} free options. Updated daily on Toolsy.`} />
         <meta name="keywords" content={`${categoryName} AI tools, best ${categoryName} tools, free ${categoryName} AI, AI ${categoryName} 2026`} />
@@ -106,61 +105,59 @@ export default function CategoryPage({ tools, categoryName, allCategories }) {
         <link rel="canonical" href={`https://toolsyai.xyz/category/${slugify(categoryName)}`} />
       </Head>
 
-      <div className="min-h-screen bg-[#050505] text-white">
+      <style>{`
+        ::-webkit-scrollbar { display: none; }
+      `}</style>
+
+      {/* CTO FIX: Main wrapper converted to inline styles to match index.js perfectly */}
+      <div style={{ minHeight: "100vh", backgroundColor: "#050505", color: "white", fontFamily: "sans-serif" }}>
 
         {/* HERO */}
-        <section className="relative pt-28 pb-10 px-6 text-center">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[300px] bg-primary/10 blur-[100px] rounded-full pointer-events-none" />
-          <div className="relative z-10 max-w-4xl mx-auto">
-            <Link href="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-white text-sm font-bold mb-6 transition-colors">
-              <ArrowLeft className="w-4 h-4" /> Back to All Tools
+        <section style={{ position: "relative", paddingTop: "7rem", paddingBottom: "2.5rem", paddingLeft: "1.5rem", paddingRight: "1.5rem", textAlign: "center", overflow: "hidden" }}>
+          
+          {/* Subtle Glow Background */}
+          <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: "800px", height: "300px", background: "radial-gradient(ellipse at 50% 0%, rgba(139, 92, 246, 0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
+          
+          <div style={{ position: "relative", zIndex: 10, maxWidth: "56rem", margin: "0 auto" }}>
+            <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", color: "#6b7280", fontSize: "0.875rem", fontWeight: 700, marginBottom: "1.5rem", textDecoration: "none", transition: "color 0.2s" }}
+              onMouseOver={e => e.currentTarget.style.color = "white"}
+              onMouseOut={e => e.currentTarget.style.color = "#6b7280"}>
+              <ArrowLeft size={16} /> Back to All Tools
             </Link>
             
-            {/* CTO FIX: Display the Premium Mapped Name for humans */}
-            <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-4 text-white">
-              Best <span className="text-primary">{displayCategoryName}</span> AI Tools
+            <h1 style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)", fontWeight: 900, letterSpacing: "-0.02em", marginBottom: "1rem", lineHeight: 1.1 }}>
+              Best <span style={{ color: "#8b5cf6" }}>{displayCategoryName}</span> AI Tools
             </h1>
-            <p className="text-gray-400 text-sm md:text-lg max-w-2xl mx-auto mb-4">
+            
+            <p style={{ color: "#9ca3af", fontSize: "clamp(0.875rem, 2vw, 1.125rem)", maxWidth: "42rem", margin: "0 auto 1.5rem", lineHeight: 1.6 }}>
               {tools.length} curated {displayCategoryName} tools — including {freeCount} free options. Updated daily.
             </p>
             
-            <div className="flex items-center justify-center gap-3 flex-wrap">
-              <span className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest">
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+              <span style={{ padding: "0.3rem 0.8rem", borderRadius: "9999px", background: "rgba(139, 92, 246, 0.1)", border: "1px solid rgba(139, 92, 246, 0.2)", color: "#8b5cf6", fontSize: "0.75rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em" }}>
                 {tools.length} Tools
               </span>
-              <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-widest">
+              <span style={{ padding: "0.3rem 0.8rem", borderRadius: "9999px", background: "rgba(16, 185, 129, 0.1)", border: "1px solid rgba(16, 185, 129, 0.2)", color: "#34d399", fontSize: "0.75rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em" }}>
                 {freeCount} Free
               </span>
             </div>
           </div>
         </section>
 
-        {/* OTHER CATEGORIES */}
-        <section className="px-4 md:px-6 max-w-6xl mx-auto mb-8">
-          <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
-            <style>{`
-              .custom-scrollbar::-webkit-scrollbar { height: 4px; }
-              .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px; }
-              .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
-              @media (max-width: 768px) {
-                .custom-scrollbar::-webkit-scrollbar { display: none; }
-                .custom-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-              }
-            `}</style>
-            
-            {/* CTO FIX: Map all categories to their premium names for the tabs */}
+        {/* OTHER CATEGORIES TABS */}
+        <section style={{ padding: "0 1.5rem", maxWidth: "72rem", margin: "0 auto 2.5rem" }}>
+          <div style={{ display: "flex", gap: "0.6rem", overflowX: "auto", paddingBottom: "0.5rem", scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}>
             {allCategories.map((cat) => {
               if (cat === "website builder") return null; // Hide duplicate DB entry
               
               const displayCat = categoryMap[cat] || cat;
+              const isActive = cat === categoryName;
               
               return (
                 <Link key={cat} href={`/category/${slugify(cat)}`}
-                  className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all border ${
-                    cat === categoryName
-                      ? "bg-primary text-white border-primary"
-                      : "bg-[#1A1A1A] text-gray-400 border-white/10 hover:bg-white/10 hover:text-white"
-                  }`}>
+                  style={{ flexShrink: 0, padding: "0.6rem 1.25rem", borderRadius: "9999px", fontSize: "0.875rem", fontWeight: 700, whiteSpace: "nowrap", textDecoration: "none", fontFamily: "inherit", background: isActive ? "rgb(139, 92, 246)" : "#161616", color: isActive ? "white" : "#a1a1aa", border: `1px solid ${isActive ? "rgb(139, 92, 246)" : "rgba(255,255,255,0.08)"}`, transition: "all 0.2s" }}
+                  onMouseOver={e => { if(!isActive) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"; e.currentTarget.style.color = "white"; } }}
+                  onMouseOut={e => { if(!isActive) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; e.currentTarget.style.color = "#a1a1aa"; } }}>
                   {displayCat}
                 </Link>
               );
@@ -168,61 +165,47 @@ export default function CategoryPage({ tools, categoryName, allCategories }) {
           </div>
         </section>
 
-        {/* TOOLS GRID */}
-        <section className="max-w-7xl mx-auto px-4 md:px-6 pb-20">
-          <div className="grid gap-6 md:gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {/* TOOLS GRID - Exact match to Homepage */}
+        <section style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 1.5rem 5rem" }}>
+          <div style={{ display: "grid", gap: "1.5rem", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 280px), 1fr))" }}>
             {tools.map((tool) => {
               const isSaved = savedToolIds.includes(String(tool.id));
               return (
                 <div key={tool.id}
-                  className="group relative bg-[#0F0F0F] border border-white/5 hover:border-primary/40 rounded-3xl md:rounded-[2rem] p-5 md:p-7 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full overflow-hidden">
-                  <div className="absolute -top-24 -right-24 w-48 h-48 blur-[60px] bg-primary/5 group-hover:bg-primary/10 transition-all" />
-
-                  {/* Top Row */}
-                  <div className="flex justify-between items-start mb-4 z-10">
-                    <div className="text-4xl md:text-5xl p-3 md:p-4 bg-white/5 rounded-xl md:rounded-2xl border border-white/5 group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-500">
-                      {tool.icon || "⚡"}
-                    </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <button onClick={() => toggleSaveTool(tool.id)}
-                        className={`p-2.5 rounded-full border transition-all duration-300 active:scale-75 ${isSaved ? "bg-primary/20 border-primary/50 text-primary" : "bg-white/5 border-white/10 text-gray-500 hover:text-white hover:bg-white/10"}`}>
-                        {isSaved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+                  style={{ position: "relative", background: "#161616", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "1.25rem", padding: "1.5rem", transition: "transform 0.25s, border-color 0.25s", display: "flex", flexDirection: "column", overflow: "hidden", boxSizing: "border-box" }}
+                  onMouseOver={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.borderColor = "rgba(139, 92, 246, 0.6)"; }}
+                  onMouseOut={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; }}>
+                  
+                  <div style={{ position: "absolute", top: "-50px", right: "-50px", width: "140px", height: "140px", borderRadius: "50%", background: "rgba(139, 92, 246, 0.03)", filter: "blur(40px)", pointerEvents: "none" }} />
+                  
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.25rem", position: "relative", zIndex: 1, boxSizing: "border-box" }}>
+                    <div style={{ fontSize: "2.25rem", padding: "0.625rem", background: "rgba(255,255,255,0.03)", borderRadius: "0.75rem", border: "1px solid rgba(255,255,255,0.05)", lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>{tool.icon || "⚡"}</div>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.5rem" }}>
+                      <button onClick={() => toggleSaveTool(tool.id)} style={{ padding: "0.5rem", borderRadius: "50%", border: `1px solid ${isSaved ? "rgba(139, 92, 246, 0.5)" : "rgba(255,255,255,0.1)"}`, background: isSaved ? "rgba(139, 92, 246, 0.15)" : "rgba(255,255,255,0.04)", color: isSaved ? "#8b5cf6" : "#6b7280", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        {isSaved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
                       </button>
-                      {tool.pricing && (
-                        <span className="bg-white/10 text-gray-300 border border-white/5 text-[9px] md:text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-full">
-                          {tool.pricing}
-                        </span>
-                      )}
+                      {tool.pricing && <span style={{ background: "rgba(255,255,255,0.05)", color: "#a1a1aa", border: "1px solid rgba(255,255,255,0.08)", fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", padding: "0.25rem 0.5rem", borderRadius: "9999px" }}>{tool.pricing}</span>}
                     </div>
                   </div>
-
-                  {/* Category tag */}
-                  <div className="mb-3 z-10">
-                    <span className="text-[9px] md:text-[10px] font-black text-zinc-400 uppercase tracking-widest bg-white/5 border border-white/10 px-2.5 py-1 rounded-md">
+                  
+                  <div style={{ display: "flex", flexDirection: "column", flexGrow: 1, position: "relative", zIndex: 1, boxSizing: "border-box" }}>
+                    <span style={{ fontSize: "0.65rem", fontWeight: 800, color: "#8b5cf6", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.5rem", display: "block" }}>
                       {categoryMap[tool.category] || tool.category}
                     </span>
+                    <h3 style={{ fontSize: "1.25rem", fontWeight: 700, color: "white", marginBottom: "0.5rem", letterSpacing: "-0.01em", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tool.name}</h3>
+                    <p style={{ color: "#a1a1aa", fontSize: "0.85rem", lineHeight: 1.6, marginBottom: "1.5rem", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{tool.description}</p>
                   </div>
-
-                  {/* Title & Description */}
-                  <h2 className="text-xl md:text-2xl font-bold text-white mb-2 tracking-tight group-hover:text-primary transition-colors line-clamp-1 z-10">
-                    {tool.name}
-                  </h2>
-                  <p className="text-gray-500 text-xs md:text-sm leading-relaxed mb-6 line-clamp-3 flex-grow group-hover:text-gray-400 z-10">
-                    {tool.description}
-                  </p>
-
-                  {/* CTA Button */}
-                  <div className="pt-4 border-t border-white/5 mt-auto z-10">
-                    <a href={tool.link?.startsWith("http") ? tool.link : `https://${tool.link}`}
-                      target="_blank" rel="noopener noreferrer"
-                      onClick={() => trackClick(tool.id, tool.click_count || 0)}
-                      className="flex items-center justify-center w-full gap-2 bg-white/5 hover:bg-primary text-white text-[11px] md:text-sm font-bold py-3 px-4 rounded-xl transition-all border border-white/10 hover:border-primary">
-                      {tool.pricing?.toLowerCase() === "free" ? "Claim Free Tool" :
-                        tool.pricing?.toLowerCase() === "freemium" ? "Start for Free" :
-                        tool.pricing?.toLowerCase() === "premium" ? "Get Official Tool" : "Visit Website"}
-                      <ArrowRight className="h-4 w-4" />
+                  
+                  <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "1.25rem", position: "relative", zIndex: 1, boxSizing: "border-box", marginTop: "auto" }}>
+                    <a href={tool.link?.startsWith("http") ? tool.link : `https://${tool.link}`} target="_blank" rel="noopener noreferrer" onClick={() => trackClick(tool.id, tool.click_count || 0)}
+                      style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", width: "100%", background: "rgba(255,255,255,0.03)", color: "white", fontSize: "0.85rem", fontWeight: 700, padding: "0.75rem 1rem", borderRadius: "0.75rem", border: "1px solid rgba(255,255,255,0.08)", textDecoration: "none", transition: "all 0.2s", boxSizing: "border-box" }}
+                      onMouseOver={e => { e.currentTarget.style.background = "#8b5cf6"; e.currentTarget.style.borderColor = "#8b5cf6"; }}
+                      onMouseOut={e => { e.currentTarget.style.background = "rgba(255,255,255,0.03)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; }}>
+                      {tool.pricing?.toLowerCase() === "free" ? "Claim Free Tool" : tool.pricing?.toLowerCase() === "freemium" ? "Start for Free" : tool.pricing?.toLowerCase() === "premium" ? "Get Official Tool" : "Visit Website"}
+                      <ArrowRight size={14} />
                     </a>
                   </div>
+                  
                 </div>
               );
             })}
@@ -230,21 +213,23 @@ export default function CategoryPage({ tools, categoryName, allCategories }) {
         </section>
 
         {/* SEO FOOTER TEXT */}
-        <section className="max-w-4xl mx-auto px-6 pb-20 text-center">
-          <div className="border-t border-white/5 pt-12">
-            <h2 className="text-2xl font-bold text-white mb-4">
+        <section style={{ maxWidth: "56rem", margin: "0 auto", padding: "0 1.5rem 5rem", textAlign: "center" }}>
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "3rem" }}>
+            <h2 style={{ fontSize: "1.5rem", fontWeight: 700, color: "white", marginBottom: "1rem" }}>
               Find the Best {displayCategoryName} AI Tools
             </h2>
-            <p className="text-gray-500 text-sm leading-relaxed max-w-2xl mx-auto">
+            <p style={{ color: "#9ca3af", fontSize: "0.875rem", lineHeight: 1.6, maxWidth: "42rem", margin: "0 auto" }}>
               Toolsy curates the best {displayCategoryName} AI tools updated daily. Whether you need free or premium tools, we have you covered. Browse our full directory of {allCategories.length}+ categories and discover the perfect AI tool for your workflow.
             </p>
-            <div className="flex items-center justify-center gap-4 mt-8 flex-wrap">
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1rem", marginTop: "2rem", flexWrap: "wrap" }}>
               {allCategories.slice(0, 6).map((cat) => {
                 if (cat === "website builder") return null;
                 const displayCat = categoryMap[cat] || cat;
                 return (
                   <Link key={cat} href={`/category/${slugify(cat)}`}
-                    className="text-xs text-gray-500 hover:text-primary transition-colors font-bold">
+                    style={{ fontSize: "0.75rem", color: "#6b7280", fontWeight: 700, textDecoration: "none", transition: "color 0.2s" }}
+                    onMouseOver={e => e.currentTarget.style.color = "#8b5cf6"}
+                    onMouseOut={e => e.currentTarget.style.color = "#6b7280"}>
                     {displayCat} →
                   </Link>
                 );
