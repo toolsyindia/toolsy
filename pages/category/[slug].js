@@ -5,6 +5,21 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { ArrowRight, ArrowLeft, Bookmark, BookmarkCheck } from "lucide-react";
 
+// --- CTO FIX: The Category Cheat Code Map ---
+const categoryMap = {
+  "Audio Generator": "🎙️ Get Studio Quality Sound",
+  "Automation Tool": "⚙️ Put Your Work on Autopilot",
+  "Chatbot & Research": "🧠 Learn & Research 10x Faster",
+  "Coding Assistant": "💻 Build Apps in Minutes",
+  "Data Tool": "📊 Analyze Data Like a Pro",
+  "Image Generator": "🎨 Create Pro Graphics & Art",
+  "Useful Utility": "⚡ Daily Life Hacks",
+  "Video Generator": "📈 Create Viral Reels",
+  "Website Builder": "🚀 Launch Your Business Today",
+  "website builder": "🚀 Launch Your Business Today",
+  "Writing Tool": "✍️ Write Perfect Posts & Emails"
+};
+
 // Generate slug from name
 export function slugify(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -48,6 +63,9 @@ export default function CategoryPage({ tools, categoryName, allCategories }) {
   const router = useRouter();
   const [savedToolIds, setSavedToolIds] = useState([]);
 
+  // CTO FIX: Translate the DB category to the Premium Goal for human eyes
+  const displayCategoryName = categoryMap[categoryName] || categoryName;
+
   useEffect(() => {
     const saved = localStorage.getItem("toolsy_saved");
     if (saved) {
@@ -78,6 +96,7 @@ export default function CategoryPage({ tools, categoryName, allCategories }) {
   return (
     <>
       <Head>
+        {/* CTO FIX: Keep the raw database categoryName here so Google rankings and keywords DO NOT BREAK */}
         <title>{categoryName} AI Tools | Best {categoryName} Tools in 2026 - Toolsy</title>
         <meta name="description" content={`Discover the best ${categoryName} AI tools in 2026. Browse ${tools.length} curated ${categoryName} tools including ${freeCount} free options. Updated daily on Toolsy.`} />
         <meta name="keywords" content={`${categoryName} AI tools, best ${categoryName} tools, free ${categoryName} AI, AI ${categoryName} 2026`} />
@@ -96,12 +115,15 @@ export default function CategoryPage({ tools, categoryName, allCategories }) {
             <Link href="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-white text-sm font-bold mb-6 transition-colors">
               <ArrowLeft className="w-4 h-4" /> Back to All Tools
             </Link>
+            
+            {/* CTO FIX: Display the Premium Mapped Name for humans */}
             <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-4 text-white">
-              Best <span className="text-primary">{categoryName}</span> AI Tools
+              Best <span className="text-primary">{displayCategoryName}</span> AI Tools
             </h1>
             <p className="text-gray-400 text-sm md:text-lg max-w-2xl mx-auto mb-4">
-              {tools.length} curated {categoryName} tools — including {freeCount} free options. Updated daily.
+              {tools.length} curated {displayCategoryName} tools — including {freeCount} free options. Updated daily.
             </p>
+            
             <div className="flex items-center justify-center gap-3 flex-wrap">
               <span className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest">
                 {tools.length} Tools
@@ -125,16 +147,24 @@ export default function CategoryPage({ tools, categoryName, allCategories }) {
                 .custom-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
               }
             `}</style>
-            {allCategories.map((cat) => (
-              <Link key={cat} href={`/category/${slugify(cat)}`}
-                className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all border ${
-                  cat === categoryName
-                    ? "bg-primary text-white border-primary"
-                    : "bg-[#1A1A1A] text-gray-400 border-white/10 hover:bg-white/10 hover:text-white"
-                }`}>
-                {cat}
-              </Link>
-            ))}
+            
+            {/* CTO FIX: Map all categories to their premium names for the tabs */}
+            {allCategories.map((cat) => {
+              if (cat === "website builder") return null; // Hide duplicate DB entry
+              
+              const displayCat = categoryMap[cat] || cat;
+              
+              return (
+                <Link key={cat} href={`/category/${slugify(cat)}`}
+                  className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all border ${
+                    cat === categoryName
+                      ? "bg-primary text-white border-primary"
+                      : "bg-[#1A1A1A] text-gray-400 border-white/10 hover:bg-white/10 hover:text-white"
+                  }`}>
+                  {displayCat}
+                </Link>
+              );
+            })}
           </div>
         </section>
 
@@ -169,7 +199,7 @@ export default function CategoryPage({ tools, categoryName, allCategories }) {
                   {/* Category tag */}
                   <div className="mb-3 z-10">
                     <span className="text-[9px] md:text-[10px] font-black text-zinc-400 uppercase tracking-widest bg-white/5 border border-white/10 px-2.5 py-1 rounded-md">
-                      {tool.category}
+                      {categoryMap[tool.category] || tool.category}
                     </span>
                   </div>
 
@@ -203,18 +233,22 @@ export default function CategoryPage({ tools, categoryName, allCategories }) {
         <section className="max-w-4xl mx-auto px-6 pb-20 text-center">
           <div className="border-t border-white/5 pt-12">
             <h2 className="text-2xl font-bold text-white mb-4">
-              Find the Best {categoryName} AI Tools
+              Find the Best {displayCategoryName} AI Tools
             </h2>
             <p className="text-gray-500 text-sm leading-relaxed max-w-2xl mx-auto">
-              Toolsy curates the best {categoryName} AI tools updated daily. Whether you need free or premium {categoryName} tools, we have you covered. Browse our full directory of {allCategories.length}+ categories and discover the perfect AI tool for your workflow.
+              Toolsy curates the best {displayCategoryName} AI tools updated daily. Whether you need free or premium tools, we have you covered. Browse our full directory of {allCategories.length}+ categories and discover the perfect AI tool for your workflow.
             </p>
             <div className="flex items-center justify-center gap-4 mt-8 flex-wrap">
-              {allCategories.slice(0, 6).map((cat) => (
-                <Link key={cat} href={`/category/${slugify(cat)}`}
-                  className="text-xs text-gray-500 hover:text-primary transition-colors font-bold">
-                  {cat} Tools →
-                </Link>
-              ))}
+              {allCategories.slice(0, 6).map((cat) => {
+                if (cat === "website builder") return null;
+                const displayCat = categoryMap[cat] || cat;
+                return (
+                  <Link key={cat} href={`/category/${slugify(cat)}`}
+                    className="text-xs text-gray-500 hover:text-primary transition-colors font-bold">
+                    {displayCat} →
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>
