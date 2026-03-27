@@ -1,11 +1,11 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Head from "next/head";
 import { useTools } from "@/hooks/useTools";
 import { supabase } from "@/lib/supabase";
 import {
   Search, Sparkles, ArrowRight, Bookmark, BookmarkCheck,
   LayoutGrid, Gift, Check, Target, User, Lightbulb,
-  X, SlidersHorizontal
+  X, SlidersHorizontal, ChevronLeft, ChevronRight
 } from "lucide-react";
 
 // --- CTO FIX: The Category Cheat Code Map ---
@@ -120,7 +120,6 @@ const QuizOverlay = ({ onComplete, onSkip }) => {
             <h2 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#111", marginBottom: "0.75rem" }}>"⚡ Your Unfair Advantage is Ready"</h2>
             <p style={{ fontSize: "1rem", fontWeight: 700, color: "rgb(var(--primary))", marginBottom: "1rem" }}>We found the perfect AI stack for your exact goal.</p>
             
-            {/* CTO FIX 1: Explicitly state that it is optional */}
             <p style={{ color: "#6b7280", marginBottom: "1.5rem", fontSize: "0.875rem", fontWeight: 500 }}>
               Want us to email you this list? <span style={{ color: "#9ca3af", fontStyle: "italic" }}>(Optional)</span>
             </p>
@@ -129,7 +128,6 @@ const QuizOverlay = ({ onComplete, onSkip }) => {
               <input type="email" placeholder="Your best email address..." value={email} onChange={(e) => setEmail(e.target.value)}
                 style={{ padding: "1rem 1.5rem", background: "#f9fafb", border: "2px solid #e5e7eb", borderRadius: "0.75rem", fontSize: "1rem", outline: "none", color: "#111", fontFamily: "inherit" }} />
               
-              {/* CTO FIX 2: Dynamic button text based on whether they typed an email or not */}
               <button onClick={handleFinish} style={{ padding: "1rem", background: "rgb(var(--primary))", color: "white", fontWeight: 900, fontSize: "1rem", borderRadius: "0.75rem", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", fontFamily: "inherit" }}>
                 {email.trim() !== "" ? "Send & Reveal My Stack" : "Skip & Reveal My Stack"} <ArrowRight size={18} />
               </button>
@@ -207,6 +205,15 @@ export default function Home() {
   const [isPricingOpen, setIsPricingOpen] = useState(false);
   const [quizFilterTag, setQuizFilterTag] = useState(null);
   const [showQuiz, setShowQuiz] = useState(false);
+
+  // --- CTO FIX: Smooth Scroll Logic ---
+  const categoryScrollRef = useRef(null);
+  const scrollCategories = (direction) => {
+    if (categoryScrollRef.current) {
+      const scrollAmount = direction === "left" ? -250 : 250;
+      categoryScrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
 
   useEffect(() => {
     const saved = localStorage.getItem("toolsy_saved");
@@ -359,23 +366,42 @@ export default function Home() {
             </div>
           </div>
 
-          {/* CATEGORIES UPGRADE - NEW GOAL-BASED NAMES IN UI */}
-          <div style={{ display: "flex", flexWrap: "nowrap", gap: "0.6rem", overflowX: "auto", paddingBottom: "1rem", scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}>
-            {categories.map((cat) => {
-              if (cat === "website builder") return null; // CTO FIX: Hide duplicate database entry from UI
+          {/* CATEGORIES UPGRADE - WITH NETFLIX SCROLL ARROWS */}
+          <div style={{ position: "relative", display: "flex", alignItems: "center", marginBottom: "1rem" }}>
+            
+            {/* Left Scroll Arrow */}
+            <button onClick={() => scrollCategories("left")} style={{ position: "absolute", left: "-15px", zIndex: 10, background: "#161616", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", color: "white", cursor: "pointer", boxShadow: "0 4px 12px rgba(0,0,0,0.8)", transition: "all 0.2s" }}
+              onMouseOver={e => { e.currentTarget.style.background = "rgb(var(--primary))"; e.currentTarget.style.borderColor = "rgb(var(--primary))"; }}
+              onMouseOut={e => { e.currentTarget.style.background = "#161616"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}>
+              <ChevronLeft size={20} />
+            </button>
 
-              const isActive = (activeCategory === cat) || (cat === "All" && activeCategory === null);
-              const displayCat = cat === "All" ? "🎯 All Goals" : (categoryMap[cat] || cat);
+            {/* Scrollable Container */}
+            <div ref={categoryScrollRef} style={{ display: "flex", flexWrap: "nowrap", gap: "0.6rem", overflowX: "auto", paddingBottom: "0.5rem", scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch", width: "100%", padding: "0 1.5rem", scrollBehavior: "smooth" }}>
+              {categories.map((cat) => {
+                if (cat === "website builder") return null;
 
-              return (
-                <button key={cat} onClick={() => setActiveCategory(cat === "All" ? null : cat)}
-                  style={{ flexShrink: 0, flexGrow: 0, padding: "0.6rem 1.25rem", borderRadius: "9999px", fontSize: "0.875rem", fontWeight: 700, whiteSpace: "nowrap", cursor: "pointer", fontFamily: "inherit", background: isActive ? "rgb(var(--primary))" : "#161616", color: isActive ? "white" : "#a1a1aa", border: `1px solid ${isActive ? "rgb(var(--primary))" : "rgba(255,255,255,0.08)"}`, transition: "all 0.2s" }}
-                  onMouseOver={e => { if(!isActive) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"; e.currentTarget.style.color = "white"; } }}
-                  onMouseOut={e => { if(!isActive) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; e.currentTarget.style.color = "#a1a1aa"; } }}>
-                  {displayCat}
-                </button>
-              );
-            })}
+                const isActive = (activeCategory === cat) || (cat === "All" && activeCategory === null);
+                const displayCat = cat === "All" ? "🎯 All Goals" : (categoryMap[cat] || cat);
+
+                return (
+                  <button key={cat} onClick={() => setActiveCategory(cat === "All" ? null : cat)}
+                    style={{ flexShrink: 0, flexGrow: 0, padding: "0.6rem 1.25rem", borderRadius: "9999px", fontSize: "0.875rem", fontWeight: 700, whiteSpace: "nowrap", cursor: "pointer", fontFamily: "inherit", background: isActive ? "rgb(var(--primary))" : "#161616", color: isActive ? "white" : "#a1a1aa", border: `1px solid ${isActive ? "rgb(var(--primary))" : "rgba(255,255,255,0.08)"}`, transition: "all 0.2s" }}
+                    onMouseOver={e => { if(!isActive) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"; e.currentTarget.style.color = "white"; } }}
+                    onMouseOut={e => { if(!isActive) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; e.currentTarget.style.color = "#a1a1aa"; } }}>
+                    {displayCat}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Right Scroll Arrow */}
+            <button onClick={() => scrollCategories("right")} style={{ position: "absolute", right: "-15px", zIndex: 10, background: "#161616", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", color: "white", cursor: "pointer", boxShadow: "0 4px 12px rgba(0,0,0,0.8)", transition: "all 0.2s" }}
+              onMouseOver={e => { e.currentTarget.style.background = "rgb(var(--primary))"; e.currentTarget.style.borderColor = "rgb(var(--primary))"; }}
+              onMouseOut={e => { e.currentTarget.style.background = "#161616"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}>
+              <ChevronRight size={20} />
+            </button>
+            
           </div>
         </section>
 
