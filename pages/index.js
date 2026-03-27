@@ -340,7 +340,12 @@ export default function Home() {
         @media (max-width: 480px) { .filter-label { display: none !important; } }
         ::-webkit-scrollbar { display: none; }
         
-        /* CTO FIX: Skeleton Pulse Animation */
+        /* CTO FIX: Hide arrows strictly on mobile screens */
+        @media (max-width: 768px) {
+          .desktop-arrow { display: none !important; }
+        }
+        
+        /* Skeleton Pulse Animation */
         @keyframes skeleton-pulse {
           0% { opacity: 0.4; }
           50% { opacity: 1; }
@@ -409,7 +414,7 @@ export default function Home() {
           <div style={{ position: "relative", display: "flex", alignItems: "center", marginBottom: "1rem" }}>
             
             {/* Left Scroll Arrow */}
-            <button onClick={() => scrollCategories("left")} style={{ position: "absolute", left: "-15px", zIndex: 10, background: "#161616", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", color: "white", cursor: "pointer", boxShadow: "0 4px 12px rgba(0,0,0,0.8)", transition: "all 0.2s" }}
+            <button className="desktop-arrow" onClick={() => scrollCategories("left")} style={{ position: "absolute", left: "-15px", zIndex: 10, background: "#161616", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", color: "white", cursor: "pointer", boxShadow: "0 4px 12px rgba(0,0,0,0.8)", transition: "all 0.2s" }}
               onMouseOver={e => { e.currentTarget.style.background = "rgb(var(--primary))"; e.currentTarget.style.borderColor = "rgb(var(--primary))"; }}
               onMouseOut={e => { e.currentTarget.style.background = "#161616"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}>
               <ChevronLeft size={20} />
@@ -435,7 +440,7 @@ export default function Home() {
             </div>
 
             {/* Right Scroll Arrow */}
-            <button onClick={() => scrollCategories("right")} style={{ position: "absolute", right: "-15px", zIndex: 10, background: "#161616", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", color: "white", cursor: "pointer", boxShadow: "0 4px 12px rgba(0,0,0,0.8)", transition: "all 0.2s" }}
+            <button className="desktop-arrow" onClick={() => scrollCategories("right")} style={{ position: "absolute", right: "-15px", zIndex: 10, background: "#161616", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", color: "white", cursor: "pointer", boxShadow: "0 4px 12px rgba(0,0,0,0.8)", transition: "all 0.2s" }}
               onMouseOver={e => { e.currentTarget.style.background = "rgb(var(--primary))"; e.currentTarget.style.borderColor = "rgb(var(--primary))"; }}
               onMouseOut={e => { e.currentTarget.style.background = "#161616"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}>
               <ChevronRight size={20} />
