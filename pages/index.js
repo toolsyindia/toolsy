@@ -8,6 +8,21 @@ import {
   X, SlidersHorizontal
 } from "lucide-react";
 
+// --- CTO FIX: The Category Cheat Code Map ---
+const categoryMap = {
+  "Audio Generator": "🎙️ Get Studio Quality Sound",
+  "Automation Tool": "⚙️ Put Your Work on Autopilot",
+  "Chatbot & Research": "🧠 Learn & Research 10x Faster",
+  "Coding Assistant": "💻 Build Apps in Minutes",
+  "Data Tool": "📊 Analyze Data Like a Pro",
+  "Image Generator": "🎨 Create Pro Graphics & Art",
+  "Useful Utility": "⚡ Daily Life Hacks",
+  "Video Generator": "📈 Create Viral Reels",
+  "Website Builder": "🚀 Launch Your Business Today",
+  "website builder": "🚀 Launch Your Business Today",
+  "Writing Tool": "✍️ Write Perfect Posts & Emails"
+};
+
 const QuizOverlay = ({ onComplete, onSkip }) => {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({ goal: "", role: "", problem: "" });
@@ -121,7 +136,7 @@ const QuizOverlay = ({ onComplete, onSkip }) => {
             </div>
           </div>
         )}
-      </div>s
+      </div>
       {step < 3 && (
         <button onClick={onSkip} style={{ position: "fixed", bottom: "1.5rem", left: "50%", transform: "translateX(-50%)", color: "#9ca3af", background: "#F9FAFB", padding: "0.5rem 1.25rem", borderRadius: "9999px", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.25rem", fontSize: "0.875rem", fontFamily: "inherit" }}>
           Skip to explore all tools <ArrowRight size={12} />
@@ -156,7 +171,10 @@ function ToolGrid({ tools, isSearch, checkActive, onVisit, savedIds, onToggleSav
             </div>
             
             <div style={{ display: "flex", flexDirection: "column", flexGrow: 1, position: "relative", zIndex: 1, boxSizing: "border-box" }}>
-              <span style={{ fontSize: "0.65rem", fontWeight: 800, color: "#8b5cf6", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.5rem", display: "block" }}>{tool.category}</span>
+              {/* CTO FIX: Show the mapped 'Goal' category on the cards instead of the boring DB text! */}
+              <span style={{ fontSize: "0.65rem", fontWeight: 800, color: "#8b5cf6", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.5rem", display: "block" }}>
+                {categoryMap[tool.category] || tool.category}
+              </span>
               <h3 style={{ fontSize: "1.25rem", fontWeight: 700, color: "white", marginBottom: "0.5rem", letterSpacing: "-0.01em", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tool.name}</h3>
               <p style={{ color: "#a1a1aa", fontSize: "0.85rem", lineHeight: 1.6, marginBottom: "1.5rem", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{tool.description}</p>
             </div>
@@ -298,10 +316,6 @@ export default function Home() {
               <span style={{ fontSize: "10px", fontWeight: 600, color: "rgb(var(--primary))", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>Premium AI Tools Directory</span>
             </div>
             
-            {/* UPDATED FONT SETTINGS: Heavier, tighter letter spacing, much larger clamp */}
-            {/* RESTORED PREMIUM SAAS FONT: Cleaner weight, better spacing, exact line breaks */}
-            {/* ADDED fontFamily to change the actual font style! */}
-            {/* THE NEW PREMIUM FONT: Applied directly to the Hero Text */}
             <h1 style={{ fontFamily: "'Outfit', sans-serif", fontSize: "clamp(3.5rem, 10vw, 6.5rem)", fontWeight: 800, letterSpacing: "-0.03em", lineHeight: 1.05, marginBottom: "1.25rem", color: "white" }}>
               Discover the <br />
               <span style={{ color: "rgb(var(--primary))" }}>Best</span> AI Tools
@@ -316,7 +330,6 @@ export default function Home() {
         {/* SEARCH & FILTERS UPGRADE - WIDER SEARCH BAR */}
         <section style={{ maxWidth: "880px", margin: "0 auto", padding: "0 1rem 1.5rem" }}>
           <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.25rem" }}>
-            {/* UPDATED SEARCH BAR: Taller, wider, premium background and glowing border on focus */}
             <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: "0.75rem", background: "#121212", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "1rem", padding: "0 1.25rem", height: "3.5rem", transition: "border-color 0.2s" }}
                  onFocusCapture={e => e.currentTarget.style.borderColor = "rgb(var(--primary))"}
                  onBlurCapture={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"}>
@@ -346,23 +359,26 @@ export default function Home() {
             </div>
           </div>
 
-          {/* CATEGORIES UPGRADE - STRICT SINGLE LINE, BETTER PADDING, PREMIUM HOVER */}
+          {/* CATEGORIES UPGRADE - NEW GOAL-BASED NAMES IN UI */}
           <div style={{ display: "flex", flexWrap: "nowrap", gap: "0.6rem", overflowX: "auto", paddingBottom: "1rem", scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}>
             {categories.map((cat) => {
+              if (cat === "website builder") return null; // CTO FIX: Hide duplicate database entry from UI
+
               const isActive = (activeCategory === cat) || (cat === "All" && activeCategory === null);
+              const displayCat = cat === "All" ? "🎯 All Goals" : (categoryMap[cat] || cat);
+
               return (
                 <button key={cat} onClick={() => setActiveCategory(cat === "All" ? null : cat)}
                   style={{ flexShrink: 0, flexGrow: 0, padding: "0.6rem 1.25rem", borderRadius: "9999px", fontSize: "0.875rem", fontWeight: 700, whiteSpace: "nowrap", cursor: "pointer", fontFamily: "inherit", background: isActive ? "rgb(var(--primary))" : "#161616", color: isActive ? "white" : "#a1a1aa", border: `1px solid ${isActive ? "rgb(var(--primary))" : "rgba(255,255,255,0.08)"}`, transition: "all 0.2s" }}
                   onMouseOver={e => { if(!isActive) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"; e.currentTarget.style.color = "white"; } }}
                   onMouseOut={e => { if(!isActive) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; e.currentTarget.style.color = "#a1a1aa"; } }}>
-                  {cat}
+                  {displayCat}
                 </button>
               );
             })}
           </div>
         </section>
 
-        {/* TABS UPGRADE - PREMIUM SAAS SEGMENTED CONTROL */}
         {/* TABS UPGRADE - CENTERED ON DESKTOP, SCROLLABLE ON MOBILE */}
         <div style={{ width: "100%", display: "flex", justifyContent: "center", padding: "0 1rem 2.5rem" }}>
           <div style={{ maxWidth: "100%", overflowX: "auto", scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch", padding: "0.25rem" }}>
@@ -384,7 +400,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-
 
         {/* TOOLS */}
         <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 1rem 5rem" }}>
