@@ -1,6 +1,5 @@
 import Head from "next/head";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { ArrowRight, ArrowLeft, Bookmark, BookmarkCheck } from "lucide-react";
@@ -60,7 +59,6 @@ export async function getStaticProps({ params }) {
 }
 
 export default function CategoryPage({ tools, categoryName, allCategories }) {
-  const router = useRouter();
   const [savedToolIds, setSavedToolIds] = useState([]);
 
   // Translate the DB category to the Premium Goal for human eyes
