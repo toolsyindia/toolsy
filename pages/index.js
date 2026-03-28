@@ -40,10 +40,14 @@ const QuizOverlay = ({ onComplete, onSkip }) => {
 
   const handleFinish = async () => {
     const tagMap = {
-      "Video Editing": "video", "Coding & Websites": "code",
-      "Design & Images": "design", "Writing Content": "writing",
-      "Audio & Music": "audio", "Automation": "automation",
-      "Data & Analytics": "data", "Useful Utilities": "utility",
+      "📈 Create Viral Reels": "video", 
+      "💻 Build Apps in Minutes": "code",
+      "🎨 Create Pro Graphics & Art": "design", 
+      "✍️ Write Perfect Posts & Emails": "writing",
+      "🎙️ Get Studio Quality Sound": "audio", 
+      "⚙️ Put Your Work on Autopilot": "automation",
+      "📊 Analyze Data Like a Pro": "data", 
+      "⚡ Daily Life Hacks": "utility",
     };
     const tagToSearch = tagMap[answers.problem] || "";
     if (email.trim() !== "") {
@@ -106,7 +110,8 @@ const QuizOverlay = ({ onComplete, onSkip }) => {
             <h2 style={{ fontSize: "2rem", fontWeight: 900, color: "#111", textAlign: "center", marginBottom: "0.5rem", letterSpacing: "-0.02em" }}>What&apos;s your biggest struggle?</h2>
             <p style={{ color: "#6b7280", textAlign: "center", marginBottom: "2rem" }}>Pick your headache, we will fix it.</p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.625rem" }}>
-              {["Video Editing", "Writing Content", "Coding & Websites", "Design & Images", "Audio & Music", "Automation", "Data & Analytics", "Useful Utilities"].map((opt) => (
+              {/* CTO FIX: Updated options to Premium Cheat Codes */}
+              {["📈 Create Viral Reels", "✍️ Write Perfect Posts & Emails", "💻 Build Apps in Minutes", "🎨 Create Pro Graphics & Art", "🎙️ Get Studio Quality Sound", "⚙️ Put Your Work on Autopilot", "📊 Analyze Data Like a Pro", "⚡ Daily Life Hacks"].map((opt) => (
                 <button key={opt} onClick={() => handleAnswer("problem", opt, 3)} style={{ ...qBtn, fontSize: "0.875rem", padding: "1rem" }}
                   onMouseOver={e => e.currentTarget.style.borderColor = "rgb(var(--primary))"}
                   onMouseOut={e => e.currentTarget.style.borderColor = "#f3f4f6"}>{opt}</button>
