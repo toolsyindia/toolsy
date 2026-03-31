@@ -8,7 +8,8 @@ import {
   X, SlidersHorizontal, ChevronLeft, ChevronRight
 } from "lucide-react";
 
-// --- CTO FIX: The Category Cheat Code Map ---
+import AICrab from '../components/AICrab'; 
+
 const categoryMap = {
   "Audio Generator": "🎙️ Get Studio Quality Sound",
   "Automation Tool": "⚙️ Put Your Work on Autopilot",
@@ -23,155 +24,24 @@ const categoryMap = {
   "Writing Tool": "✍️ Write Perfect Posts & Emails"
 };
 
-const QuizOverlay = ({ onComplete, onSkip }) => {
-  const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState({ goal: "", role: "", problem: "" });
-  const [email, setEmail] = useState("");
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = "auto"; };
-  }, []);
-
-  const handleAnswer = (key, value, nextStep) => {
-    setAnswers(prev => ({ ...prev, [key]: value }));
-    setStep(nextStep);
-  };
-
-  const handleFinish = async () => {
-    const tagMap = {
-      "📈 Create Viral Reels": "video", 
-      "💻 Build Apps in Minutes": "code",
-      "🎨 Create Pro Graphics & Art": "design", 
-      "✍️ Write Perfect Posts & Emails": "writing",
-      "🎙️ Get Studio Quality Sound": "audio", 
-      "⚙️ Put Your Work on Autopilot": "automation",
-      "📊 Analyze Data Like a Pro": "data", 
-      "⚡ Daily Life Hacks": "utility",
-    };
-    const tagToSearch = tagMap[answers.problem] || "";
-    if (email.trim() !== "") {
-      try {
-        await fetch("https://script.google.com/macros/s/AKfycbzf2hzxyEqdbOshBuRBti6wmYjHX4yc8BAGqgRmzQnv-p9QKNm73KA-ZH-cpathXc3K4w/exec", {
-          method: "POST", mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, ...answers }),
-        });
-      } catch (error) { console.error("Failed:", error); }
-    }
-    onComplete(tagToSearch);
-  };
-
-  const qBtn = { padding: "1.25rem", textAlign: "left", background: "white", border: "2px solid #f3f4f6", borderRadius: "1rem", color: "#1f2937", fontWeight: 700, fontSize: "1rem", cursor: "pointer", width: "100%", fontFamily: "inherit", transition: "border-color 0.2s" };
-
-  return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 999, background: "#F9FAFB", overflowY: "auto", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "1.5rem" }}>
-      <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "4px", background: "#e5e7eb", zIndex: 1000 }}>
-        <div style={{ height: "100%", background: "rgb(var(--primary))", width: `${(step / 3) * 100}%`, transition: "width 0.5s ease" }} />
-      </div>
-      <div style={{ width: "100%", maxWidth: "480px" }}>
-        {step === 0 && (
-          <div>
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: "1.5rem" }}>
-              <div style={{ padding: "1rem", background: "rgba(var(--primary),0.1)", borderRadius: "50%", color: "rgb(var(--primary))" }}><Target size={32} /></div>
-            </div>
-            <h2 style={{ fontSize: "2rem", fontWeight: 900, color: "#111", textAlign: "center", marginBottom: "0.5rem", letterSpacing: "-0.02em" }}>What is your goal today?</h2>
-            <p style={{ color: "#6b7280", textAlign: "center", marginBottom: "2rem" }}>Let&apos;s find the exact AI tools you need.</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-              {["Make Money", "Save Time", "Just Exploring"].map((opt) => (
-                <button key={opt} onClick={() => handleAnswer("goal", opt, 1)} style={qBtn}
-                  onMouseOver={e => e.currentTarget.style.borderColor = "rgb(var(--primary))"}
-                  onMouseOut={e => e.currentTarget.style.borderColor = "#f3f4f6"}>{opt}</button>
-              ))}
-            </div>
-          </div>
-        )}
-        {step === 1 && (
-          <div>
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: "1.5rem" }}>
-              <div style={{ padding: "1rem", background: "rgba(var(--primary),0.1)", borderRadius: "50%", color: "rgb(var(--primary))" }}><User size={32} /></div>
-            </div>
-            <h2 style={{ fontSize: "2rem", fontWeight: 900, color: "#111", textAlign: "center", marginBottom: "0.5rem", letterSpacing: "-0.02em" }}>Who are you?</h2>
-            <p style={{ color: "#6b7280", textAlign: "center", marginBottom: "2rem" }}>This helps us personalize your tool stack.</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-              {["Content Creator", "Developer / Student", "Business Owner"].map((opt) => (
-                <button key={opt} onClick={() => handleAnswer("role", opt, 2)} style={qBtn}
-                  onMouseOver={e => e.currentTarget.style.borderColor = "rgb(var(--primary))"}
-                  onMouseOut={e => e.currentTarget.style.borderColor = "#f3f4f6"}>{opt}</button>
-              ))}
-            </div>
-          </div>
-        )}
-        {step === 2 && (
-          <div>
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: "1.5rem" }}>
-              <div style={{ padding: "1rem", background: "rgba(var(--primary),0.1)", borderRadius: "50%", color: "rgb(var(--primary))" }}><Lightbulb size={32} /></div>
-            </div>
-            <h2 style={{ fontSize: "2rem", fontWeight: 900, color: "#111", textAlign: "center", marginBottom: "0.5rem", letterSpacing: "-0.02em" }}>What&apos;s your biggest struggle?</h2>
-            <p style={{ color: "#6b7280", textAlign: "center", marginBottom: "2rem" }}>Pick your headache, we will fix it.</p>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.625rem" }}>
-              {/* CTO FIX: Updated options to Premium Cheat Codes */}
-              {["📈 Create Viral Reels", "✍️ Write Perfect Posts & Emails", "💻 Build Apps in Minutes", "🎨 Create Pro Graphics & Art", "🎙️ Get Studio Quality Sound", "⚙️ Put Your Work on Autopilot", "📊 Analyze Data Like a Pro", "⚡ Daily Life Hacks"].map((opt) => (
-                <button key={opt} onClick={() => handleAnswer("problem", opt, 3)} style={{ ...qBtn, fontSize: "0.875rem", padding: "1rem" }}
-                  onMouseOver={e => e.currentTarget.style.borderColor = "rgb(var(--primary))"}
-                  onMouseOut={e => e.currentTarget.style.borderColor = "#f3f4f6"}>{opt}</button>
-              ))}
-            </div>
-          </div>
-        )}
-       {step === 3 && (
-          <div style={{ background: "white", padding: "2.5rem", borderRadius: "1.5rem", boxShadow: "0 25px 50px rgba(0,0,0,0.12)", border: "1px solid #e0e7ff", textAlign: "center" }}>
-            <div style={{ display: "inline-flex", padding: "1rem", borderRadius: "50%", background: "rgba(var(--primary),0.1)", color: "rgb(var(--primary))", marginBottom: "1.5rem" }}><Sparkles size={32} /></div>
-            <h2 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#111", marginBottom: "0.75rem" }}>"⚡ Your Unfair Advantage is Ready"</h2>
-            <p style={{ fontSize: "1rem", fontWeight: 700, color: "rgb(var(--primary))", marginBottom: "1rem" }}>We found the perfect AI stack for your exact goal.</p>
-            
-            <p style={{ color: "#6b7280", marginBottom: "1.5rem", fontSize: "0.875rem", fontWeight: 500 }}>
-              Want us to email you this list? <span style={{ color: "#9ca3af", fontStyle: "italic" }}>(Optional)</span>
-            </p>
-            
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-              <input type="email" placeholder="Your best email address..." value={email} onChange={(e) => setEmail(e.target.value)}
-                style={{ padding: "1rem 1.5rem", background: "#f9fafb", border: "2px solid #e5e7eb", borderRadius: "0.75rem", fontSize: "1rem", outline: "none", color: "#111", fontFamily: "inherit" }} />
-              
-              <button onClick={handleFinish} style={{ padding: "1rem", background: "rgb(var(--primary))", color: "white", fontWeight: 900, fontSize: "1rem", borderRadius: "0.75rem", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", fontFamily: "inherit" }}>
-                {email.trim() !== "" ? "Send & Reveal My Stack" : "Skip & Reveal My Stack"} <ArrowRight size={18} />
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-      {step < 3 && (
-        <button onClick={onSkip} style={{ position: "fixed", bottom: "1.5rem", left: "50%", transform: "translateX(-50%)", color: "#9ca3af", background: "#F9FAFB", padding: "0.5rem 1.25rem", borderRadius: "9999px", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.25rem", fontSize: "0.875rem", fontFamily: "inherit" }}>
-          Skip to explore all tools <ArrowRight size={12} />
-        </button>
-      )}
-    </div>
-  );
-};
-
-// --- CTO FIX: Pro Skeleton Loader Component ---
 function SkeletonGrid() {
   return (
     <div style={{ display: "grid", gap: "1.5rem", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 280px), 1fr))" }}>
       {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((i) => (
         <div key={i} className="skeleton-card" style={{ background: "#161616", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "1.25rem", padding: "1.5rem", display: "flex", flexDirection: "column", minHeight: "280px", boxSizing: "border-box" }}>
-          
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.25rem" }}>
             <div style={{ width: "3.5rem", height: "3.5rem", background: "rgba(255,255,255,0.05)", borderRadius: "0.75rem" }} />
             <div style={{ width: "60px", height: "24px", background: "rgba(255,255,255,0.05)", borderRadius: "9999px" }} />
           </div>
-          
           <div style={{ display: "flex", flexDirection: "column", flexGrow: 1, gap: "0.75rem" }}>
             <div style={{ width: "40%", height: "12px", background: "rgba(255,255,255,0.05)", borderRadius: "4px" }} />
             <div style={{ width: "80%", height: "20px", background: "rgba(255,255,255,0.08)", borderRadius: "4px" }} />
             <div style={{ width: "100%", height: "12px", background: "rgba(255,255,255,0.03)", borderRadius: "4px", marginTop: "0.5rem" }} />
             <div style={{ width: "90%", height: "12px", background: "rgba(255,255,255,0.03)", borderRadius: "4px" }} />
           </div>
-          
           <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "1.25rem", marginTop: "1.5rem" }}>
             <div style={{ width: "100%", height: "40px", background: "rgba(255,255,255,0.05)", borderRadius: "0.75rem" }} />
           </div>
-          
         </div>
       ))}
     </div>
@@ -203,7 +73,6 @@ function ToolGrid({ tools, isSearch, checkActive, onVisit, savedIds, onToggleSav
             </div>
             
             <div style={{ display: "flex", flexDirection: "column", flexGrow: 1, position: "relative", zIndex: 1, boxSizing: "border-box" }}>
-              {/* CTO FIX: Show the mapped 'Goal' category on the cards instead of the boring DB text! */}
               <span style={{ fontSize: "0.65rem", fontWeight: 800, color: "#8b5cf6", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.5rem", display: "block" }}>
                 {categoryMap[tool.category] || tool.category}
               </span>
@@ -220,7 +89,6 @@ function ToolGrid({ tools, isSearch, checkActive, onVisit, savedIds, onToggleSav
                 <ArrowRight size={14} />
               </a>
             </div>
-            
           </div>
         );
       })}
@@ -238,10 +106,13 @@ export default function Home() {
   const [pricingFilter, setPricingFilter] = useState("All");
   const [isPricingOpen, setIsPricingOpen] = useState(false);
   const [quizFilterTag, setQuizFilterTag] = useState(null);
-  const [showQuiz, setShowQuiz] = useState(false);
+  
+  // CTO FIX: VIP Export Modal State
+  const [showVipModal, setShowVipModal] = useState(false);
 
-  // --- CTO FIX: Smooth Scroll Logic ---
+  const toolsRef = useRef(null);
   const categoryScrollRef = useRef(null);
+
   const scrollCategories = (direction) => {
     if (categoryScrollRef.current) {
       const scrollAmount = direction === "left" ? -250 : 250;
@@ -252,37 +123,25 @@ export default function Home() {
   useEffect(() => {
     const saved = localStorage.getItem("toolsy_saved");
     if (saved) { try { setSavedToolIds(JSON.parse(saved)); } catch (e) { } }
-    
-    // --- CTO FIX: The 6-Hour Growth Hack Loop ---
-    const lastQuizTime = localStorage.getItem("toolsy_quiz_timestamp");
-    const now = Date.now();
-    const sixHoursInMs = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
-
-    // If never taken, OR if 6 hours have passed -> Show the Quiz!
-    if (!lastQuizTime || (now - parseInt(lastQuizTime, 10)) > sixHoursInMs) {
-      const timer = setTimeout(() => setShowQuiz(true), 1500);
-      return () => clearTimeout(timer);
-    }
   }, []);
 
-  const handleQuizComplete = (tag) => { 
-    if (tag) setQuizFilterTag(tag); 
-    setShowQuiz(false); 
-    // Save the exact millisecond they finished
-    localStorage.setItem("toolsy_quiz_timestamp", Date.now().toString()); 
-  };
-  
-  const handleQuizSkip = () => { 
-    setShowQuiz(false); 
-    // Save the exact millisecond they skipped
-    localStorage.setItem("toolsy_quiz_timestamp", Date.now().toString()); 
-  };
-
   const clearQuizFilter = () => setQuizFilterTag(null);
+  
+  // CTO FIX: Smart Bookmarker Logic
   const toggleSaveTool = (id) => {
     setSavedToolIds((prev) => {
-      const newSaved = prev.includes(id) ? prev.filter(tId => tId !== id) : [...prev, id];
+      const isAdding = !prev.includes(id);
+      const newSaved = isAdding ? [...prev, id] : prev.filter(tId => tId !== id);
       localStorage.setItem("toolsy_saved", JSON.stringify(newSaved));
+      
+      // If they just saved their 3rd tool, trigger the VIP Export Modal!
+      if (isAdding && newSaved.length === 3) {
+        const hasSeenVip = localStorage.getItem("toolsy_vip_shown");
+        if (!hasSeenVip) {
+          setTimeout(() => setShowVipModal(true), 600); // Small delay so it feels natural
+          localStorage.setItem("toolsy_vip_shown", "true"); // Never bug them twice
+        }
+      }
       return newSaved;
     });
   };
@@ -339,31 +198,31 @@ export default function Home() {
         <link rel="canonical" href="https://toolsyai.xyz" />
       </Head>
 
-      {showQuiz && <QuizOverlay onComplete={handleQuizComplete} onSkip={handleQuizSkip} />}
-
       <style>{`
         @media (max-width: 480px) { .filter-label { display: none !important; } }
         ::-webkit-scrollbar { display: none; }
-        
-        /* CTO FIX: Hide arrows strictly on mobile screens */
-        @media (max-width: 768px) {
-          .desktop-arrow { display: none !important; }
-        }
-        
-        /* Skeleton Pulse Animation */
-        @keyframes skeleton-pulse {
-          0% { opacity: 0.4; }
-          50% { opacity: 1; }
-          100% { opacity: 0.4; }
-        }
-        .skeleton-card {
-          animation: skeleton-pulse 1.5s ease-in-out infinite;
-        }
+        @media (max-width: 768px) { .desktop-arrow { display: none !important; } }
+        @keyframes skeleton-pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
+        .skeleton-card { animation: skeleton-pulse 1.5s ease-in-out infinite; }
       `}</style>
+
+      {/* CTO FIX: VIP Export Modal */}
+      {showVipModal && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1050, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', padding: '1rem' }}>
+          <div style={{ background: '#0d0d0d', border: '1px solid rgba(255, 102, 0, 0.3)', padding: '2.5rem 2rem', borderRadius: '24px', width: '100%', maxWidth: '420px', textAlign: 'center', boxShadow: '0 20px 60px rgba(255,102,0,0.15)', position: 'relative' }}>
+            <button onClick={() => setShowVipModal(false)} style={{ position: 'absolute', top: '15px', right: '15px', background: 'transparent', border: 'none', color: '#6b7280', cursor: 'pointer' }}><X size={20} /></button>
+            <div style={{ fontSize: '3.5rem', marginBottom: '1rem', filter: 'drop-shadow(0 4px 10px rgba(255,102,0,0.4))' }}>🦀</div>
+            <h3 style={{ color: 'white', fontSize: '1.6rem', fontWeight: 900, marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>Sick Stack! 🔥</h3>
+            <p style={{ color: '#a1a1aa', fontSize: '0.95rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>You just saved your 3rd tool. Want me to email your custom VIP list to you so you never lose it?</p>
+            <input type="email" placeholder="Your best email..." style={{ width: '100%', padding: '14px 16px', borderRadius: '12px', border: '1px solid #333', background: '#161616', color: 'white', marginBottom: '12px', outline: 'none', fontFamily: 'inherit' }} onFocus={e=>e.target.style.borderColor='#ff6600'} onBlur={e=>e.target.style.borderColor='#333'} />
+            <button onClick={() => setShowVipModal(false)} style={{ width: '100%', padding: '14px', background: '#ff6600', color: '#000', fontWeight: 900, border: 'none', borderRadius: '12px', cursor: 'pointer', marginBottom: '12px', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}><ArrowRight size={18} /> Send My VIP List</button>
+            <button onClick={() => setShowVipModal(false)} style={{ width: '100%', padding: '10px', background: 'transparent', color: '#6b7280', fontWeight: 700, border: 'none', cursor: 'pointer', fontSize: '14px' }}>No thanks, I'm good</button>
+          </div>
+        </div>
+      )}
 
       <div style={{ minHeight: "100vh", background: "#0d0d0d", color: "white" }}>
 
-        {/* HERO SECTION UPGRADE - BIGGER, TIGHTER TEXT LIKE THE OLD DESIGN */}
         <section style={{ position: "relative", paddingTop: "5rem", paddingBottom: "1rem", textAlign: "center", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: "700px", height: "450px", background: "radial-gradient(ellipse at 50% 0%, rgba(var(--primary),0.15) 0%, transparent 65%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 1, maxWidth: "820px", margin: "0 auto", padding: "0 1rem" }}>
@@ -383,7 +242,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* SEARCH & FILTERS UPGRADE - WIDER SEARCH BAR */}
         <section style={{ maxWidth: "880px", margin: "0 auto", padding: "0 1rem 1.5rem" }}>
           <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.25rem" }}>
             <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: "0.75rem", background: "#121212", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "1rem", padding: "0 1.25rem", height: "3.5rem", transition: "border-color 0.2s" }}
@@ -415,24 +273,17 @@ export default function Home() {
             </div>
           </div>
 
-          {/* CATEGORIES UPGRADE - WITH NETFLIX SCROLL ARROWS */}
           <div style={{ position: "relative", display: "flex", alignItems: "center", marginBottom: "1rem" }}>
-            
-            {/* Left Scroll Arrow */}
             <button className="desktop-arrow" onClick={() => scrollCategories("left")} style={{ position: "absolute", left: "-15px", zIndex: 10, background: "#161616", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", color: "white", cursor: "pointer", boxShadow: "0 4px 12px rgba(0,0,0,0.8)", transition: "all 0.2s" }}
               onMouseOver={e => { e.currentTarget.style.background = "rgb(var(--primary))"; e.currentTarget.style.borderColor = "rgb(var(--primary))"; }}
               onMouseOut={e => { e.currentTarget.style.background = "#161616"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}>
               <ChevronLeft size={20} />
             </button>
-
-            {/* Scrollable Container */}
             <div ref={categoryScrollRef} style={{ display: "flex", flexWrap: "nowrap", gap: "0.6rem", overflowX: "auto", paddingBottom: "0.5rem", scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch", width: "100%", padding: "0 1.5rem", scrollBehavior: "smooth" }}>
               {categories.map((cat) => {
                 if (cat === "website builder") return null;
-
                 const isActive = (activeCategory === cat) || (cat === "All" && activeCategory === null);
                 const displayCat = cat === "All" ? "🎯 All Goals" : (categoryMap[cat] || cat);
-
                 return (
                   <button key={cat} onClick={() => setActiveCategory(cat === "All" ? null : cat)}
                     style={{ flexShrink: 0, flexGrow: 0, padding: "0.6rem 1.25rem", borderRadius: "9999px", fontSize: "0.875rem", fontWeight: 700, whiteSpace: "nowrap", cursor: "pointer", fontFamily: "inherit", background: isActive ? "rgb(var(--primary))" : "#161616", color: isActive ? "white" : "#a1a1aa", border: `1px solid ${isActive ? "rgb(var(--primary))" : "rgba(255,255,255,0.08)"}`, transition: "all 0.2s" }}
@@ -443,18 +294,14 @@ export default function Home() {
                 );
               })}
             </div>
-
-            {/* Right Scroll Arrow */}
             <button className="desktop-arrow" onClick={() => scrollCategories("right")} style={{ position: "absolute", right: "-15px", zIndex: 10, background: "#161616", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", color: "white", cursor: "pointer", boxShadow: "0 4px 12px rgba(0,0,0,0.8)", transition: "all 0.2s" }}
               onMouseOver={e => { e.currentTarget.style.background = "rgb(var(--primary))"; e.currentTarget.style.borderColor = "rgb(var(--primary))"; }}
               onMouseOut={e => { e.currentTarget.style.background = "#161616"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}>
               <ChevronRight size={20} />
             </button>
-            
           </div>
         </section>
 
-        {/* TABS UPGRADE - CENTERED ON DESKTOP, SCROLLABLE ON MOBILE */}
         <div style={{ width: "100%", display: "flex", justifyContent: "center", padding: "0 1rem 2.5rem" }}>
           <div style={{ maxWidth: "100%", overflowX: "auto", scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch", padding: "0.25rem" }}>
             <div style={{ display: "inline-flex", gap: "0.25rem", background: "#121212", border: "1px solid rgba(255,255,255,0.08)", padding: "0.35rem", borderRadius: "1rem", flexWrap: "nowrap", boxShadow: "0 4px 20px -10px rgba(0,0,0,0.5)" }}>
@@ -476,10 +323,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* TOOLS */}
-        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 1rem 5rem" }}>
+        <div ref={toolsRef} style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 1rem 5rem", scrollMarginTop: "100px" }}>
           {isLoading ? (
-            /* CTO FIX: Pro Skeleton Loader applied here! */
             <SkeletonGrid />
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
@@ -498,7 +343,7 @@ export default function Home() {
                     <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
                       <div style={{ width: "3px", height: "1.75rem", background: "#3f3f46", borderRadius: "9999px" }} />
                       <h2 style={{ fontSize: "1.4rem", fontWeight: 700, color: "white", letterSpacing: "-0.02em" }}>
-                        {quizFilterTag ? "Your Personalized AI Stack" : activeTab === "saved" ? "Your Bookmarks" : activeTab === "free" ? "Free Tools" : search ? "Search Results" : "Explore Collection"}
+                        {quizFilterTag ? "🔥 Your Custom VIP Stack" : activeTab === "saved" ? "Your Bookmarks" : activeTab === "free" ? "Free Tools" : search ? "Search Results" : "Explore Collection"}
                       </h2>
                     </div>
                     {quizFilterTag && (
@@ -510,11 +355,16 @@ export default function Home() {
                   <ToolGrid tools={visibleRest} isSearch={!!search || !!quizFilterTag} checkActive={isSponsorshipActive} onVisit={trackClick} savedIds={savedToolIds} onToggleSave={toggleSaveTool} />
                 </section>
               ) : (
-                <div style={{ textAlign: "center", padding: "4rem 1rem", border: "1px dashed rgba(255,255,255,0.1)", borderRadius: "1.5rem", background: "rgba(255,255,255,0.02)" }}>
-                  <Bookmark size={36} color="#3f3f46" style={{ margin: "0 auto 1rem" }} />
-                  <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "white", marginBottom: "0.5rem" }}>No matches found</h3>
-                  <p style={{ color: "#6b7280", marginBottom: "1.25rem", fontSize: "0.875rem" }}>We couldn&apos;t find a tool with those tags right now.</p>
-                  <button onClick={clearQuizFilter} style={{ padding: "0.7rem 1.5rem", background: "rgb(var(--primary))", color: "white", fontWeight: 700, borderRadius: "0.75rem", border: "none", cursor: "pointer", fontFamily: "inherit" }}>View All Tools</button>
+                /* CTO FIX: The Lost Crab UI! */
+                <div style={{ textAlign: "center", padding: "6rem 1rem", border: "1px dashed rgba(255, 102, 0, 0.2)", borderRadius: "1.5rem", background: "rgba(255, 102, 0, 0.02)" }}>
+                  <div style={{ fontSize: "56px", marginBottom: "1rem", filter: "drop-shadow(0 0 15px rgba(255,102,0,0.3))" }}>🦀❓</div>
+                  <h3 style={{ fontSize: "1.5rem", fontWeight: 800, color: "white", marginBottom: "0.75rem", letterSpacing: "-0.02em" }}>The Crab is confused...</h3>
+                  <p style={{ color: "#9ca3af", marginBottom: "2rem", fontSize: "1rem", maxWidth: "400px", margin: "0 auto 2rem", lineHeight: "1.6" }}>
+                    I searched the whole internet but couldn't find <span style={{ color: "white", fontWeight: "bold" }}>"{search}"</span>. Want to explore our trending tools instead?
+                  </p>
+                  <button onClick={() => { setSearch(""); clearQuizFilter(); setActiveTab("all"); }} style={{ padding: "0.875rem 1.75rem", background: "rgba(255,102,0,0.1)", color: "#ff6600", fontWeight: 800, borderRadius: "1rem", border: "1px solid rgba(255,102,0,0.3)", cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: "0.5rem", transition: "all 0.2s" }} onMouseOver={e=>{e.currentTarget.style.background="#ff6600"; e.currentTarget.style.color="#000"}} onMouseOut={e=>{e.currentTarget.style.background="rgba(255,102,0,0.1)"; e.currentTarget.style.color="#ff6600"}}>
+                    Reset & Explore Tools <ArrowRight size={16} />
+                  </button>
                 </div>
               )}
               {rest.length > displayLimit && (
@@ -530,6 +380,14 @@ export default function Home() {
             </div>
           )}
         </div>
+
+        <AICrab onComplete={(tag) => {
+          setQuizFilterTag(tag);
+          setTimeout(() => {
+            toolsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 150);
+        }} />
+
       </div>
     </>
   );
