@@ -158,7 +158,8 @@ export default function Home() {
     if (!isMarked) return false;
     if (!tool.sponsored_until) return true;
     const expiryDate = new Date(tool.sponsored_until);
-    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     return expiryDate >= today;
   };
 
@@ -177,24 +178,17 @@ export default function Home() {
     else if (activeTab === "saved") result = result.filter(t => savedToolIds.includes(String(t.id)));
     if (pricingFilter !== "All") result = result.filter(t => t.pricing?.toLowerCase() === pricingFilter.toLowerCase());
     
-    // CTO FIX: The STRICT VIP Filter!
     if (quizFilterTag) {
       const qt = quizFilterTag.toLowerCase();
-      
-      // 1. Only search EXACT tags or category names (Ignores descriptions to block generic tools)
       result = result.filter(t => 
         (t.tags && t.tags.toLowerCase().includes(qt)) || 
         (t.category && t.category.toLowerCase().includes(qt))
       );
-      
-      // 2. Force the absolute BEST (featured) tools to the very top
       result.sort((a, b) => { 
         const aFeatured = isSponsorshipActive(a, "featured"); 
         const bFeatured = isSponsorshipActive(b, "featured"); 
         return aFeatured === bFeatured ? 0 : aFeatured ? -1 : 1; 
       });
-      
-      // 3. Cut the list down to ONLY the top 8 tools so it feels highly curated!
       result = result.slice(0, 8);
     }
     
@@ -204,6 +198,9 @@ export default function Home() {
   const featured = filtered.filter(t => isSponsorshipActive(t, "featured"));
   const rest = filtered.filter(t => !featured.includes(t));
   const visibleRest = rest.slice(0, displayLimit);
+
+  // CTO FIX: Intelligent "Empty Check" so the Lost Crab doesn't pop up on page load!
+  const isActuallyEmpty = !isLoading && filtered.length === 0 && (search.trim().length > 0 || quizFilterTag !== null);
 
   return (
     <>
@@ -347,44 +344,55 @@ export default function Home() {
             <SkeletonGrid />
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
-              {activeTab === "all" && featured.length > 0 && !search && !quizFilterTag && (
-                <section>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.25rem" }}>
-                    <div style={{ width: "3px", height: "1.75rem", background: "rgb(var(--primary))", borderRadius: "9999px" }} />
-                    <h2 style={{ fontSize: "1.4rem", fontWeight: 700, color: "white", letterSpacing: "-0.02em" }}>Featured Tools</h2>
-                  </div>
-                  <ToolGrid tools={featured} isSearch={false} checkActive={isSponsorshipActive} onVisit={trackClick} savedIds={savedToolIds} onToggleSave={toggleSaveTool} />
-                </section>
-              )}
-              {visibleRest.length > 0 ? (
-                <section>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem", flexWrap: "wrap", gap: "0.75rem" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                      <div style={{ width: "3px", height: "1.75rem", background: "#3f3f46", borderRadius: "9999px" }} />
-                      <h2 style={{ fontSize: "1.4rem", fontWeight: 700, color: "white", letterSpacing: "-0.02em" }}>
-                        {quizFilterTag ? "🔥 Your Custom VIP Stack" : activeTab === "saved" ? "Your Bookmarks" : activeTab === "free" ? "Free Tools" : search ? "Search Results" : "Explore Collection"}
-                      </h2>
+              
+              {/* Show results if we HAVE tools */}
+              {filtered.length > 0 ? (
+                <>
+                  {activeTab === "all" && featured.length > 0 && !search && !quizFilterTag && (
+                    <section>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.25rem" }}>
+                        <div style={{ width: "3px", height: "1.75rem", background: "rgb(var(--primary))", borderRadius: "9999px" }} />
+                        <h2 style={{ fontSize: "1.4rem", fontWeight: 700, color: "white", letterSpacing: "-0.02em" }}>Featured Tools</h2>
+                      </div>
+                      <ToolGrid tools={featured} isSearch={false} checkActive={isSponsorshipActive} onVisit={trackClick} savedIds={savedToolIds} onToggleSave={toggleSaveTool} />
+                    </section>
+                  )}
+                  <section>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem", flexWrap: "wrap", gap: "0.75rem" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                        <div style={{ width: "3px", height: "1.75rem", background: "#3f3f46", borderRadius: "9999px" }} />
+                        <h2 style={{ fontSize: "1.4rem", fontWeight: 700, color: "white", letterSpacing: "-0.02em" }}>
+                          {quizFilterTag ? "🔥 Your Custom VIP Stack" : activeTab === "saved" ? "Your Bookmarks" : activeTab === "free" ? "Free Tools" : search ? "Search Results" : "Explore Collection"}
+                        </h2>
+                      </div>
+                      {quizFilterTag && (
+                        <button onClick={clearQuizFilter} style={{ display: "flex", alignItems: "center", gap: "0.4rem", padding: "0.45rem 0.9rem", borderRadius: "0.7rem", border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "#9ca3af", cursor: "pointer", fontWeight: 700, fontSize: "0.8rem", fontFamily: "inherit" }}>
+                          Clear Filter <X size={13} />
+                        </button>
+                      )}
                     </div>
-                    {quizFilterTag && (
-                      <button onClick={clearQuizFilter} style={{ display: "flex", alignItems: "center", gap: "0.4rem", padding: "0.45rem 0.9rem", borderRadius: "0.7rem", border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "#9ca3af", cursor: "pointer", fontWeight: 700, fontSize: "0.8rem", fontFamily: "inherit" }}>
-                        Clear Filter <X size={13} />
-                      </button>
-                    )}
-                  </div>
-                  <ToolGrid tools={visibleRest} isSearch={!!search || !!quizFilterTag} checkActive={isSponsorshipActive} onVisit={trackClick} savedIds={savedToolIds} onToggleSave={toggleSaveTool} />
-                </section>
+                    <ToolGrid tools={visibleRest} isSearch={!!search || !!quizFilterTag} checkActive={isSponsorshipActive} onVisit={trackClick} savedIds={savedToolIds} onToggleSave={toggleSaveTool} />
+                  </section>
+                </>
               ) : (
-                <div style={{ textAlign: "center", padding: "6rem 1rem", border: "1px dashed rgba(255, 102, 0, 0.2)", borderRadius: "1.5rem", background: "rgba(255, 102, 0, 0.02)" }}>
-                  <div style={{ fontSize: "56px", marginBottom: "1rem", filter: "drop-shadow(0 0 15px rgba(255,102,0,0.3))" }}>🦀❓</div>
-                  <h3 style={{ fontSize: "1.5rem", fontWeight: 800, color: "white", marginBottom: "0.75rem", letterSpacing: "-0.02em" }}>The Crab is confused...</h3>
-                  <p style={{ color: "#9ca3af", marginBottom: "2rem", fontSize: "1rem", maxWidth: "400px", margin: "0 auto 2rem", lineHeight: "1.6" }}>
-                    I searched the whole internet but couldn't find <span style={{ color: "white", fontWeight: "bold" }}>{search ? `"${search}"` : "anything matching that"}</span>. Want to explore our trending tools instead?
-                  </p>
-                  <button onClick={() => { setSearch(""); clearQuizFilter(); setActiveTab("all"); }} style={{ padding: "0.875rem 1.75rem", background: "rgba(255,102,0,0.1)", color: "#ff6600", fontWeight: 800, borderRadius: "1rem", border: "1px solid rgba(255,102,0,0.3)", cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: "0.5rem", transition: "all 0.2s" }} onMouseOver={e=>{e.currentTarget.style.background="#ff6600"; e.currentTarget.style.color="#000"}} onMouseOut={e=>{e.currentTarget.style.background="rgba(255,102,0,0.1)"; e.currentTarget.style.color="#ff6600"}}>
-                    Reset & Explore Tools <ArrowRight size={16} />
-                  </button>
-                </div>
+                /* Only show the Lost Crab if the user ACTUALLY searched or used the quiz */
+                isActuallyEmpty ? (
+                  <div style={{ textAlign: "center", padding: "6rem 1rem", border: "1px dashed rgba(255, 102, 0, 0.2)", borderRadius: "1.5rem", background: "rgba(255, 102, 0, 0.02)" }}>
+                    <div style={{ fontSize: "56px", marginBottom: "1rem", filter: "drop-shadow(0 0 15px rgba(255,102,0,0.3))" }}>🦀❓</div>
+                    <h3 style={{ fontSize: "1.5rem", fontWeight: 800, color: "white", marginBottom: "0.75rem", letterSpacing: "-0.02em" }}>The Crab is confused...</h3>
+                    <p style={{ color: "#9ca3af", marginBottom: "2rem", fontSize: "1rem", maxWidth: "400px", margin: "0 auto 2rem", lineHeight: "1.6" }}>
+                      I searched the whole internet but couldn't find <span style={{ color: "white", fontWeight: "bold" }}>{search ? `"${search}"` : "anything matching that"}</span>. Want to explore our trending tools instead?
+                    </p>
+                    <button onClick={() => { setSearch(""); clearQuizFilter(); setActiveTab("all"); }} style={{ padding: "0.875rem 1.75rem", background: "rgba(255,102,0,0.1)", color: "#ff6600", fontWeight: 800, borderRadius: "1rem", border: "1px solid rgba(255,102,0,0.3)", cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: "0.5rem", transition: "all 0.2s" }} onMouseOver={e=>{e.currentTarget.style.background="#ff6600"; e.currentTarget.style.color="#000"}} onMouseOut={e=>{e.currentTarget.style.background="rgba(255,102,0,0.1)"; e.currentTarget.style.color="#ff6600"}}>
+                      Reset & Explore Tools <ArrowRight size={16} />
+                    </button>
+                  </div>
+                ) : (
+                  /* While loading or just a blank start state (if tools haven't arrived yet) */
+                  <SkeletonGrid />
+                )
               )}
+
               {rest.length > displayLimit && (
                 <div style={{ textAlign: "center" }}>
                   <button onClick={() => setDisplayLimit(p => p + 12)}
