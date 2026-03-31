@@ -107,7 +107,6 @@ export default function Home() {
   const [isPricingOpen, setIsPricingOpen] = useState(false);
   const [quizFilterTag, setQuizFilterTag] = useState(null);
   
-  // CTO FIX: VIP Export Modal State
   const [showVipModal, setShowVipModal] = useState(false);
 
   const toolsRef = useRef(null);
@@ -127,19 +126,17 @@ export default function Home() {
 
   const clearQuizFilter = () => setQuizFilterTag(null);
   
-  // CTO FIX: Smart Bookmarker Logic
   const toggleSaveTool = (id) => {
     setSavedToolIds((prev) => {
       const isAdding = !prev.includes(id);
       const newSaved = isAdding ? [...prev, id] : prev.filter(tId => tId !== id);
       localStorage.setItem("toolsy_saved", JSON.stringify(newSaved));
       
-      // If they just saved their 3rd tool, trigger the VIP Export Modal!
       if (isAdding && newSaved.length === 3) {
         const hasSeenVip = localStorage.getItem("toolsy_vip_shown");
         if (!hasSeenVip) {
-          setTimeout(() => setShowVipModal(true), 600); // Small delay so it feels natural
-          localStorage.setItem("toolsy_vip_shown", "true"); // Never bug them twice
+          setTimeout(() => setShowVipModal(true), 600); 
+          localStorage.setItem("toolsy_vip_shown", "true"); 
         }
       }
       return newSaved;
@@ -168,16 +165,39 @@ export default function Home() {
   const filtered = useMemo(() => {
     if (!tools) return [];
     let result = [...tools];
+    
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(t => t.name.toLowerCase().includes(q) || t.description.toLowerCase().includes(q) || t.category.toLowerCase().includes(q));
       result.sort((a, b) => { const aSug = isSponsorshipActive(a, "suggested"); const bSug = isSponsorshipActive(b, "suggested"); return aSug === bSug ? 0 : aSug ? -1 : 1; });
     }
+    
     if (activeCategory && activeCategory !== "All") result = result.filter(t => t.category === activeCategory);
     if (activeTab === "free") result = result.filter(t => t.pricing?.toLowerCase() === "free");
     else if (activeTab === "saved") result = result.filter(t => savedToolIds.includes(String(t.id)));
     if (pricingFilter !== "All") result = result.filter(t => t.pricing?.toLowerCase() === pricingFilter.toLowerCase());
-    if (quizFilterTag) result = result.filter(t => t.tags?.toLowerCase().includes(quizFilterTag.toLowerCase()));
+    
+    // CTO FIX: The STRICT VIP Filter!
+    if (quizFilterTag) {
+      const qt = quizFilterTag.toLowerCase();
+      
+      // 1. Only search EXACT tags or category names (Ignores descriptions to block generic tools)
+      result = result.filter(t => 
+        (t.tags && t.tags.toLowerCase().includes(qt)) || 
+        (t.category && t.category.toLowerCase().includes(qt))
+      );
+      
+      // 2. Force the absolute BEST (featured) tools to the very top
+      result.sort((a, b) => { 
+        const aFeatured = isSponsorshipActive(a, "featured"); 
+        const bFeatured = isSponsorshipActive(b, "featured"); 
+        return aFeatured === bFeatured ? 0 : aFeatured ? -1 : 1; 
+      });
+      
+      // 3. Cut the list down to ONLY the top 8 tools so it feels highly curated!
+      result = result.slice(0, 8);
+    }
+    
     return result;
   }, [tools, search, activeCategory, activeTab, savedToolIds, pricingFilter, quizFilterTag]);
 
@@ -206,7 +226,6 @@ export default function Home() {
         .skeleton-card { animation: skeleton-pulse 1.5s ease-in-out infinite; }
       `}</style>
 
-      {/* CTO FIX: VIP Export Modal */}
       {showVipModal && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 1050, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', padding: '1rem' }}>
           <div style={{ background: '#0d0d0d', border: '1px solid rgba(255, 102, 0, 0.3)', padding: '2.5rem 2rem', borderRadius: '24px', width: '100%', maxWidth: '420px', textAlign: 'center', boxShadow: '0 20px 60px rgba(255,102,0,0.15)', position: 'relative' }}>
@@ -355,12 +374,11 @@ export default function Home() {
                   <ToolGrid tools={visibleRest} isSearch={!!search || !!quizFilterTag} checkActive={isSponsorshipActive} onVisit={trackClick} savedIds={savedToolIds} onToggleSave={toggleSaveTool} />
                 </section>
               ) : (
-                /* CTO FIX: The Lost Crab UI! */
                 <div style={{ textAlign: "center", padding: "6rem 1rem", border: "1px dashed rgba(255, 102, 0, 0.2)", borderRadius: "1.5rem", background: "rgba(255, 102, 0, 0.02)" }}>
                   <div style={{ fontSize: "56px", marginBottom: "1rem", filter: "drop-shadow(0 0 15px rgba(255,102,0,0.3))" }}>🦀❓</div>
                   <h3 style={{ fontSize: "1.5rem", fontWeight: 800, color: "white", marginBottom: "0.75rem", letterSpacing: "-0.02em" }}>The Crab is confused...</h3>
                   <p style={{ color: "#9ca3af", marginBottom: "2rem", fontSize: "1rem", maxWidth: "400px", margin: "0 auto 2rem", lineHeight: "1.6" }}>
-                    I searched the whole internet but couldn't find <span style={{ color: "white", fontWeight: "bold" }}>"{search}"</span>. Want to explore our trending tools instead?
+                    I searched the whole internet but couldn't find <span style={{ color: "white", fontWeight: "bold" }}>{search ? `"${search}"` : "anything matching that"}</span>. Want to explore our trending tools instead?
                   </p>
                   <button onClick={() => { setSearch(""); clearQuizFilter(); setActiveTab("all"); }} style={{ padding: "0.875rem 1.75rem", background: "rgba(255,102,0,0.1)", color: "#ff6600", fontWeight: 800, borderRadius: "1rem", border: "1px solid rgba(255,102,0,0.3)", cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: "0.5rem", transition: "all 0.2s" }} onMouseOver={e=>{e.currentTarget.style.background="#ff6600"; e.currentTarget.style.color="#000"}} onMouseOut={e=>{e.currentTarget.style.background="rgba(255,102,0,0.1)"; e.currentTarget.style.color="#ff6600"}}>
                     Reset & Explore Tools <ArrowRight size={16} />

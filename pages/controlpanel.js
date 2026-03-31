@@ -5,7 +5,7 @@ import { useTools, useAddTool, useUpdateTool, useDeleteTool } from "@/hooks/useT
 import { toast } from "sonner";
 import {
   Pencil, Trash2, Plus, LogOut, LayoutDashboard, Star, TrendingUp,
-  Search, MousePointer2, CalendarClock, Ban, Tags, Check, X
+  Search, MousePointer2, CalendarClock, Ban, Tags, Check, X, Zap
 } from "lucide-react";
 
 const emptyTool = {
@@ -104,13 +104,14 @@ function ToolFormModal({ initial, onSubmit, onCancel, submitLabel, featuredCount
             <select value={form.tags || "none"} onChange={(e) => set("tags", e.target.value === "none" ? "" : e.target.value)} className="admin-input" style={{ borderColor: "rgba(99, 102, 241, 0.2)" }}>
               <option value="none">No Tag (Skip in Quiz)</option>
               <option value="video">🎬 Video Editing / Generation</option>
-              <option value="code">💻 Coding & Web Dev</option>
-              <option value="design">🎨 Design & Images</option>
+              <option value="coding">💻 Coding & Web Dev</option>
+              <option value="image">🎨 Design & Images</option>
               <option value="writing">✍️ Writing & Chatbots</option>
               <option value="audio">🎵 Audio & Voice</option>
               <option value="automation">⚙️ Automation & Workflows</option>
               <option value="data">📊 Data & Analytics</option>
               <option value="utility">🛠️ Everyday Utilities</option>
+              <option value="godmode">⚡ GOD MODE (Secret VIP Stack)</option>
             </select>
           </div>
 
@@ -173,7 +174,9 @@ export default function ControlPanel() {
   const [editingTool, setEditingTool] = useState(null);
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  
   const [searchQuery, setSearchQuery] = useState("");
+  const [godModeSearch, setGodModeSearch] = useState(""); 
 
   if (authLoading) return <div style={{ minHeight: "100vh", backgroundColor: "#050505", display: "flex", alignItems: "center", justifyContent: "center", color: "#6b7280" }}>Loading Admin Engine...</div>;
   if (!user) return <LoginForm onLogin={signIn} />;
@@ -196,6 +199,18 @@ export default function ControlPanel() {
   const featuredTools = tools?.filter(t => isSponsorshipActive(t, "featured")) || [];
   const suggestedTools = tools?.filter(t => isSponsorshipActive(t, "suggested")) || [];
   const premiumSlots = Array.from({ length: 6 }).map((_, i) => featuredTools[i] || null);
+  
+  // CTO FIX: Bulletproof filtering logic so NO tools get hidden
+  const godModeTools = tools?.filter(t => t.tags?.toLowerCase() === "godmode") || [];
+  
+  const availableGodModeTools = tools?.filter(t => {
+    const isNotGodMode = !t.tags || t.tags.toLowerCase() !== "godmode";
+    const searchStr = godModeSearch.toLowerCase();
+    const matchesSearch = !searchStr || 
+      (t.name && t.name.toLowerCase().includes(searchStr)) || 
+      (t.category && t.category.toLowerCase().includes(searchStr));
+    return isNotGodMode && matchesSearch;
+  }) || [];
 
   const filteredTools = tools?.filter((tool) =>
     tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -246,6 +261,15 @@ export default function ControlPanel() {
     if (!confirm(`Remove ${tool.name} from ${field} slot?`)) return;
     try { await updateTool.mutateAsync({ ...tool, [field]: false }); toast.success(`${tool.name} removed!`); } 
     catch (err) { toast.error(err.message); }
+  };
+
+  const toggleGodMode = async (tool, isAdding) => {
+    try {
+      await updateTool.mutateAsync({ ...tool, tags: isAdding ? "godmode" : "" });
+      toast.success(isAdding ? `${tool.name} added to VIP Stack ⚡` : `${tool.name} removed from VIP Stack`);
+    } catch (err) {
+      toast.error(err.message);
+    }
   };
 
   return (
@@ -302,13 +326,16 @@ export default function ControlPanel() {
             ))}
           </div>
 
-          {/* TABS */}
-          <div style={{ display: "flex", gap: "0.5rem", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "1rem" }}>
-            <button onClick={() => setView("database")} className="admin-btn" style={{ backgroundColor: view === "database" ? "rgba(255,255,255,0.1)" : "transparent", color: view === "database" ? "white" : "#6b7280" }}>
+          {/* 3 TABS NOW! */}
+          <div style={{ display: "flex", gap: "0.5rem", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "1rem", overflowX: "auto" }}>
+            <button onClick={() => setView("database")} className="admin-btn" style={{ backgroundColor: view === "database" ? "rgba(255,255,255,0.1)" : "transparent", color: view === "database" ? "white" : "#6b7280", whiteSpace: "nowrap" }}>
               <LayoutDashboard size={16} /> Full Database
             </button>
-            <button onClick={() => setView("ads")} className="admin-btn" style={{ backgroundColor: view === "ads" ? "rgba(139, 92, 246, 0.15)" : "transparent", color: view === "ads" ? "#8b5cf6" : "#6b7280" }}>
+            <button onClick={() => setView("ads")} className="admin-btn" style={{ backgroundColor: view === "ads" ? "rgba(234, 179, 8, 0.15)" : "transparent", color: view === "ads" ? "#eab308" : "#6b7280", whiteSpace: "nowrap" }}>
               <Star size={16} /> Ad Manager Pro
+            </button>
+            <button onClick={() => setView("godmode")} className="admin-btn" style={{ backgroundColor: view === "godmode" ? "rgba(239, 68, 68, 0.15)" : "transparent", color: view === "godmode" ? "#ef4444" : "#6b7280", whiteSpace: "nowrap" }}>
+              <Zap size={16} /> God Mode Config
             </button>
           </div>
 
@@ -383,7 +410,7 @@ export default function ControlPanel() {
 
           {/* ADS VIEW */}
           {view === "ads" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "3rem" }}>
               <div>
                 <h2 style={{ fontSize: "1.25rem", fontWeight: 900, display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}><Star color="#eab308" fill="#eab308" size={20} /> Premium Top 6 Slots</h2>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1rem" }}>
@@ -408,6 +435,90 @@ export default function ControlPanel() {
                   ))}
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* CTO FIX: NEW DEDICATED GOD MODE TAB WITH NO LIMITS */}
+          {view === "godmode" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "3rem" }}>
+              
+              {/* Active VIP Tools */}
+              <div>
+                <h2 style={{ fontSize: "1.25rem", fontWeight: 900, display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem", color: "#ef4444" }}>
+                  <Zap color="#ef4444" fill="#ef4444" size={20} /> Active VIP Stack
+                </h2>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1rem" }}>
+                  {godModeTools.length > 0 ? (
+                    godModeTools.map((tool) => (
+                      <div key={tool.id} style={{ backgroundColor: "rgba(239, 68, 68, 0.05)", border: "1px solid rgba(239, 68, 68, 0.3)", borderRadius: "1rem", padding: "1.25rem", boxShadow: "0 0 20px rgba(239, 68, 68, 0.1)" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+                          <span style={{ fontSize: "0.65rem", fontWeight: 900, color: "#ef4444", textTransform: "uppercase", letterSpacing: "0.1em" }}>⚡ VIP TOOL</span>
+                          <span style={{ fontSize: "0.75rem", fontWeight: 700, backgroundColor: "rgba(255,255,255,0.1)", padding: "0.1rem 0.4rem", borderRadius: "0.25rem" }}>{tool.click_count || 0} clicks</span>
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
+                          <span style={{ fontSize: "2rem" }}>{tool.icon || "⚡"}</span>
+                          <span style={{ fontSize: "1.25rem", fontWeight: 700 }}>{tool.name}</span>
+                        </div>
+                        <button onClick={() => toggleGodMode(tool, false)} style={{ width: "100%", padding: "0.5rem", backgroundColor: "transparent", color: "#ef4444", border: "1px solid rgba(239, 68, 68, 0.3)", borderRadius: "0.5rem", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", transition: "all 0.2s" }} onMouseOver={e=>e.currentTarget.style.backgroundColor="rgba(239, 68, 68, 0.1)"} onMouseOut={e=>e.currentTarget.style.backgroundColor="transparent"}><Trash2 size={14} /> Remove from VIP</button>
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{ border: "1px dashed rgba(239, 68, 68, 0.2)", borderRadius: "1rem", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "150px", gridColumn: "1 / -1", backgroundColor: "rgba(239, 68, 68, 0.02)" }}>
+                      <span style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🦀❓</span>
+                      <span style={{ fontSize: "0.85rem", fontWeight: 900, color: "#ef4444" }}>NO TOOLS IN GOD MODE</span>
+                      <span style={{ fontSize: "0.65rem", fontWeight: 900, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.1em", marginTop: "0.25rem" }}>Select tools from the database below</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Add to VIP Tool Selector */}
+              <div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem", marginBottom: "1rem" }}>
+                  <h2 style={{ fontSize: "1.25rem", fontWeight: 900, color: "white" }}>Add Tools to VIP Stack</h2>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", maxWidth: "300px", width: "100%", backgroundColor: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "0.75rem", padding: "0.5rem 1rem" }}>
+                    <Search size={16} color="#6b7280" />
+                    <input type="text" placeholder="Search to add..." value={godModeSearch} onChange={(e) => setGodModeSearch(e.target.value)} style={{ background: "transparent", border: "none", color: "white", outline: "none", width: "100%", fontFamily: "inherit" }} />
+                  </div>
+                </div>
+
+                <div style={{ backgroundColor: "#0F0F0F", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "1rem", overflowX: "auto", maxHeight: "500px", overflowY: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                    <thead style={{ backgroundColor: "rgba(255,255,255,0.05)", position: "sticky", top: 0, zIndex: 10, backdropFilter: "blur(10px)" }}>
+                      <tr>
+                        <th className="admin-table-th">Tool Name</th>
+                        <th className="admin-table-th">Category</th>
+                        <th className="admin-table-th" style={{ textAlign: "right" }}>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {/* CTO FIX: Removed .slice(0,20) so ALL tools show up! */}
+                      {availableGodModeTools?.map((tool) => (
+                        <tr key={tool.id}>
+                          <td className="admin-table-td">
+                            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                              <span style={{ fontSize: "1.2rem", padding: "0.4rem", backgroundColor: "rgba(255,255,255,0.05)", borderRadius: "0.4rem" }}>{tool.icon || "⚡"}</span>
+                              <div style={{ fontWeight: 700 }}>{tool.name}</div>
+                            </div>
+                          </td>
+                          <td className="admin-table-td">
+                            <span style={{ fontSize: "0.65rem", fontWeight: 800, textTransform: "uppercase", color: "#9ca3af", backgroundColor: "rgba(255,255,255,0.05)", padding: "0.25rem 0.5rem", borderRadius: "0.25rem", border: "1px solid rgba(255,255,255,0.1)" }}>{tool.category}</span>
+                          </td>
+                          <td className="admin-table-td" style={{ textAlign: "right" }}>
+                            <button onClick={() => toggleGodMode(tool, true)} style={{ padding: "0.4rem 0.8rem", backgroundColor: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.3)", borderRadius: "0.5rem", color: "#ef4444", cursor: "pointer", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "0.4rem", transition: "all 0.2s" }} onMouseOver={e=>{e.currentTarget.style.backgroundColor="#ef4444"; e.currentTarget.style.color="white"}} onMouseOut={e=>{e.currentTarget.style.backgroundColor="rgba(239, 68, 68, 0.1)"; e.currentTarget.style.color="#ef4444"}}><Plus size={14} /> Add to VIP</button>
+                          </td>
+                        </tr>
+                      ))}
+                      {availableGodModeTools.length === 0 && (
+                        <tr>
+                          <td colSpan="3" style={{ textAlign: "center", padding: "2rem", color: "#6b7280" }}>No tools found matching your search.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
             </div>
           )}
 

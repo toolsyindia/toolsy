@@ -8,7 +8,6 @@ export default function AICrab({ onComplete }) {
   const [selectedTag, setSelectedTag] = useState("");
   const [showHint, setShowHint] = useState(false);
   
-  // CTO FIX: Easter Egg State
   const [clickCount, setClickCount] = useState(0);
   const [isGodMode, setIsGodMode] = useState(false);
   const clickTimer = useRef(null);
@@ -42,30 +41,25 @@ export default function AICrab({ onComplete }) {
     setTimeout(() => playSound(800, 400, 'square', 0.5), 500);
   };
 
-  // CTO FIX: The 5-Click Secret Trigger
   const handleCrabClick = () => {
-    if (isGodMode) return; // Don't trigger if already in God Mode
+    if (isGodMode) return; 
 
     setClickCount(prev => prev + 1);
     
-    // Clear previous timer
     if (clickTimer.current) clearTimeout(clickTimer.current);
     
-    // Reset click count after 2 seconds of inactivity
     clickTimer.current = setTimeout(() => {
       setClickCount(0);
     }, 2000);
 
-    // If they hit 3 clicks fast!
     if (clickCount + 1 >= 3) {
       setIsGodMode(true);
       setIsOpen(true);
       setShowHint(false);
       playSiren();
-      return; // Stop normal opening
+      return; 
     }
 
-    // Normal open/close
     playSound();
     setIsOpen(!isOpen);
     setShowHint(false); 
@@ -96,9 +90,9 @@ export default function AICrab({ onComplete }) {
   };
 
   const handleGodModeReveal = () => {
-    if (onComplete) onComplete("automation"); // Example: God mode reveals automation tools
+    if (onComplete) onComplete("godmode"); 
     setIsOpen(false);
-    setTimeout(() => setIsGodMode(false), 1000); // Reset after closing
+    setTimeout(() => setIsGodMode(false), 1000); 
   };
 
   const btnStyle = {
@@ -124,7 +118,6 @@ export default function AICrab({ onComplete }) {
           .crab-svg { width: 65px; height: 65px; }
         }
 
-        /* God Mode Shake Animation */
         @keyframes godShake {
           0% { transform: translate(1px, 1px) rotate(0deg); }
           10% { transform: translate(-1px, -2px) rotate(-1deg); }
@@ -185,16 +178,13 @@ export default function AICrab({ onComplete }) {
 
               <div style={{ padding: '24px 20px' }}>
                 
-                {/* CTO FIX: THE GOD MODE SCREEN */}
                 {isGodMode ? (
                   <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: 'rgba(255, 0, 0, 0.15)', borderRadius: '99px', color: '#ff4444', fontWeight: '800', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '16px' }}>
                       <AlertTriangle size={14} strokeWidth={3} /> Developer Secret Found
                     </div>
                     <h4 style={{ margin: '0 0 8px 0', fontSize: '20px', fontWeight: '900', color: '#fff', letterSpacing: '-0.02em' }}>You found the God-Tier Stack.</h4>
-                    <p style={{ margin: '0 0 24px 0', fontSize: '14px', fontWeight: '500', color: '#9ca3af', lineHeight: '1.6' }}>Enter your email to permanently unlock the secret tools the 1% use to build startups in hours.</p>
-                    
-                    <input type="email" placeholder="Enter email to unlock..." style={{ width: '100%', padding: '14px 16px', borderRadius: '12px', border: '1px solid rgba(255,0,0,0.3)', background: 'rgba(0,0,0,0.5)', color: 'white', marginBottom: '16px', boxSizing: 'border-box', fontFamily: 'inherit', outline: 'none', fontSize: '14px' }} onFocus={e=>e.target.style.borderColor='#ff0000'} onBlur={e=>e.target.style.borderColor='rgba(255,0,0,0.3)'} />
+                    <p style={{ margin: '0 0 24px 0', fontSize: '14px', fontWeight: '500', color: '#9ca3af', lineHeight: '1.6' }}>Unlock the secret tools the 1% use to build startups in hours.</p>
                     
                     <button onClick={handleGodModeReveal} style={{ width: '100%', padding: '16px', background: '#ff0000', color: '#fff', fontWeight: '900', border: 'none', borderRadius: '12px', cursor: 'pointer', fontFamily: 'inherit', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 8px 25px rgba(255, 0, 0, 0.4)' }} onMouseDown={e=>e.currentTarget.style.transform='scale(0.96)'} onMouseUp={e=>e.currentTarget.style.transform='scale(1)'}>
                       <Zap size={18} fill="#fff" /> Activate God Mode
@@ -202,7 +192,6 @@ export default function AICrab({ onComplete }) {
                   </motion.div>
                 ) : (
                   <>
-                    {/* Normal Chat Flow */}
                     {step === 0 && (
                       <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }}>
                         <p style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '700', color: '#f3f4f6', lineHeight: '1.4' }}>Yo! 👋 What are we building today?</p>
@@ -227,10 +216,11 @@ export default function AICrab({ onComplete }) {
                       <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }}>
                         <p style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '700', color: '#f3f4f6', lineHeight: '1.4' }}>Awesome. What is the hardest part for you right now?</p>
                         <div style={{display: 'flex', flexDirection: 'column', gap: '4px'}}>
+                          {/* CTO FIX: Updated tags to exactly match the database categories */}
                           <button style={btnStyle} onClick={() => pickProblem("writing")} onMouseOver={e=>{e.currentTarget.style.background='rgba(255, 102, 0, 0.1)'; e.currentTarget.style.borderColor='rgba(255, 102, 0, 0.5)'}} onMouseOut={e=>{e.currentTarget.style.background='rgba(255, 255, 255, 0.05)'; e.currentTarget.style.borderColor='rgba(255, 255, 255, 0.1)'}}><span style={{ fontSize: '18px' }}>✍️</span> Writing Content</button>
-                          <button style={btnStyle} onClick={() => pickProblem("code")} onMouseOver={e=>{e.currentTarget.style.background='rgba(255, 102, 0, 0.1)'; e.currentTarget.style.borderColor='rgba(255, 102, 0, 0.5)'}} onMouseOut={e=>{e.currentTarget.style.background='rgba(255, 255, 255, 0.05)'; e.currentTarget.style.borderColor='rgba(255, 255, 255, 0.1)'}}><span style={{ fontSize: '18px' }}>💻</span> Coding the App</button>
+                          <button style={btnStyle} onClick={() => pickProblem("coding")} onMouseOver={e=>{e.currentTarget.style.background='rgba(255, 102, 0, 0.1)'; e.currentTarget.style.borderColor='rgba(255, 102, 0, 0.5)'}} onMouseOut={e=>{e.currentTarget.style.background='rgba(255, 255, 255, 0.05)'; e.currentTarget.style.borderColor='rgba(255, 255, 255, 0.1)'}}><span style={{ fontSize: '18px' }}>💻</span> Coding the App</button>
                           <button style={btnStyle} onClick={() => pickProblem("video")} onMouseOver={e=>{e.currentTarget.style.background='rgba(255, 102, 0, 0.1)'; e.currentTarget.style.borderColor='rgba(255, 102, 0, 0.5)'}} onMouseOut={e=>{e.currentTarget.style.background='rgba(255, 255, 255, 0.05)'; e.currentTarget.style.borderColor='rgba(255, 255, 255, 0.1)'}}><span style={{ fontSize: '18px' }}>🎥</span> Making Videos</button>
-                          <button style={btnStyle} onClick={() => pickProblem("design")} onMouseOver={e=>{e.currentTarget.style.background='rgba(255, 102, 0, 0.1)'; e.currentTarget.style.borderColor='rgba(255, 102, 0, 0.5)'}} onMouseOut={e=>{e.currentTarget.style.background='rgba(255, 255, 255, 0.05)'; e.currentTarget.style.borderColor='rgba(255, 255, 255, 0.1)'}}><span style={{ fontSize: '18px' }}>🎨</span> Designing things</button>
+                          <button style={btnStyle} onClick={() => pickProblem("image")} onMouseOver={e=>{e.currentTarget.style.background='rgba(255, 102, 0, 0.1)'; e.currentTarget.style.borderColor='rgba(255, 102, 0, 0.5)'}} onMouseOut={e=>{e.currentTarget.style.background='rgba(255, 255, 255, 0.05)'; e.currentTarget.style.borderColor='rgba(255, 255, 255, 0.1)'}}><span style={{ fontSize: '18px' }}>🎨</span> Designing things</button>
                         </div>
                       </motion.div>
                     )}
@@ -270,7 +260,6 @@ export default function AICrab({ onComplete }) {
             <motion.g animate={{ rotate: [0, 15, 0] }} transition={{ repeat: Infinity, duration: isGodMode ? 0.5 : 1.5, delay: 0.2 }} style={{ transformOrigin: '75px 45px' }}><path d="M 70 50 C 90 40 90 20 75 15 C 65 30 80 40 70 50" fill={isGodMode ? "#cc0000" : "#ff5500"} stroke={isGodMode ? "#aa0000" : "#cc5200"} strokeWidth="2" style={{transition: 'all 0.3s'}}/></motion.g>
             <ellipse cx="50" cy="65" rx="35" ry="25" fill={isGodMode ? "#ff0000" : "#ff6600"} style={{transition: 'fill 0.3s'}} />
             <ellipse cx="50" cy="70" rx="25" ry="12" fill={isGodMode ? "#ff3333" : "#ff8833"} opacity="0.6" style={{transition: 'fill 0.3s'}} />
-            {/* Angry face in god mode! */}
             <path d={isGodMode ? "M 35 75 Q 50 65 65 75" : "M 40 68 Q 50 78 60 68"} fill="none" stroke="#662200" strokeWidth="4" strokeLinecap="round" style={{transition: 'd 0.3s'}}/>
             <motion.g animate={isGodMode ? {} : { scaleY: [1, 0.1, 1, 1, 1, 1, 1] }} transition={isGodMode ? {} : { repeat: Infinity, duration: 3.5 }} style={{ transformOrigin: '50px 40px' }}>
               <path d="M 40 45 L 35 25 M 60 45 L 65 25" stroke={isGodMode ? "#ff0000" : "#ff6600"} strokeWidth="8" strokeLinecap="round" style={{transition: 'stroke 0.3s'}} />
