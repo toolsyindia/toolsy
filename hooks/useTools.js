@@ -5,10 +5,17 @@ export function useTools() {
   return useQuery({
     queryKey: ["tools"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("tools").select("*").order("id", { ascending: false });
+      const { data, error } = await supabase
+        .from("tools")
+        .select("*")
+        .order("id", { ascending: false });
       if (error) throw error;
       return data;
     },
+    // CTO FIX: Force fresh data on live site
+    staleTime: 0, 
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 }
 
