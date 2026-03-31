@@ -145,6 +145,7 @@ export default function Home() {
 
   const categories = useMemo(() => {
     if (!tools) return [];
+    // Force "All" and then Case-Insensitive Unique Categories
     return ["All", ...new Set(tools.map((t) => t.category))].sort();
   }, [tools]);
 
@@ -167,17 +168,28 @@ export default function Home() {
     if (!tools) return [];
     let result = [...tools];
     
+    // Normal Search Logic
     if (search.trim()) {
       const q = search.toLowerCase();
-      result = result.filter(t => t.name.toLowerCase().includes(q) || t.description.toLowerCase().includes(q) || t.category.toLowerCase().includes(q));
+      result = result.filter(t => 
+        t.name.toLowerCase().includes(q) || 
+        t.description.toLowerCase().includes(q) || 
+        (t.category && t.category.toLowerCase().includes(q))
+      );
       result.sort((a, b) => { const aSug = isSponsorshipActive(a, "suggested"); const bSug = isSponsorshipActive(b, "suggested"); return aSug === bSug ? 0 : aSug ? -1 : 1; });
     }
     
-    if (activeCategory && activeCategory !== "All") result = result.filter(t => t.category === activeCategory);
+    // Category Filter (CASE INSENSITIVE FIX)
+    if (activeCategory && activeCategory !== "All") {
+      result = result.filter(t => t.category && t.category.toLowerCase() === activeCategory.toLowerCase());
+    }
+    
     if (activeTab === "free") result = result.filter(t => t.pricing?.toLowerCase() === "free");
     else if (activeTab === "saved") result = result.filter(t => savedToolIds.includes(String(t.id)));
+    
     if (pricingFilter !== "All") result = result.filter(t => t.pricing?.toLowerCase() === pricingFilter.toLowerCase());
     
+    // Crab VIP Filter
     if (quizFilterTag) {
       const qt = quizFilterTag.toLowerCase();
       result = result.filter(t => 
@@ -199,8 +211,8 @@ export default function Home() {
   const rest = filtered.filter(t => !featured.includes(t));
   const visibleRest = rest.slice(0, displayLimit);
 
-  // CTO FIX: Intelligent "Empty Check" so the Lost Crab doesn't pop up on page load!
-  const isActuallyEmpty = !isLoading && filtered.length === 0 && (search.trim().length > 0 || quizFilterTag !== null);
+  // GHOST SEARCH FIX: Don't show "Not Found" while database is loading or before user acts.
+  const isActuallyEmpty = !isLoading && filtered.length === 0 && (search.trim().length > 0 || quizFilterTag !== null || (activeCategory && activeCategory !== "All"));
 
   return (
     <>
@@ -297,7 +309,6 @@ export default function Home() {
             </button>
             <div ref={categoryScrollRef} style={{ display: "flex", flexWrap: "nowrap", gap: "0.6rem", overflowX: "auto", paddingBottom: "0.5rem", scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch", width: "100%", padding: "0 1.5rem", scrollBehavior: "smooth" }}>
               {categories.map((cat) => {
-                if (cat === "website builder") return null;
                 const isActive = (activeCategory === cat) || (cat === "All" && activeCategory === null);
                 const displayCat = cat === "All" ? "🎯 All Goals" : (categoryMap[cat] || cat);
                 return (
@@ -345,7 +356,6 @@ export default function Home() {
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
               
-              {/* Show results if we HAVE tools */}
               {filtered.length > 0 ? (
                 <>
                   {activeTab === "all" && featured.length > 0 && !search && !quizFilterTag && (
@@ -375,7 +385,6 @@ export default function Home() {
                   </section>
                 </>
               ) : (
-                /* Only show the Lost Crab if the user ACTUALLY searched or used the quiz */
                 isActuallyEmpty ? (
                   <div style={{ textAlign: "center", padding: "6rem 1rem", border: "1px dashed rgba(255, 102, 0, 0.2)", borderRadius: "1.5rem", background: "rgba(255, 102, 0, 0.02)" }}>
                     <div style={{ fontSize: "56px", marginBottom: "1rem", filter: "drop-shadow(0 0 15px rgba(255,102,0,0.3))" }}>🦀❓</div>
@@ -383,12 +392,11 @@ export default function Home() {
                     <p style={{ color: "#9ca3af", marginBottom: "2rem", fontSize: "1rem", maxWidth: "400px", margin: "0 auto 2rem", lineHeight: "1.6" }}>
                       I searched the whole internet but couldn't find <span style={{ color: "white", fontWeight: "bold" }}>{search ? `"${search}"` : "anything matching that"}</span>. Want to explore our trending tools instead?
                     </p>
-                    <button onClick={() => { setSearch(""); clearQuizFilter(); setActiveTab("all"); }} style={{ padding: "0.875rem 1.75rem", background: "rgba(255,102,0,0.1)", color: "#ff6600", fontWeight: 800, borderRadius: "1rem", border: "1px solid rgba(255,102,0,0.3)", cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: "0.5rem", transition: "all 0.2s" }} onMouseOver={e=>{e.currentTarget.style.background="#ff6600"; e.currentTarget.style.color="#000"}} onMouseOut={e=>{e.currentTarget.style.background="rgba(255,102,0,0.1)"; e.currentTarget.style.color="#ff6600"}}>
+                    <button onClick={() => { setSearch(""); clearQuizFilter(); setActiveCategory(null); setActiveTab("all"); }} style={{ padding: "0.875rem 1.75rem", background: "rgba(255,102,0,0.1)", color: "#ff6600", fontWeight: 800, borderRadius: "1rem", border: "1px solid rgba(255,102,0,0.3)", cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: "0.5rem", transition: "all 0.2s" }} onMouseOver={e=>{e.currentTarget.style.background="#ff6600"; e.currentTarget.style.color="#000"}} onMouseOut={e=>{e.currentTarget.style.background="rgba(255,102,0,0.1)"; e.currentTarget.style.color="#ff6600"}}>
                       Reset & Explore Tools <ArrowRight size={16} />
                     </button>
                   </div>
                 ) : (
-                  /* While loading or just a blank start state (if tools haven't arrived yet) */
                   <SkeletonGrid />
                 )
               )}
